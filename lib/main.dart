@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pregnancy_mode_app/screen/thinq_main.dart';
 import 'home_screen.dart';
 import 'routine_screen.dart';
 import 'info_screen.dart';
@@ -27,7 +28,7 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
   Widget build(BuildContext context) {
     // 🔹 바텀 탭에 들어갈 실제 화면들 (항상 사용)
     final screens = [
-      HomeScreen(controller: controller),      // 메인 홈
+      const ThinqHomeScreen(),      // 메인 홈
       RoutineScreen(controller: controller),   // 가전 루틴
       InfoScreen(controller: controller),      // 임신 정보
     ];
