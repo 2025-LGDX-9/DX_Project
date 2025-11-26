@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pregnancy_mode_app/screens/nofification_screen.dart';
 
-import '../pregnancy_controller.dart';
+import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 import '../screens/onboarding_screen.dart';
 
 Widget _buildTopBackground() {
