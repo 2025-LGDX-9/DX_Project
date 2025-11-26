@@ -113,6 +113,7 @@ class HomeScreen extends StatelessWidget {
                                                         Icon(
                                                           Icons.pregnant_woman,
                                                         ),
+                                                        SizedBox(width: 10,),
                                                         Column(
                                                           crossAxisAlignment:
                                                           CrossAxisAlignment
@@ -171,6 +172,7 @@ class HomeScreen extends StatelessWidget {
                                                             0xff43BA84,
                                                           ),
                                                         ),
+                                                        SizedBox(width: 10,),
                                                         Column(
                                                           crossAxisAlignment:
                                                           CrossAxisAlignment
@@ -230,6 +232,7 @@ class HomeScreen extends StatelessWidget {
                                                             0xffDB4F4F,
                                                           ),
                                                         ),
+                                                        SizedBox(width: 10,),
                                                         Column(
                                                           crossAxisAlignment:
                                                           CrossAxisAlignment
@@ -289,6 +292,7 @@ class HomeScreen extends StatelessWidget {
                                                                   0xff7B60EB,
                                                                 ),
                                                               ),
+                                                              SizedBox(width: 10,),
                                                               Column(
                                                                 crossAxisAlignment:
                                                                 CrossAxisAlignment
@@ -327,6 +331,7 @@ class HomeScreen extends StatelessWidget {
                                                                 0xff436AE5,
                                                               ),
                                                             ),
+                                                            SizedBox(width: 10,),
                                                             Column(
                                                               crossAxisAlignment:
                                                               CrossAxisAlignment
@@ -362,6 +367,7 @@ class HomeScreen extends StatelessWidget {
                                                                 0xff4EB1FF,
                                                               ),
                                                             ),
+                                                            SizedBox(width: 10,),
                                                             Column(
                                                               crossAxisAlignment:
                                                               CrossAxisAlignment
@@ -417,6 +423,7 @@ class HomeScreen extends StatelessWidget {
                                                                   0xff909090,
                                                                 ),
                                                               ),
+                                                              SizedBox(width: 10,),
                                                               Column(
                                                                 crossAxisAlignment:
                                                                 CrossAxisAlignment
@@ -455,6 +462,7 @@ class HomeScreen extends StatelessWidget {
                                                                 0xff0298EB,
                                                               ),
                                                             ),
+                                                            SizedBox(width: 10,),
                                                             Column(
                                                               crossAxisAlignment:
                                                               CrossAxisAlignment
@@ -530,7 +538,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          PopupMenuDivider(height: 1),
+                          PopupMenuDivider(height: 1, color: Colors.white24,),
                           PopupMenuItem(
                             child: Padding(
                               padding: EdgeInsets.all(10),
