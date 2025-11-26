@@ -667,8 +667,11 @@ class ThinqHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMainBanner({required String title, required String buttonText, required String imagePath}) {
-
+  Widget _buildMainBanner({
+    required String title,
+    required String buttonText,
+    required String imagePath,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       padding: const EdgeInsets.all(18),
@@ -677,16 +680,64 @@ class ThinqHomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Text(title,
-                style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.4)),
+          // 🔵 왼쪽 이미지 추가
+          Image.asset(
+            imagePath,
+            width: 70,
+            height: 70,
+            fit: BoxFit.contain,
           ),
-          const SizedBox(width: 10),
+
+          const SizedBox(width: 16),
+
+          // 🔵 오른쪽 텍스트 + 버튼
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    height: 1.4,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3446EB),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 22,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                  ),
+                  onPressed: () {},
+                  child: Text(
+                    buttonText,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
+
 
   Widget _sectionTitle(String title) {
     return Padding(
