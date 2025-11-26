@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:pregnancy_mode_app/home_screen.dart';
-import 'package:pregnancy_mode_app/routine_screen.dart';
-import 'package:pregnancy_mode_app/info_screen.dart';
+import 'package:pregnancy_mode_app/screens/home_screen.dart';
+import 'package:pregnancy_mode_app/screens/routine_screen.dart';
+import 'package:pregnancy_mode_app/screens/info_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
-import 'package:pregnancy_mode_app/menu_screen.dart';
+import 'package:pregnancy_mode_app/screens/menu_screen.dart';
 
 void main() {
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pregnancy_mode_app/onboarding_screen.dart';
+import 'package:pregnancy_mode_app/screens/onboarding_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 
 /// 가전 루틴 화면
