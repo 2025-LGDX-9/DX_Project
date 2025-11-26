@@ -24,9 +24,13 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 상단 태명 + D-day
             Text(
               babyName,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
@@ -36,10 +40,16 @@ class HomeScreen extends StatelessWidget {
               style: TextStyle(color: Colors.grey.shade700),
             ),
             const SizedBox(height: 16),
+
+            // 태아 카드
             _buildBabyCard(weeks),
             const SizedBox(height: 24),
-            const Text('임신 주차 꿀팁',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+            // 임신 주차 꿀팁
+            const Text(
+              '임신 주차 꿀팁',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             const _TipCard(
               title: '오늘의 생활 꿀팁',
@@ -47,17 +57,25 @@ class HomeScreen extends StatelessWidget {
               buttonText: '오늘의 영양제 추천 보기',
               icon: Icons.medication_outlined,
             ),
+
+            // 🔻 기존의 "에어컨 온도 조절" 영역은 제거됨 🔻
+            // const SizedBox(height: 24),
+            // const Text('에어컨 온도 조절',
+            //     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            // const SizedBox(height: 8),
+            // const _TemperatureControl(),
+
             const SizedBox(height: 24),
-            const Text('에어컨 온도 조절',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const _TemperatureControl(),
+
+            // 즐겨 찾는 제품 섹션
+            _buildFavoriteDevicesSection(),
           ],
         ),
       ),
     );
   }
 
+  /// 태아 카드 위젯
   Widget _buildBabyCard(int weeks) {
     return Container(
       width: double.infinity,
@@ -76,8 +94,7 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: const Color(0xfffde4ea),
               borderRadius: BorderRadius.circular(16),
@@ -91,7 +108,7 @@ class HomeScreen extends StatelessWidget {
           SizedBox(
             height: 160,
             child: Image.asset(
-              'assets/images/baby.png', // 네가 넣은 태아 이미지
+              'assets/images/baby.png', // 태아 이미지
               fit: BoxFit.contain,
             ),
           ),
@@ -106,6 +123,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
+/// 임신 주차 꿀팁 카드
 class _TipCard extends StatelessWidget {
   final String title;
   final String description;
@@ -138,7 +156,10 @@ class _TipCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 4),
           Text(description),
           const SizedBox(height: 12),
@@ -160,38 +181,103 @@ class _TipCard extends StatelessWidget {
   }
 }
 
-class _TemperatureControl extends StatefulWidget {
-  const _TemperatureControl();
+/// 홈 화면에서 즐겨 찾는 제품 영역
+Widget _buildFavoriteDevicesSection() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        '즐겨 찾는 제품',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      const SizedBox(height: 12),
 
-  @override
-  State<_TemperatureControl> createState() => _TemperatureControlState();
+      // 가로 스크롤 카드 리스트
+      SizedBox(
+        height: 110,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: const [
+            FavoriteDeviceCard(
+              name: '냉장고',
+              status: '냉장 온도 3℃',
+              icon: Icons.kitchen,
+            ),
+            FavoriteDeviceCard(
+              name: '전기레인지',
+              status: '보온 모드',
+              icon: Icons.microwave,
+            ),
+            FavoriteDeviceCard(
+              name: 'TV',
+              status: '꺼짐',
+              icon: Icons.tv,
+            ),
+            FavoriteDeviceCard(
+              name: '공기청정기',
+              status: '케어 중',
+              icon: Icons.air,
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
 }
 
-class _TemperatureControlState extends State<_TemperatureControl> {
-  double _value = 25;
+/// 즐겨 찾는 제품 카드
+class FavoriteDeviceCard extends StatelessWidget {
+  final String name;
+  final String status;
+  final IconData icon;
+
+  const FavoriteDeviceCard({
+    super.key,
+    required this.name,
+    required this.status,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('권장 범위: 24–26°C'),
-        const SizedBox(height: 8),
-        Text(
-          '${_value.toStringAsFixed(0)}°C',
-          style:
-          const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        Slider(
-          value: _value,
-          min: 18,
-          max: 30,
-          onChanged: (v) {
-            setState(() => _value = v);
-          },
-        ),
-        const Text('적정 온도입니다. 몸이 춥거나 덥지 않은지 한 번 더 체크해 주세요.'),
-      ],
+    return Container(
+      width: 110,
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 28),
+          Text(
+            name,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            status,
+            style: const TextStyle(
+              fontSize: 11,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
