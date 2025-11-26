@@ -115,6 +115,7 @@ class InfoScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: GridView.count(
+                childAspectRatio: 0.8,
                 crossAxisCount: 4,
                 children: const [
                   _InfoIconButton(

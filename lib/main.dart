@@ -37,7 +37,6 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
     return MaterialApp(
       theme: ThemeData(useMaterial3: false),
       debugShowCheckedModeBanner: false,
-      // theme: ThemeData(useMaterial3: false),
       home: Scaffold(
         body: SafeArea(child: screens[_selectedIndex],),
         bottomNavigationBar: BottomNavigationBar(

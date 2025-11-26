@@ -15,6 +15,7 @@ class RoutineScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xffFAF0F0),
       body: Column(
         children: [
           Padding(
