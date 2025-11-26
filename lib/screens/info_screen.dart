@@ -9,99 +9,114 @@ class InfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6F9),
-      appBar: AppBar(
-        title: const Text('임신 관련 정보'),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 상단 추천 카드 (스트레스 완화 콘텐츠)
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+      body: Column(
+        children: [
+          // 상단 타이틀
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+            child: Row(
+              children: [
+                Text(
+                  "임신 관련 정보",
+                  style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 배경 일러스트
-                    AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: Image.asset(
-                        'assets/images/meditation.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '스트레스 완화 콘텐츠 추천',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          SizedBox(height: 6),
-                          Text(
-                            '집에서 따라하는 10분 명상',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            '간단한 호흡과 스트레칭으로 몸과 마음을 함께 풀어주세요.',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
                 ),
-              ),
+              ],
             ),
+          ),
 
-            const SizedBox(height: 24),
+          // 상단 콘텐츠 + 제목 묶음
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,   // ★ 필수: Column이 높이를 무한대로 차지하지 않음
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 상단 추천 카드
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AspectRatio(
+                          aspectRatio: 16 / 9,
+                          child: Image.asset(
+                            'assets/images/meditation.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          child: const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '스트레스 완화 콘텐츠 추천',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                '집에서 따라하는 10분 명상',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                '간단한 호흡과 스트레칭으로 몸과 마음을 함께 풀어주세요.',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
 
-            const Text(
-              '정보 제공 페이지',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
+                const SizedBox(height: 24),
+
+                const Text(
+                  '정보 제공 페이지',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
             ),
-            const SizedBox(height: 16),
+          ),
 
-            // 여기서부터 아이콘 버튼들 (전처럼 버튼 이미지 형태)
-            Expanded(
+          // 하단 GridView (남은 공간만 차지)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: GridView.count(
                 crossAxisCount: 4,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 12,
-                children: [
+                children: const [
                   _InfoIconButton(
                     imagePath: 'assets/images/info_week.png',
                     label: '주차별\n건강 정보',
@@ -137,14 +152,13 @@ class InfoScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-/// 작은 카드 모양 아이콘 버튼 위젯
 class _InfoIconButton extends StatelessWidget {
   final String imagePath;
   final String label;
@@ -158,7 +172,6 @@ class _InfoIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // TODO: 이 부분에 각 상세 페이지로 이동 로직 나중에 추가하면 됨
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('$label 페이지는 아직 준비 중이에요.')),
         );

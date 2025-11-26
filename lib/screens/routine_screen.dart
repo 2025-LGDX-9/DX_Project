@@ -14,39 +14,53 @@ class RoutineScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('가전 루틴'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 0,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          // 🔹 헤더 부분 (텍스트 전체가 버튼처럼 동작)
-          _RoutineHeader(controller: controller),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+            child: Row(
+              children: [
+                Text(
+                  "가전 루틴",
+                  style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                // 🔹 헤더 부분 (텍스트 전체가 버튼처럼 동작)
+                _RoutineHeader(controller: controller),
 
-          const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-          const _DeviceTile(
-            name: '에어컨',
-            description: '온도 조절: 24–26°C 유지',
-            icon: Icons.ac_unit,
-          ),
-          const _DeviceTile(
-            name: '공기청정기',
-            description: '냄새 제거 모드로 켜짐',
-            icon: Icons.air,
-          ),
-          const _DeviceTile(
-            name: '가습기',
-            description: '습도 조절: 40–60% 유지',
-            icon: Icons.grain,
-          ),
-          const _DeviceTile(
-            name: '로봇청소기',
-            description: '오전 10시, 오후 5시 작동',
-            icon: Icons.cleaning_services_outlined,
+                const _DeviceTile(
+                  name: '에어컨',
+                  description: '온도 조절: 24–26°C 유지',
+                  icon: Icons.ac_unit,
+                ),
+                const _DeviceTile(
+                  name: '공기청정기',
+                  description: '냄새 제거 모드로 켜짐',
+                  icon: Icons.air,
+                ),
+                const _DeviceTile(
+                  name: '가습기',
+                  description: '습도 조절: 40–60% 유지',
+                  icon: Icons.grain,
+                ),
+                const _DeviceTile(
+                  name: '로봇청소기',
+                  description: '오전 10시, 오후 5시 작동',
+                  icon: Icons.cleaning_services_outlined,
+                ),
+              ],
+            ),
           ),
         ],
       ),

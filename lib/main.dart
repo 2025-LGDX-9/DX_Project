@@ -6,7 +6,6 @@ import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 import 'package:pregnancy_mode_app/screens/menu_screen.dart';
 
 void main() {
-
   runApp(const PregnancyModeApp());
 }
 
