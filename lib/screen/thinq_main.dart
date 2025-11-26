@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pregnancy_mode_app/screens/nofification_screen.dart';
+
+import '../pregnancy_controller.dart';
+import '../screens/onboarding_screen.dart';
 
 Widget _buildTopBackground() {
   return Container(
@@ -13,7 +17,7 @@ Widget _buildTopBackground() {
           Color(0xFF0D1A3A), // 어두운 네이비 (아래)
         ],
       ),
-      borderRadius: BorderRadius.only(
+        borderRadius: BorderRadius.only(
         bottomLeft: Radius.circular(40),
         bottomRight: Radius.circular(40),
       ),
@@ -23,7 +27,9 @@ Widget _buildTopBackground() {
 
 
 class ThinqHomeScreen extends StatelessWidget {
-  const ThinqHomeScreen({super.key});
+  const ThinqHomeScreen({super.key, required this.controller});
+  final PregnancyController controller;
+
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +45,529 @@ class ThinqHomeScreen extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: [Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
                     _buildUserHomeTitle(),
+                    Row(
+                      children: [
+                        // 추가 등록 버튼
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true, // ★ 패널 높이 직접 제어 가능
+                                backgroundColor: Colors.transparent,
+                                builder: (context) {
+                                  return Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xffEFF1F4),
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(24), // ★ 위쪽만 둥글게
+                                      ),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(height: 12),
+                                        Container(
+                                          width: 40,
+                                          height: 5,
+                                          decoration: BoxDecoration(
+                                            color: Colors.black26,
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 16),
+                                        // ★ 내부 내용
+                                        Padding(
+                                          padding: EdgeInsets.all(20),
+                                          child: Column(
+                                            children: [
+                                              //임산부 등록 버튼
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: InkWell(
+                                                  onTap: () {Navigator.push(context, MaterialPageRoute(builder: (_)=>OnboardingScreen(controller: controller,onCompleted: (){},)));},
+                                                  child: Ink(
+                                                    width: MediaQuery.of(
+                                                      context,
+                                                    ).size.width,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                      BorderRadius.circular(
+                                                        20,
+                                                      ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: EdgeInsets.all(20),
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                        children: [
+                                                          Icon(
+                                                            Icons.pregnant_woman,
+                                                          ),
+                                                          SizedBox(width: 10,),
+                                                          Column(
+                                                            crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                            children: [
+                                                              Text(
+                                                                "임산부 모드",
+                                                                style: TextStyle(
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                "설명",
+                                                                style: TextStyle(
+                                                                  fontSize: 15,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 12),
+                                              //제품 추가 버튼
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: InkWell(
+                                                  onTap: () {},
+                                                  child: Ink(
+                                                    width: MediaQuery.of(
+                                                      context,
+                                                    ).size.width,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                      BorderRadius.circular(
+                                                        20,
+                                                      ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: EdgeInsets.all(20),
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                        children: [
+                                                          Icon(
+                                                            Icons.add_circle,
+                                                            color: Color(
+                                                              0xff43BA84,
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 10,),
+                                                          Column(
+                                                            crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                            children: [
+                                                              Text(
+                                                                "제품 추가",
+                                                                style: TextStyle(
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                "LG와 다양한 브랜드의 제품",
+                                                                style: TextStyle(
+                                                                  fontSize: 15,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 12),
+                                              //씽큐 플레이
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: InkWell(
+                                                  onTap: () {},
+                                                  child: Ink(
+                                                    width: MediaQuery.of(
+                                                      context,
+                                                    ).size.width,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                      BorderRadius.circular(
+                                                        20,
+                                                      ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: EdgeInsets.all(20),
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .add_home_outlined,
+                                                            color: Color(
+                                                              0xffDB4F4F,
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 10,),
+                                                          Column(
+                                                            crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                            children: [
+                                                              Text(
+                                                                "ThinQ PLAY",
+                                                                style: TextStyle(
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                "앱 다운로드와 제품 업그레이드",
+                                                                style: TextStyle(
+                                                                  fontSize: 15,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 12),
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: Ink(
+                                                  width: MediaQuery.of(
+                                                    context,
+                                                  ).size.width,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                    BorderRadius.circular(20),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: EdgeInsets.all(20),
+                                                    child: Column(
+                                                      children: [
+                                                        InkWell(
+                                                          onTap: () {},
+                                                          child: Ink(
+                                                            child: Row(
+                                                              crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                              children: [
+                                                                Icon(
+                                                                  Icons
+                                                                      .check_circle_rounded,
+                                                                  color: Color(
+                                                                    0xff7B60EB,
+                                                                  ),
+                                                                ),
+                                                                SizedBox(width: 10,),
+                                                                Column(
+                                                                  crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                                  children: [
+                                                                    Text(
+                                                                      "루틴 만들기",
+                                                                      style: TextStyle(
+                                                                        fontSize:
+                                                                        20,
+                                                                        fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 12),
+                                                        Divider(height: 1),
+                                                        SizedBox(height: 12),
+                                                        InkWell(
+                                                          onTap: (){},
+                                                          child: Row(
+                                                            crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                            children: [
+                                                              Icon(
+                                                                Icons
+                                                                    .add_home_work_rounded,
+                                                                color: Color(
+                                                                  0xff436AE5,
+                                                                ),
+                                                              ),
+                                                              SizedBox(width: 10,),
+                                                              Column(
+                                                                crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                                children: [
+                                                                  Text(
+                                                                    "우리 단지 연결",
+                                                                    style: TextStyle(
+                                                                      fontSize: 20,
+                                                                      fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 12),
+                                                        Divider(height: 1),
+                                                        SizedBox(height: 12),
+                                                        InkWell(
+                                                          onTap: (){},
+                                                          child: Row(
+                                                            crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                            children: [
+                                                              Icon(
+                                                                Icons.drafts,
+                                                                color: Color(
+                                                                  0xff4EB1FF,
+                                                                ),
+                                                              ),
+                                                              SizedBox(width: 10,),
+                                                              Column(
+                                                                crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                                children: [
+                                                                  Text(
+                                                                    "3D 홈뷰 만들기",
+                                                                    style: TextStyle(
+                                                                      fontSize: 20,
+                                                                      fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 12),
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: Ink(
+                                                  width: MediaQuery.of(
+                                                    context,
+                                                  ).size.width,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                    BorderRadius.circular(20),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: EdgeInsets.all(20),
+                                                    child: Column(
+                                                      children: [
+                                                        InkWell(
+                                                          onTap: () {},
+                                                          child: Ink(
+                                                            child: Row(
+                                                              crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                              children: [
+                                                                Icon(
+                                                                  Icons
+                                                                      .person_add,
+                                                                  color: Color(
+                                                                    0xff909090,
+                                                                  ),
+                                                                ),
+                                                                SizedBox(width: 10,),
+                                                                Column(
+                                                                  crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                                  children: [
+                                                                    Text(
+                                                                      "멤버 초대",
+                                                                      style: TextStyle(
+                                                                        fontSize:
+                                                                        20,
+                                                                        fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 12),
+                                                        Divider(height: 1),
+                                                        SizedBox(height: 12),
+                                                        InkWell(
+                                                          onTap: (){},
+                                                          child: Row(
+                                                            crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                            children: [
+                                                              Icon(
+                                                                Icons
+                                                                    .add_home,
+                                                                color: Color(
+                                                                  0xff0298EB,
+                                                                ),
+                                                              ),
+                                                              SizedBox(width: 10,),
+                                                              Column(
+                                                                crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                                children: [
+                                                                  Text(
+                                                                    "새로운 홈 만들기",
+                                                                    style: TextStyle(
+                                                                      fontSize: 20,
+                                                                      fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            child: Image.asset(
+                              "assets/images/pregnant_register.png",
+                              width: 30,
+                              height: 30,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10,),
+                        // 알림 버튼
+                        GestureDetector(
+                          onTap: ()=>{Navigator.push(context, MaterialPageRoute(builder: (_)=>notification()))},
+                          child: Image.asset(
+                            "assets/images/notification.png",
+                            width: 25,
+                            height: 25,
+                          ),
+                        ),
+                        SizedBox(width: 10,),
+                        // 메뉴 버튼
+                        PopupMenuButton(
+                          offset: Offset(0, 40),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          color: Color(0xff2E2E2E),
+                          itemBuilder: (context) => <PopupMenuEntry>[
+                            PopupMenuItem(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "화면 편집",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    Icon(Icons.edit, color: Colors.white),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            PopupMenuDivider(height: 1, color: Colors.white24,),
+                            PopupMenuItem(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "홈 설정",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    Icon(Icons.settings, color: Colors.white),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                          child: Image.asset(
+                            "assets/images/menu.png",
+                            width: 30,
+                            height: 30,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],),
+
 
                     const SizedBox(height: 10),
 
@@ -116,6 +643,7 @@ class ThinqHomeScreen extends StatelessWidget {
               Icon(Icons.notifications_outlined, color: Colors.white, size: 26),
             ],
           ),
+
         ],
       ),
     );
@@ -133,6 +661,8 @@ class ThinqHomeScreen extends StatelessWidget {
           SizedBox(width: 5),
           Icon(Icons.arrow_drop_down, color: Colors.white, size: 30),
         ],
+
+
       ),
     );
   }
