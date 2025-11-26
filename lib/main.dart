@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
-import 'routine_screen.dart';
-import 'info_screen.dart';
-import 'pregnancy_controller.dart';
+import 'package:pregnancy_mode_app/home_screen.dart';
+import 'package:pregnancy_mode_app/routine_screen.dart';
+import 'package:pregnancy_mode_app/info_screen.dart';
+import 'package:pregnancy_mode_app/pregnancy_controller.dart';
+import 'package:pregnancy_mode_app/menu_screen.dart';
 
 void main() {
+
   runApp(const PregnancyModeApp());
 }
 
@@ -30,29 +32,39 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
       HomeScreen(controller: controller),      // 메인 홈
       RoutineScreen(controller: controller),   // 가전 루틴
       InfoScreen(controller: controller),      // 임신 정보
+      MenuScreen(),
     ];
 
     return MaterialApp(
+      theme: ThemeData(useMaterial3: false),
       debugShowCheckedModeBanner: false,
+      // theme: ThemeData(useMaterial3: false),
       home: Scaffold(
-        body: screens[_selectedIndex],
+        body: SafeArea(child: screens[_selectedIndex],),
         bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Colors.black, // 선택된 아이템의 아이콘 및 레이블 색상 변경
+          selectedLabelStyle: TextStyle(color: Colors.black), // 선택된 아이템의 레이블 색상 변경
           currentIndex: _selectedIndex,
           onTap: (idx) {
             setState(() => _selectedIndex = idx);
           },
-          items: const [
+          items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: '홈',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.devices_other),
-              label: '가전 루틴',
+              icon: Icon(Icons.dashboard_outlined),
+              label: "디바이스",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.info_outline),
+              icon: Icon(Icons.menu_book),
               label: '정보',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.menu),
+              label: '메뉴',
             ),
           ],
         ),

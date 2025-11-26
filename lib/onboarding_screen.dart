@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pregnancy_controller.dart';
+import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final PregnancyController controller;
