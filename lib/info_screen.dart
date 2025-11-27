@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'pregnancy_controller.dart';
 
-// ⬇️ 네가 실제로 가진 파일 이름에 맞게 수정된 부분
+// 네가 가진 다른 화면들
 import 'week_health_screen.dart';
 import 'nutrition_guide_screen.dart';
 import 'government_support_screen.dart';
@@ -59,7 +59,8 @@ class InfoScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => WeekHealthScreen(weeks: controller.weeks),
+                // 🔥 weeks 말고 controller 전체 전달!
+                builder: (_) => WeekHealthScreen(controller: controller),
               ),
             );
           },
@@ -248,7 +249,11 @@ class CategoryButton extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Icon(icon, size: 30, color: const Color(0xff7b5cff)),
+              child: Icon(
+                icon,
+                size: 30,
+                color: const Color(0xff7b5cff),
+              ),
             ),
             const SizedBox(height: 6),
             Text(
