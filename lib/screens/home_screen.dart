@@ -91,7 +91,19 @@ class HomeScreen extends StatelessWidget {
                                             Material(
                                               color: Colors.transparent,
                                               child: InkWell(
-                                                onTap: () {Navigator.push(context, MaterialPageRoute(builder: (_)=>OnboardingScreen(controller: controller,onCompleted: (){},)));},
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (_) =>
+                                                          OnboardingScreen(
+                                                            controller:
+                                                                controller,
+                                                            onCompleted: () {},
+                                                          ),
+                                                    ),
+                                                  );
+                                                },
                                                 child: Ink(
                                                   width: MediaQuery.of(
                                                     context,
@@ -99,33 +111,33 @@ class HomeScreen extends StatelessWidget {
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                      20,
-                                                    ),
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
                                                   ),
                                                   child: Padding(
                                                     padding: EdgeInsets.all(20),
                                                     child: Row(
                                                       crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .center,
+                                                          CrossAxisAlignment
+                                                              .center,
                                                       children: [
                                                         Icon(
                                                           Icons.pregnant_woman,
                                                         ),
-                                                        SizedBox(width: 10,),
+                                                        SizedBox(width: 10),
                                                         Column(
                                                           crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Text(
                                                               "임산부 모드",
                                                               style: TextStyle(
                                                                 fontSize: 20,
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                    FontWeight
+                                                                        .bold,
                                                               ),
                                                             ),
                                                             Text(
@@ -155,16 +167,16 @@ class HomeScreen extends StatelessWidget {
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                      20,
-                                                    ),
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
                                                   ),
                                                   child: Padding(
                                                     padding: EdgeInsets.all(20),
                                                     child: Row(
                                                       crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .center,
+                                                          CrossAxisAlignment
+                                                              .center,
                                                       children: [
                                                         Icon(
                                                           Icons.add_circle,
@@ -172,19 +184,19 @@ class HomeScreen extends StatelessWidget {
                                                             0xff43BA84,
                                                           ),
                                                         ),
-                                                        SizedBox(width: 10,),
+                                                        SizedBox(width: 10),
                                                         Column(
                                                           crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Text(
                                                               "제품 추가",
                                                               style: TextStyle(
                                                                 fontSize: 20,
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                    FontWeight
+                                                                        .bold,
                                                               ),
                                                             ),
                                                             Text(
@@ -214,16 +226,16 @@ class HomeScreen extends StatelessWidget {
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                      20,
-                                                    ),
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
                                                   ),
                                                   child: Padding(
                                                     padding: EdgeInsets.all(20),
                                                     child: Row(
                                                       crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .center,
+                                                          CrossAxisAlignment
+                                                              .center,
                                                       children: [
                                                         Icon(
                                                           Icons
@@ -232,19 +244,19 @@ class HomeScreen extends StatelessWidget {
                                                             0xffDB4F4F,
                                                           ),
                                                         ),
-                                                        SizedBox(width: 10,),
+                                                        SizedBox(width: 10),
                                                         Column(
                                                           crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Text(
                                                               "ThinQ PLAY",
                                                               style: TextStyle(
                                                                 fontSize: 20,
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                    FontWeight
+                                                                        .bold,
                                                               ),
                                                             ),
                                                             Text(
@@ -271,7 +283,7 @@ class HomeScreen extends StatelessWidget {
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                  BorderRadius.circular(20),
+                                                      BorderRadius.circular(20),
                                                 ),
                                                 child: Padding(
                                                   padding: EdgeInsets.all(20),
@@ -282,8 +294,8 @@ class HomeScreen extends StatelessWidget {
                                                         child: Ink(
                                                           child: Row(
                                                             crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
+                                                                CrossAxisAlignment
+                                                                    .center,
                                                             children: [
                                                               Icon(
                                                                 Icons
@@ -292,20 +304,22 @@ class HomeScreen extends StatelessWidget {
                                                                   0xff7B60EB,
                                                                 ),
                                                               ),
-                                                              SizedBox(width: 10,),
+                                                              SizedBox(
+                                                                width: 10,
+                                                              ),
                                                               Column(
                                                                 crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
+                                                                    CrossAxisAlignment
+                                                                        .start,
                                                                 children: [
                                                                   Text(
                                                                     "루틴 만들기",
                                                                     style: TextStyle(
                                                                       fontSize:
-                                                                      20,
+                                                                          20,
                                                                       fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                                                          FontWeight
+                                                                              .bold,
                                                                     ),
                                                                   ),
                                                                 ],
@@ -318,11 +332,11 @@ class HomeScreen extends StatelessWidget {
                                                       Divider(height: 1),
                                                       SizedBox(height: 12),
                                                       InkWell(
-                                                        onTap: (){},
+                                                        onTap: () {},
                                                         child: Row(
                                                           crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
+                                                              CrossAxisAlignment
+                                                                  .center,
                                                           children: [
                                                             Icon(
                                                               Icons
@@ -331,19 +345,20 @@ class HomeScreen extends StatelessWidget {
                                                                 0xff436AE5,
                                                               ),
                                                             ),
-                                                            SizedBox(width: 10,),
+                                                            SizedBox(width: 10),
                                                             Column(
                                                               crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                                  CrossAxisAlignment
+                                                                      .start,
                                                               children: [
                                                                 Text(
                                                                   "우리 단지 연결",
                                                                   style: TextStyle(
-                                                                    fontSize: 20,
+                                                                    fontSize:
+                                                                        20,
                                                                     fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                        FontWeight
+                                                                            .bold,
                                                                   ),
                                                                 ),
                                                               ],
@@ -355,11 +370,11 @@ class HomeScreen extends StatelessWidget {
                                                       Divider(height: 1),
                                                       SizedBox(height: 12),
                                                       InkWell(
-                                                        onTap: (){},
+                                                        onTap: () {},
                                                         child: Row(
                                                           crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
+                                                              CrossAxisAlignment
+                                                                  .center,
                                                           children: [
                                                             Icon(
                                                               Icons.drafts,
@@ -367,19 +382,20 @@ class HomeScreen extends StatelessWidget {
                                                                 0xff4EB1FF,
                                                               ),
                                                             ),
-                                                            SizedBox(width: 10,),
+                                                            SizedBox(width: 10),
                                                             Column(
                                                               crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                                  CrossAxisAlignment
+                                                                      .start,
                                                               children: [
                                                                 Text(
                                                                   "3D 홈뷰 만들기",
                                                                   style: TextStyle(
-                                                                    fontSize: 20,
+                                                                    fontSize:
+                                                                        20,
                                                                     fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                        FontWeight
+                                                                            .bold,
                                                                   ),
                                                                 ),
                                                               ],
@@ -402,7 +418,7 @@ class HomeScreen extends StatelessWidget {
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                  BorderRadius.circular(20),
+                                                      BorderRadius.circular(20),
                                                 ),
                                                 child: Padding(
                                                   padding: EdgeInsets.all(20),
@@ -413,8 +429,8 @@ class HomeScreen extends StatelessWidget {
                                                         child: Ink(
                                                           child: Row(
                                                             crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
+                                                                CrossAxisAlignment
+                                                                    .center,
                                                             children: [
                                                               Icon(
                                                                 Icons
@@ -423,20 +439,22 @@ class HomeScreen extends StatelessWidget {
                                                                   0xff909090,
                                                                 ),
                                                               ),
-                                                              SizedBox(width: 10,),
+                                                              SizedBox(
+                                                                width: 10,
+                                                              ),
                                                               Column(
                                                                 crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
+                                                                    CrossAxisAlignment
+                                                                        .start,
                                                                 children: [
                                                                   Text(
                                                                     "멤버 초대",
                                                                     style: TextStyle(
                                                                       fontSize:
-                                                                      20,
+                                                                          20,
                                                                       fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                                                          FontWeight
+                                                                              .bold,
                                                                     ),
                                                                   ),
                                                                 ],
@@ -449,32 +467,32 @@ class HomeScreen extends StatelessWidget {
                                                       Divider(height: 1),
                                                       SizedBox(height: 12),
                                                       InkWell(
-                                                        onTap: (){},
+                                                        onTap: () {},
                                                         child: Row(
                                                           crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
+                                                              CrossAxisAlignment
+                                                                  .center,
                                                           children: [
                                                             Icon(
-                                                              Icons
-                                                                  .add_home,
+                                                              Icons.add_home,
                                                               color: Color(
                                                                 0xff0298EB,
                                                               ),
                                                             ),
-                                                            SizedBox(width: 10,),
+                                                            SizedBox(width: 10),
                                                             Column(
                                                               crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                                  CrossAxisAlignment
+                                                                      .start,
                                                               children: [
                                                                 Text(
                                                                   "새로운 홈 만들기",
                                                                   style: TextStyle(
-                                                                    fontSize: 20,
+                                                                    fontSize:
+                                                                        20,
                                                                     fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                        FontWeight
+                                                                            .bold,
                                                                   ),
                                                                 ),
                                                               ],
@@ -503,17 +521,22 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(width: 10),
                       // 알림 버튼
                       GestureDetector(
-                        onTap: ()=>{Navigator.push(context, MaterialPageRoute(builder: (_)=>notification()))},
+                        onTap: () => {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => notification()),
+                          ),
+                        },
                         child: Image.asset(
                           "assets/images/notification.png",
                           width: 25,
                           height: 25,
                         ),
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(width: 10),
                       // 메뉴 버튼
                       PopupMenuButton(
                         offset: Offset(0, 40),
@@ -527,7 +550,7 @@ class HomeScreen extends StatelessWidget {
                               padding: EdgeInsets.all(10),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "화면 편집",
@@ -538,13 +561,13 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          PopupMenuDivider(height: 1, color: Colors.white24,),
+                          PopupMenuDivider(height: 1, color: Colors.white24),
                           PopupMenuItem(
                             child: Padding(
                               padding: EdgeInsets.all(10),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "홈 설정",
@@ -567,7 +590,7 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 10,),
+            SizedBox(height: 10),
             Flexible(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
@@ -576,7 +599,10 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Text(
                       babyName,
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -588,8 +614,13 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _buildBabyCard(weeks),
                     const SizedBox(height: 24),
-                    const Text('임신 주차 꿀팁',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text(
+                      '임신 주차 꿀팁',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     const _TipCard(
                       title: '오늘의 생활 꿀팁',
@@ -598,10 +629,16 @@ class HomeScreen extends StatelessWidget {
                       icon: Icons.medication_outlined,
                     ),
                     const SizedBox(height: 24),
-                    const Text('에어컨 온도 조절',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    const _TemperatureControl(),
+                    // const Text(
+                    //   '에어컨 온도 조절',
+                    //   style: TextStyle(
+                    //     fontSize: 18,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 8),
+                    // const _TemperatureControl(),
+                    _buildFavoriteDevicesSection(),
                   ],
                 ),
               ),
@@ -630,8 +667,7 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: const Color(0xfffde4ea),
               borderRadius: BorderRadius.circular(16),
@@ -701,8 +737,7 @@ class _TipCard extends StatelessWidget {
             icon: Icon(icon, size: 18),
             label: Text(buttonText),
             style: OutlinedButton.styleFrom(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(999),
               ),
@@ -733,8 +768,7 @@ class _TemperatureControlState extends State<_TemperatureControl> {
         const SizedBox(height: 8),
         Text(
           '${_value.toStringAsFixed(0)}°C',
-          style:
-          const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         Slider(
           value: _value,
@@ -748,4 +782,102 @@ class _TemperatureControlState extends State<_TemperatureControl> {
       ],
     );
   }
+}
+
+class FavoriteDeviceCard extends StatelessWidget {
+  final String name;
+  final String status;
+  final IconData icon;
+
+  const FavoriteDeviceCard({
+    super.key,
+    required this.name,
+    required this.status,
+    required this.icon,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 110,
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 28),
+          Text(
+            name,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            status,
+            style: const TextStyle(
+              fontSize: 11,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Widget _buildFavoriteDevicesSection() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        '즐겨 찾는 제품',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      const SizedBox(height: 12),
+
+      // 가로 스크롤 카드 리스트
+      SizedBox(
+        height: 110,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: const [
+            FavoriteDeviceCard(
+              name: '냉장고',
+              status: '냉장 온도 3℃',
+              icon: Icons.kitchen,
+            ),
+            FavoriteDeviceCard(
+              name: '전기레인지',
+              status: '보온 모드',
+              icon: Icons.microwave,
+            ),
+            FavoriteDeviceCard(
+              name: 'TV',
+              status: '꺼짐',
+              icon: Icons.tv,
+            ),
+            FavoriteDeviceCard(
+              name: '공기청정기',
+              status: '케어 중',
+              icon: Icons.air,
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
 }

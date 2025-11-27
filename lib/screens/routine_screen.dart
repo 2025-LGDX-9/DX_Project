@@ -2,15 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:pregnancy_mode_app/screens/onboarding_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 import 'package:pregnancy_mode_app/screens/nofification_screen.dart';
+import 'package:pregnancy_mode_app/screens/smart_routine_detail_screen.dart';
 
 /// 가전 루틴 화면
-class RoutineScreen extends StatelessWidget {
+class RoutineScreen extends StatefulWidget {
   final PregnancyController controller;
 
   const RoutineScreen({
     super.key,
     required this.controller, // ← main.dart 에서 넘겨주는 컨트롤러
   });
+
+  @override
+  State<RoutineScreen> createState() => _RoutineScreenState();
+}
+
+class _RoutineScreenState extends State<RoutineScreen> {
+  bool _airconOn = true;
+  bool _airCleanerOn = true;
+  bool _humidifierOn = true;
+  bool _robotOn = true;
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +85,7 @@ class RoutineScreen extends StatelessWidget {
                                       height: 5,
                                       decoration: BoxDecoration(
                                         color: Colors.black26,
-                                        borderRadius: BorderRadius.circular(
-                                          20,
-                                        ),
+                                        borderRadius: BorderRadius.circular(20),
                                       ),
                                     ),
                                     SizedBox(height: 16),
@@ -97,16 +106,14 @@ class RoutineScreen extends StatelessWidget {
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                  BorderRadius.circular(
-                                                    20,
-                                                  ),
+                                                      BorderRadius.circular(20),
                                                 ),
                                                 child: Padding(
                                                   padding: EdgeInsets.all(20),
                                                   child: Row(
                                                     crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     children: [
                                                       Icon(
                                                         Icons.add_circle,
@@ -114,19 +121,19 @@ class RoutineScreen extends StatelessWidget {
                                                           0xff43BA84,
                                                         ),
                                                       ),
-                                                      SizedBox(width: 10,),
+                                                      SizedBox(width: 10),
                                                       Column(
                                                         crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                            CrossAxisAlignment
+                                                                .start,
                                                         children: [
                                                           Text(
                                                             "제품 추가",
                                                             style: TextStyle(
                                                               fontSize: 20,
                                                               fontWeight:
-                                                              FontWeight
-                                                                  .bold,
+                                                                  FontWeight
+                                                                      .bold,
                                                             ),
                                                           ),
                                                           Text(
@@ -156,16 +163,14 @@ class RoutineScreen extends StatelessWidget {
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                  BorderRadius.circular(
-                                                    20,
-                                                  ),
+                                                      BorderRadius.circular(20),
                                                 ),
                                                 child: Padding(
                                                   padding: EdgeInsets.all(20),
                                                   child: Row(
                                                     crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     children: [
                                                       Icon(
                                                         Icons
@@ -174,19 +179,19 @@ class RoutineScreen extends StatelessWidget {
                                                           0xffDB4F4F,
                                                         ),
                                                       ),
-                                                      SizedBox(width: 10,),
+                                                      SizedBox(width: 10),
                                                       Column(
                                                         crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                            CrossAxisAlignment
+                                                                .start,
                                                         children: [
                                                           Text(
                                                             "우리 단지 연결",
                                                             style: TextStyle(
                                                               fontSize: 20,
                                                               fontWeight:
-                                                              FontWeight
-                                                                  .bold,
+                                                                  FontWeight
+                                                                      .bold,
                                                             ),
                                                           ),
                                                         ],
@@ -209,16 +214,14 @@ class RoutineScreen extends StatelessWidget {
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                  BorderRadius.circular(
-                                                    20,
-                                                  ),
+                                                      BorderRadius.circular(20),
                                                 ),
                                                 child: Padding(
                                                   padding: EdgeInsets.all(20),
                                                   child: Row(
                                                     crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     children: [
                                                       Icon(
                                                         Icons.add_circle,
@@ -226,19 +229,19 @@ class RoutineScreen extends StatelessWidget {
                                                           0xff43BA84,
                                                         ),
                                                       ),
-                                                      SizedBox(width: 10,),
+                                                      SizedBox(width: 10),
                                                       Column(
                                                         crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                            CrossAxisAlignment
+                                                                .start,
                                                         children: [
                                                           Text(
                                                             "방 만들기",
                                                             style: TextStyle(
                                                               fontSize: 20,
                                                               fontWeight:
-                                                              FontWeight
-                                                                  .bold,
+                                                                  FontWeight
+                                                                      .bold,
                                                             ),
                                                           ),
                                                         ],
@@ -266,17 +269,22 @@ class RoutineScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(width: 10,),
+                    SizedBox(width: 10),
                     // 알림 버튼
                     GestureDetector(
-                      onTap: ()=>{Navigator.push(context, MaterialPageRoute(builder: (_)=>notification()))},
+                      onTap: () => {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => notification()),
+                        ),
+                      },
                       child: Image.asset(
                         "assets/images/notification.png",
                         width: 25,
                         height: 25,
                       ),
                     ),
-                    SizedBox(width: 10,),
+                    SizedBox(width: 10),
                     // 메뉴 버튼
                     PopupMenuButton(
                       offset: Offset(0, 40),
@@ -289,8 +297,7 @@ class RoutineScreen extends StatelessWidget {
                           child: Padding(
                             padding: EdgeInsets.all(10),
                             child: Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   "방 설정",
@@ -318,29 +325,86 @@ class RoutineScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               children: [
                 // 🔹 헤더 부분 (텍스트 전체가 버튼처럼 동작)
-                _RoutineHeader(controller: controller),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            SmartRoutineDetailScreen(controller: widget.controller),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xfff7edff),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.auto_awesome, color: Colors.deepPurple),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text(
+                                '나를 위한 가전별 맞춤 루틴',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                '임산부 기본 코스로 가전을 자동 제어합니다.',
+                                style: TextStyle(fontSize: 13),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right),
+                      ],
+                    ),
+                  ),
+                ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
-                const _DeviceTile(
+                const Text(
+                  '내 가전',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+
+                _DeviceTile(
                   name: '에어컨',
                   description: '온도 조절: 24–26°C 유지',
                   icon: Icons.ac_unit,
+                  value: _airconOn,
+                  onChanged: (v) => setState(() => _airconOn = v),
                 ),
-                const _DeviceTile(
+                _DeviceTile(
                   name: '공기청정기',
                   description: '냄새 제거 모드로 켜짐',
                   icon: Icons.air,
+                  value: _airCleanerOn,
+                  onChanged: (v) => setState(() => _airCleanerOn = v),
                 ),
-                const _DeviceTile(
+                _DeviceTile(
                   name: '가습기',
                   description: '습도 조절: 40–60% 유지',
                   icon: Icons.grain,
+                  value: _humidifierOn,
+                  onChanged: (v) => setState(() => _humidifierOn = v),
                 ),
-                const _DeviceTile(
+                _DeviceTile(
                   name: '로봇청소기',
                   description: '오전 10시, 오후 5시 작동',
                   icon: Icons.cleaning_services_outlined,
+                  value: _robotOn,
+                  onChanged: (v) => setState(() => _robotOn = v),
                 ),
               ],
             ),
@@ -351,67 +415,20 @@ class RoutineScreen extends StatelessWidget {
   }
 }
 
-/// 🔹 상단 "나를 위한 가전별 맞춤 루틴" 카드
-class _RoutineHeader extends StatelessWidget {
-  final PregnancyController controller;
-
-  const _RoutineHeader({
-    super.key,
-    required this.controller,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xfff3f6ff),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          // 👉 텍스트 영역 전체를 버튼처럼 눌렀을 때 온보딩 페이지로 이동
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => OnboardingScreen(
-                controller: controller,
-                onCompleted: () {
-                  // 온보딩 완료 후에 할 동작 있으면 여기 추가
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-          );
-        },
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '나를 위한 가전별 맞춤 루틴',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 4),
-            Text('임산부 기본 코스로 가전을 자동 제어합니다.'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 /// 🔹 각 가전 타일
 class _DeviceTile extends StatelessWidget {
   final String name;
   final String description;
   final IconData icon;
+  final bool value;
+  final ValueChanged<bool> onChanged;
 
   const _DeviceTile({
-    super.key,
     required this.name,
     required this.description,
     required this.icon,
+    required this.value,
+    required this.onChanged,
   });
 
   @override
@@ -423,10 +440,7 @@ class _DeviceTile extends StatelessWidget {
         leading: Icon(icon),
         title: Text(name),
         subtitle: Text(description),
-        trailing: Switch(
-          value: true,
-          onChanged: (_) {},
-        ),
+        trailing: Switch(value: value, onChanged: onChanged),
       ),
     );
   }
