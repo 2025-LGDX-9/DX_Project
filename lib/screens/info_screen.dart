@@ -158,7 +158,7 @@ class _MeditationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: _openYoutube,   // 🔥 카드 전체 클릭 이벤트
+      onTap: _openYoutube,
       borderRadius: BorderRadius.circular(24),
       child: Container(
         decoration: BoxDecoration(

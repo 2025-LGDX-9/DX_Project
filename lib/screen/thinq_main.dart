@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pregnancy_mode_app/Test/WeatherDetailScreen.dart';
+import 'package:pregnancy_mode_app/Test/WeatherTestScreen.dart';
 import 'package:pregnancy_mode_app/screens/nofification_screen.dart';
 import 'package:pregnancy_mode_app/screens/home_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
@@ -672,6 +674,19 @@ class ThinqHomeScreen extends StatelessWidget {
                     subtitle:
                         "맛있는 상상이 시작되는 공간으로 놀러오세요\n핫한 레시피부터 요리 꿀팁까지 인스타그램에서 확인해보세요",
                     imagePath: "assets/images/kitchen.png",
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => WeatherDetailScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    ),
+                    child: Text("날씨 상세 페이지", style: TextStyle(fontSize: 16)),
                   ),
 
                   const SizedBox(height: 80),
