@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pregnancy_mode_app/screens/onboarding_screen.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/onboarding_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
-import 'package:pregnancy_mode_app/screens/nofification_screen.dart';
-import 'package:pregnancy_mode_app/screens/smart_routine_detail_screen.dart';
+import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/smart_routine_detail_screen.dart';
 
 /// 가전 루틴 화면
 class RoutineScreen extends StatefulWidget {

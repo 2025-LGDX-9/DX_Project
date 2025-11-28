@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
-import 'package:pregnancy_mode_app/screens/government_support_screen.dart';
-import 'package:pregnancy_mode_app/screens/nutrition_guide_screen.dart';
-import 'package:pregnancy_mode_app/screens/week_health_screen.dart';
+import 'package:pregnancy_mode_app/screens/3rdpage/nutrition_guide_screen.dart';
+import 'package:pregnancy_mode_app/screens/3rdpage/week_health_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'government_support_screen.dart';
 
 class InfoScreen extends StatelessWidget {
   final PregnancyController controller;

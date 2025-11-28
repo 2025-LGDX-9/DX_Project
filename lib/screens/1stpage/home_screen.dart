@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pregnancy_mode_app/screens/onboarding_screen.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/onboarding_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
-import 'package:pregnancy_mode_app/screens/nofification_screen.dart';
+import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final PregnancyController controller;

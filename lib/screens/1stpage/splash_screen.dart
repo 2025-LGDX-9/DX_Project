@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pregnancy_mode_app/screens/home_screen.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/home_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
-import 'package:pregnancy_mode_app/screen/thinq_main.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/thinq_main.dart';
 
 class ThinQSplashScreen extends StatefulWidget {
   @override

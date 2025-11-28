@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pregnancy_mode_app/Test/WeatherDetailScreen.dart';
 import 'package:pregnancy_mode_app/Test/WeatherTestScreen.dart';
-import 'package:pregnancy_mode_app/screens/nofification_screen.dart';
-import 'package:pregnancy_mode_app/screens/home_screen.dart';
+import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/home_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
-import '../screens/onboarding_screen.dart';
+import 'onboarding_screen.dart';
 
 Widget _buildTopBackground() {
   return Container(

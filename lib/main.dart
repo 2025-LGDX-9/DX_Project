@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:pregnancy_mode_app/screen/thinq_main.dart';
-import 'package:pregnancy_mode_app/screens/00_splash_screen.dart';
-import 'package:pregnancy_mode_app/screens/home_screen.dart';
-import 'package:pregnancy_mode_app/screens/routine_screen.dart';
-import 'package:pregnancy_mode_app/screens/info_screen.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/thinq_main.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/splash_screen.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/home_screen.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/routine_screen.dart';
+import 'package:pregnancy_mode_app/screens/3rdpage/info_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
-import 'package:pregnancy_mode_app/screens/menu_screen.dart';
+import 'package:pregnancy_mode_app/screens/4thpage/menu_screen.dart';
 
 void main() {
   runApp(const PregnancyModeApp());

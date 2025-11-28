@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../pregnancy_controller.dart';
+import '../../pregnancy_controller.dart';
 
 /// 주차별 건강 정보 화면
 class WeekHealthScreen extends StatefulWidget {

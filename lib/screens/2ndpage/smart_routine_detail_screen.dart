@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../pregnancy_controller.dart';
+import '../../pregnancy_controller.dart';
 
 /// 나를 위한 가전별 맞춤 루틴 - 상세 설정 화면
 class SmartRoutineDetailScreen extends StatelessWidget {
