@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/onboarding_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/edit_screen.dart';
 import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -159,7 +160,7 @@ class HomeScreen extends StatelessWidget {
                                             Material(
                                               color: Colors.transparent,
                                               child: InkWell(
-                                                onTap: () {},
+                                                onTap: () {Navigator.push(context, MaterialPageRoute(builder: (_)=>EditScreen()));},
                                                 child: Ink(
                                                   width: MediaQuery.of(
                                                     context,

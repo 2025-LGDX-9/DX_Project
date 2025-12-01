@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pregnancy_mode_app/screens/3rdpage/recipe_detail_chicken.dart';
+import 'package:pregnancy_mode_app/screens/3rdpage/recipe_detail_spinach.dart';
 
 class NutritionGuideScreen extends StatefulWidget {
   const NutritionGuideScreen({super.key});
@@ -108,14 +110,16 @@ class _NutritionGuideScreenState extends State<NutritionGuideScreen>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _foodCard(
-              image: "assets/images/food_chicken.png",
+              image: "assets/images/chicken.png",
               title: "오븐 통닭 구이",
               buttonText: "레시피 보기",
+              onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (_)=>RecipeDetailChicken()));}
             ),
             _foodCard(
-              image: "assets/images/food_spinach.png",
+              image: "assets/images/spinach.png",
               title: "시금치 그라탕",
               buttonText: "레시피 보기",
+                onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (_)=>RecipeDetailSpinach()));}
             ),
           ],
         ),
@@ -222,6 +226,7 @@ class _NutritionGuideScreenState extends State<NutritionGuideScreen>
     required String image,
     required String title,
     required String buttonText,
+    required VoidCallback onPressed,   // ← 추가
   }) {
     return Container(
       width: 150,
@@ -244,12 +249,14 @@ class _NutritionGuideScreenState extends State<NutritionGuideScreen>
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(title,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 14)),
+            child: Text(
+              title,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 14),
+            ),
           ),
           TextButton(
-            onPressed: () {},
+            onPressed: onPressed,    // ← 여기 적용
             child: Text(buttonText),
           )
         ],
@@ -257,3 +264,4 @@ class _NutritionGuideScreenState extends State<NutritionGuideScreen>
     );
   }
 }
+

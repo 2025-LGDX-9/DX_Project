@@ -74,16 +74,16 @@ class _RobotCleanerControlScreenState
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff385a92),
+                  backgroundColor: const Color( 0xff385a92),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                icon: const Icon(Icons.play_arrow),
+                icon: const Icon(Icons.play_arrow, color: Colors.white,),
                 label: const Text(
                   '전체 청소 시작',
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
             ),
@@ -225,7 +225,7 @@ class _RobotCleanerControlScreenState
   }) {
     return Row(
       children: [
-        const Icon(Icons.waves, color: Color(0xff385a92)),
+        const Icon(Icons.wind_power, color: Color(0xff385a92)),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
