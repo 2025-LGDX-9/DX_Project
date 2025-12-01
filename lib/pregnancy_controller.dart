@@ -48,7 +48,7 @@ class PregnancyController {
   // =========================
 
   /// 에어컨 전원 ON/OFF
-  bool airconOn = true;
+  bool airconOn = false;
 
   /// 목표 온도 (℃)
   double airconTargetTemp = 24.0;
@@ -58,6 +58,9 @@ class PregnancyController {
 
   /// 풍량 단계 (1~3 정도로 사용)
   int airconFanLevel = 2;
+
+  /// 에어컨 수면모드
+  bool airconSleepMode = false;
 
   // =========================
   // 가전 제어 상태 - 로봇청소기 (나중에 쓸 예정)

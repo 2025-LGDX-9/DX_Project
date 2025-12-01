@@ -46,10 +46,20 @@ class _NutritionGuideScreenState extends State<NutritionGuideScreen>
                 color: const Color(0xff7b61ff),
                 borderRadius: BorderRadius.circular(20),
               ),
+              indicatorPadding: EdgeInsets.symmetric(vertical: 6),
               tabs: const [
-                Tab(text: "영양제"),
-                Tab(text: "식단 가이드"),
-                Tab(text: "섭취 시 주의사항"),
+                Padding(
+                  padding: EdgeInsets.only(left: 5, right: 5),
+                  child: Tab(text: "영양제"),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 5, right: 5),
+                  child: Tab(text: "식단 가이드"),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 5, right: 5),
+                  child: Tab(text: "섭취 시 주의사항"),
+                ),
               ],
             ),
           ),
