@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pregnancy_mode_app/air_cleaner_control_screen.dart';
-import 'package:pregnancy_mode_app/aircon_control_screen.dart';
-import 'package:pregnancy_mode_app/humidifier_control_screen.dart';
-import 'package:pregnancy_mode_app/robot_cleaner_control_screen.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/air_cleaner_control_screen.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/aircon_control_screen.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/humidifier_control_screen.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/robot_cleaner_control_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/smart_routine_detail_screen.dart';
@@ -342,7 +342,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                 _DeviceTile(
                   name: '에어컨',
                   description: '온도 조절: 24–26℃ 유지',
-                  icon: Icons.ac_unit,
+                  icon: Image.asset("assets/images/aircon.png"),
                   isOn: _acOn,
                   onToggle: (value) {
                     setState(() {
@@ -366,7 +366,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                 _DeviceTile(
                   name: '공기청정기',
                   description: '냄새 제거 모드로 켜짐',
-                  icon: Icons.air,
+                  icon: Image.asset("assets/images/air_cleaner.png"),
                   isOn: _airCleanerOn,
                   onToggle: (value) {
                     setState(() {
@@ -393,7 +393,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                   name: '가습기',
                   description:
                   '습도 조절: ${controller.humidifierTargetHumidity.toStringAsFixed(0)}% 유지',
-                  icon: Icons.grain,
+                  icon: Image.asset("assets/images/humidifier.png"),
                   isOn: controller.humidifierPower,
                   onToggle: (value) {
                     setState(() {
@@ -418,7 +418,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                 _DeviceTile(
                   name: '로봇청소기',
                   description: '오전 10시, 오후 5시 작동',
-                  icon: Icons.cleaning_services_outlined,
+                  icon: Image.asset("assets/images/robot_cleaner.png"),
                   isOn: _robotOn,
                   onToggle: (value) {
                     setState(() {
@@ -437,7 +437,30 @@ class _RoutineScreenState extends State<RoutineScreen> {
                       setState(() {});
                     });
                   },
-
+                ),
+                _DeviceTile(
+                  name: '워시타워',
+                  description: """세탁    |     건조\n꺼짐    |     00:09 남음
+                                """,
+                  icon: Image.asset("assets/images/wash_tower.png"),
+                  isOn: _robotOn,
+                  onToggle: (value) {
+                    setState(() {
+                      _robotOn = value;
+                    });
+                  },
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            RobotCleanerControlScreen(controller: controller),
+                      ),
+                    ).then((_) {
+                      // 제어 화면에서 돌아왔을 때 상태 갱신하고 싶으면 여기서 setState 호출
+                      setState(() {});
+                    });
+                  },
                 ),
               ],
             ),
@@ -452,7 +475,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
 class _DeviceTile extends StatelessWidget {
   final String name;
   final String description;
-  final IconData icon;
+  final Widget icon;
   final bool isOn;
   final ValueChanged<bool> onToggle;
   final VoidCallback onTap;
@@ -480,7 +503,7 @@ class _DeviceTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              Icon(icon, color: const Color(0xff7b5cff), size: 28),
+              Center(child: SizedBox(width: 40, height: 40,child: icon,),),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(

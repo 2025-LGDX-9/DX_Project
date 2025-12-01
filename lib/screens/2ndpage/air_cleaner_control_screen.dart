@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pregnancy_controller.dart';
+import '../../pregnancy_controller.dart';
 
 /// 공기청정기 제어 화면
 class AirCleanerControlScreen extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pregnancy_controller.dart';
+import '../../pregnancy_controller.dart';
 
 class HumidifierControlScreen extends StatefulWidget {
   final PregnancyController controller;

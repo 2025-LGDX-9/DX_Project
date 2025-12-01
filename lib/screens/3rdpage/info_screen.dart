@@ -46,10 +46,11 @@ class InfoScreen extends StatelessWidget {
             crossAxisSpacing: 12,
             mainAxisSpacing: 16,
             // 🔥 셀을 더 "높게" 만들어서 Column이 여유있게 들어가도록
-            childAspectRatio: 0.55, // (width / height), 값 낮을수록 셀 높이가 커짐
+            childAspectRatio: 0.55,
+            // (width / height), 값 낮을수록 셀 높이가 커짐
             children: [
               CategoryButton(
-                icon: Icons.calendar_month,
+                icon: Image.asset("assets/images/calender.png"),
                 label: '주차별\n건강 정보',
                 onTap: () {
                   Navigator.push(
@@ -61,7 +62,7 @@ class InfoScreen extends StatelessWidget {
                 },
               ),
               CategoryButton(
-                icon: Icons.medication_liquid,
+                icon: Image.asset("assets/images/drug.png"),
                 label: '영양제·식단',
                 onTap: () {
                   Navigator.push(
@@ -73,7 +74,7 @@ class InfoScreen extends StatelessWidget {
                 },
               ),
               CategoryButton(
-                icon: Icons.local_hospital,
+                icon: Image.asset("assets/images/hospital.png"),
                 label: '건강·의료',
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -82,7 +83,7 @@ class InfoScreen extends StatelessWidget {
                 },
               ),
               CategoryButton(
-                icon: Icons.fitness_center,
+                icon: Image.asset("assets/images/exercise.png"),
                 label: '운동',
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -91,7 +92,7 @@ class InfoScreen extends StatelessWidget {
                 },
               ),
               CategoryButton(
-                icon: Icons.home,
+                icon: Image.asset("assets/images/wash.png"),
                 label: '생활 환경\n관리',
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -100,7 +101,7 @@ class InfoScreen extends StatelessWidget {
                 },
               ),
               CategoryButton(
-                icon: Icons.shopping_bag,
+                icon: Image.asset("assets/images/shopping.png"),
                 label: '산모 용품',
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -109,7 +110,7 @@ class InfoScreen extends StatelessWidget {
                 },
               ),
               CategoryButton(
-                icon: Icons.question_answer,
+                icon: Image.asset("assets/images/question.png"),
                 label: '자주하는\n질문',
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -118,7 +119,7 @@ class InfoScreen extends StatelessWidget {
                 },
               ),
               CategoryButton(
-                icon: Icons.volunteer_activism,
+                icon: Image.asset("assets/images/goverment_info.png"),
                 label: '정부지원/\n복지 정보',
                 onTap: () {
                   Navigator.push(
@@ -146,15 +147,11 @@ class _MeditationCard extends StatelessWidget {
   Future<void> _openYoutube() async {
     final Uri url = Uri.parse(youtubeUrl);
     if (await canLaunchUrl(url)) {
-      await launchUrl(
-        url,
-        mode: LaunchMode.inAppWebView,
-      );
+      await launchUrl(url, mode: LaunchMode.inAppWebView);
     } else {
       print("URL 실행 실패");
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +217,7 @@ class _MeditationCard extends StatelessWidget {
 }
 
 class CategoryButton extends StatelessWidget {
-  final IconData icon;
+  final Widget icon;
   final String label;
   final VoidCallback onTap;
 
@@ -240,7 +237,7 @@ class CategoryButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min, // 🔥 셀 안에서 필요 이상으로 안 늘어나게
         children: [
           Container(
-            width: 56,  // 🔥 조금 줄임 (64 → 56)
+            width: 56, // 🔥 조금 줄임 (64 → 56)
             height: 56, // 🔥 조금 줄임
             decoration: BoxDecoration(
               color: Colors.white,
@@ -253,10 +250,12 @@ class CategoryButton extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(
-              icon,
-              size: 28, // 살짝 줄임
-              color: const Color(0xff7b5cff),
+            child: Center(
+              child: SizedBox(
+                width: 28,
+                height: 28, // 살짝 줄임
+                child: icon,
+              ),
             ),
           ),
           const SizedBox(height: 4),
