@@ -4,7 +4,7 @@ import 'package:pregnancy_mode_app/screens/3rdpage/nutrition_guide_screen.dart';
 import 'package:pregnancy_mode_app/screens/3rdpage/week_health_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'government_support_screen.dart';
+import 'package:pregnancy_mode_app/screens/3rdpage/government_support_screen.dart';
 
 class InfoScreen extends StatelessWidget {
   final PregnancyController controller;

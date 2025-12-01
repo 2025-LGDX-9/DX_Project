@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pregnancy_mode_app/screens/3rdpage/incentive_info_screen.dart';
+import 'package:pregnancy_mode_app/screens/3rdpage/supoortBusiness_info_screen.dart';
+import 'package:pregnancy_mode_app/screens/3rdpage/voucher_info_screen.dart';
 
 /// 정부지원 / 복지정보 화면
 class GovernmentSupportScreen extends StatelessWidget {
@@ -74,19 +77,24 @@ class GovernmentSupportScreen extends StatelessWidget {
           const SizedBox(height: 20),
 
           // 리스트 카드들
-          const _SupportItem(
+          _SupportItem(
             title: '출산 장려금',
             subtitle: '지자체별로 금액과 지원 기준이 달라요.',
+            onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (_)=>IncentiveInfoScreen()));},
           ),
           const SizedBox(height: 12),
-          const _SupportItem(
+          _SupportItem(
             title: '임산부 건강관리 바우처',
             subtitle: '1인당 40만원 상당의 바우처를 제공하는 사업이에요.',
+            onPressed: (){
+              Navigator.push(context, MaterialPageRoute(builder: (_)=>VoucherInfoScreen()));
+            }
           ),
           const SizedBox(height: 12),
-          const _SupportItem(
+          _SupportItem(
             title: '육아용품 지원 사업',
             subtitle: '기저귀, 아기침대 등 출산 초기 필수용품을 지원해요.',
+            onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (_)=>SupoortbusinessInfoScreen()));},
           ),
 
           const SizedBox(height: 20),
@@ -117,10 +125,12 @@ class GovernmentSupportScreen extends StatelessWidget {
 class _SupportItem extends StatelessWidget {
   final String title;
   final String subtitle;
+  final VoidCallback onPressed;
 
   const _SupportItem({
     required this.title,
     required this.subtitle,
+    required this.onPressed,
   });
 
   @override
@@ -164,11 +174,8 @@ class _SupportItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          // 오른쪽 "자세히보기" 버튼
           TextButton(
-            onPressed: () {
-              // TODO: 실제 링크나 상세 팝업 연결할 수 있음
-            },
+            onPressed: onPressed,
             child: const Text('자세히보기'),
           ),
         ],

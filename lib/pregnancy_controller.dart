@@ -26,4 +26,52 @@ class PregnancyController {
     final d = dueDate.day.toString().padLeft(2, '0');
     return 'D-$diff  $y.$m.$d 예정';
   }
+
+  // =========================
+  // 가전 제어 상태 - 가습기
+  // =========================
+
+  /// 가습기 전원 ON/OFF
+  bool humidifierPower = true;
+
+  /// 목표 습도 (%)
+  double humidifierTargetHumidity = 50;
+
+  /// 세기 모드 (약 / 표준 / 강풍 / 취침)
+  String humidifierMode = '표준';
+
+  /// 예약 시간 (시간 단위, 0이면 예약 없음)
+  int humidifierReserveHours = 0;
+
+  // =========================
+  // 가전 제어 상태 - 에어컨
+  // =========================
+
+  /// 에어컨 전원 ON/OFF
+  bool airconOn = true;
+
+  /// 목표 온도 (℃)
+  double airconTargetTemp = 24.0;
+
+  /// 운전 모드 (냉방 / 제습 / 송풍 / 자동 등)
+  String airconMode = '냉방';
+
+  /// 풍량 단계 (1~3 정도로 사용)
+  int airconFanLevel = 2;
+
+  // =========================
+  // 가전 제어 상태 - 로봇청소기 (나중에 쓸 예정)
+  // =========================
+
+  /// 로봇청소기 전원 ON/OFF
+  bool robotOn = true;
+
+  /// 하루 자동 청소 횟수
+  int robotDailyCount = 2;
+
+  /// 오전 청소 시간 (예: 10시)
+  int robotMorningHour = 10;
+
+  /// 오후 청소 시간 (예: 17시)
+  int robotEveningHour = 17;
 }
