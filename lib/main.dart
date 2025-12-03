@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/thinq_main.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/splash_screen.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/home_screen.dart';
@@ -7,7 +9,16 @@ import 'package:pregnancy_mode_app/screens/3rdpage/info_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 import 'package:pregnancy_mode_app/screens/4thpage/menu_screen.dart';
 
-void main() {
+import 'models/favorite_device.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(FavoriteDeviceAdapter()); // ★ 등록 필수
+
+  await Hive.openBox<FavoriteDevice>('favorite_devices'); // ★ 박스 열기
   runApp(const PregnancyModeApp());
 }
 

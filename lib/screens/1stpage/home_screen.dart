@@ -1,22 +1,26 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:pregnancy_mode_app/models/favorite_device.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/invite_member.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/onboarding_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/tutorial_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/edit_screen.dart';
 import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
+import 'package:pregnancy_mode_app/services/favorite_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final PregnancyController controller;
+  final bool showTutorial;
 
-  const HomeScreen({super.key, required this.controller});
+  const HomeScreen({super.key, required this.controller, this.showTutorial = false});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // final Random _random = Random();
 
   final List<String> _tipMessages = [ // 축하 메시지 리스트 추가
     "이 시기엔 카페인 섭취를 조금 줄여보는 게 좋아요.",
@@ -58,6 +62,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
+    // ★ Onboarding 이후 첫 진입이면 튜토리얼 화면 띄우기
+    if (widget.showTutorial) {
+      Future.delayed(const Duration(milliseconds: 150), () {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const TutorialScreen(),
+        );
+      });
+    }
+
     _randomTip = _tipMessages[Random().nextInt(_tipMessages.length)];
     _randomDeviceTip = _deviceTipMessages[Random().nextInt(_deviceTipMessages.length)];
   }
@@ -91,6 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -509,7 +527,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   child: Column(
                                                     children: [
                                                       InkWell(
-                                                        onTap: () {},
+                                                        onTap: () {Navigator.push(context, MaterialPageRoute(builder: (_)=>InviteMember()));},
                                                         child: Ink(
                                                           child: Row(
                                                             crossAxisAlignment:
@@ -725,6 +743,145 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildFavoriteDevicesSection() {
+    final favorites = FavoriteService.getFavorites();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Text(
+              '즐겨 찾는 제품',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 4),
+            IconButton(
+              icon: const Icon(Icons.edit, size: 18),
+              onPressed: _openFavoriteEditModal,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 110,
+          child: favorites.isEmpty
+              ? const Center(child: Text("즐겨찾기한 제품이 없습니다."))
+              : ListView(
+            scrollDirection: Axis.horizontal,
+            children: favorites.map((d) {
+              final icon = IconData(
+                d.iconCode,
+                fontFamily: 'MaterialIcons',
+              );
+              return FavoriteDeviceCard(
+                name: d.name,
+                icon: icon,
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _openFavoriteEditModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) {
+        return SizedBox(
+          height: 220,
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.black26,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "즐겨찾기 편집",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _openAddFavoriteModal();
+                },
+                child: const Text("제품 추가하기"),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _openAddFavoriteModal() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) {
+        return SizedBox(
+          height: 400,
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              const Text("제품 추가", style: TextStyle(fontSize: 18)),
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildAddDeviceTile("냉장고", Icons.kitchen),
+                    _buildAddDeviceTile("전기레인지", Icons.microwave),
+                    _buildAddDeviceTile("TV", Icons.tv),
+                    _buildAddDeviceTile("에어컨", Icons.ac_unit),
+                    _buildAddDeviceTile("공기청정기", Icons.air),
+                    _buildAddDeviceTile("가습기", Icons.water_drop),
+                    _buildAddDeviceTile("로봇청소기", Icons.cleaning_services),
+                    _buildAddDeviceTile(
+                        "워시타워", Icons.local_laundry_service),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAddDeviceTile(String name, IconData icon) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(name),
+      onTap: () {
+        FavoriteService.addFavorite(
+          FavoriteDevice(name: name, iconCode: icon.codePoint),
+        );
+
+        // bottom sheet 닫고, 즐겨찾기 리스트 다시 그리기
+        Navigator.pop(context);
+        setState(() {});
+      },
+    );
+  }
+
   Widget _buildBabyCard(int weeks) {
     return Container(
       width: double.infinity,
@@ -830,52 +987,16 @@ class _TipCard extends StatelessWidget {
   }
 }
 
-class _TemperatureControl extends StatefulWidget {
-  const _TemperatureControl();
-
-  @override
-  State<_TemperatureControl> createState() => _TemperatureControlState();
-}
-
-class _TemperatureControlState extends State<_TemperatureControl> {
-  double _value = 25;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('권장 범위: 24–26°C'),
-        const SizedBox(height: 8),
-        Text(
-          '${_value.toStringAsFixed(0)}°C',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        Slider(
-          value: _value,
-          min: 18,
-          max: 30,
-          onChanged: (v) {
-            setState(() => _value = v);
-          },
-        ),
-        const Text('적정 온도입니다. 몸이 춥거나 덥지 않은지 한 번 더 체크해 주세요.'),
-      ],
-    );
-  }
-}
-
 class FavoriteDeviceCard extends StatelessWidget {
   final String name;
-  final String status;
   final IconData icon;
 
   const FavoriteDeviceCard({
     super.key,
     required this.name,
-    required this.status,
     required this.icon,
   });
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -894,22 +1015,14 @@ class FavoriteDeviceCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 28),
-          Text(
-            name,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            status,
-            style: const TextStyle(
-              fontSize: 11,
-              color: Colors.grey,
-            ),
+          const SizedBox(height: 6),
+          Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+          const Text(
+            '즐겨찾기',
+            style: TextStyle(fontSize: 11, color: Colors.grey),
           ),
         ],
       ),
@@ -917,48 +1030,4 @@ class FavoriteDeviceCard extends StatelessWidget {
   }
 }
 
-Widget _buildFavoriteDevicesSection() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const Text(
-        '즐겨 찾는 제품',
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      const SizedBox(height: 12),
 
-      // 가로 스크롤 카드 리스트
-      SizedBox(
-        height: 110,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          children: const [
-            FavoriteDeviceCard(
-              name: '냉장고',
-              status: '냉장 온도 3℃',
-              icon: Icons.kitchen,
-            ),
-            FavoriteDeviceCard(
-              name: '전기레인지',
-              status: '보온 모드',
-              icon: Icons.microwave,
-            ),
-            FavoriteDeviceCard(
-              name: 'TV',
-              status: '꺼짐',
-              icon: Icons.tv,
-            ),
-            FavoriteDeviceCard(
-              name: '공기청정기',
-              status: '케어 중',
-              icon: Icons.air,
-            ),
-          ],
-        ),
-      ),
-    ],
-  );
-}

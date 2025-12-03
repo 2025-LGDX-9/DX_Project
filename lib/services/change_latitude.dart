@@ -141,7 +141,7 @@ Future<Map<String, dynamic>> getTodayWeather() async {
 
 Future<List<Map<String, dynamic>>> getTodayHourlyWeather() async {
   final raw = await getWeather();
-  final items = raw["response"]["body"]["items"]["item"];
+  final items = (raw["response"]["body"]["items"]["item"] as List<dynamic>);
 
   final now = DateTime.now();
   final today = "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
@@ -176,7 +176,7 @@ Future<List<Map<String, dynamic>>> getTodayHourlyWeather() async {
 
 Future<List<Map<String, dynamic>>> getTomorrowWeather() async {
   final raw = await getWeather();
-  final items = raw["response"]["body"]["items"]["item"];
+  final items = (raw["response"]["body"]["items"]["item"] as List<dynamic>);
 
   final now = DateTime.now().add(Duration(days: 1));
   final tomorrow = "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
@@ -218,37 +218,47 @@ Future<Weather_map_xy> getCurrentXY() async {
   return WeatherXYConverter.toGrid(pos.longitude, pos.latitude);
 }
 
-// 🔥 최근 발표시각 계산
-String getBaseTime() {
-  final now = DateTime.now();
-  final hour = now.hour;
-
-  if (hour >= 23) return "2300";
-  if (hour >= 20) return "2000";
-  if (hour >= 17) return "1700";
-  if (hour >= 14) return "1400";
-  if (hour >= 11) return "1100";
-  if (hour >= 8) return "0800";
-  if (hour >= 5) return "0500";
-  if (hour >= 2) return "0200";
-
-  // 새벽 1시 → 전날 23시 사용
-  return "2300";
-}
 
 Future<Map<String, dynamic>> getWeather() async {
   // 1) 내 현재 위치를 위·경도로 가져와서 → 기상청 격자좌표로 변환
-  Weather_map_xy xy = await getCurrentXY();   // <-- 이 함수는 이미 위에 있음
+  Weather_map_xy xy = await getCurrentXY();
 
-  // 2) 오늘 날짜 (YYYYMMDD) 계산
+  // 2) 기상청 기준 baseDate / baseTime 계산
   final now = DateTime.now();
+  late DateTime baseDateTime;
+  final hour = now.hour;
+
+  // 🔹 00~01시는 "전날 23시" 발표분을 사용해야 함
+  if (hour < 2) {
+    final yesterday = now.subtract(Duration(days: 1));
+    baseDateTime = DateTime(yesterday.year, yesterday.month, yesterday.day, 23);
+  } else if (hour < 5) {
+    baseDateTime = DateTime(now.year, now.month, now.day, 2);
+  } else if (hour < 8) {
+    baseDateTime = DateTime(now.year, now.month, now.day, 5);
+  } else if (hour < 11) {
+    baseDateTime = DateTime(now.year, now.month, now.day, 8);
+  } else if (hour < 14) {
+    baseDateTime = DateTime(now.year, now.month, now.day, 11);
+  } else if (hour < 17) {
+    baseDateTime = DateTime(now.year, now.month, now.day, 14);
+  } else if (hour < 20) {
+    baseDateTime = DateTime(now.year, now.month, now.day, 17);
+  } else if (hour < 23) {
+    baseDateTime = DateTime(now.year, now.month, now.day, 20);
+  } else {
+    baseDateTime = DateTime(now.year, now.month, now.day, 23);
+  }
+
+  // 최종 baseDate / baseTime 문자열
   final baseDate =
-      "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
+      "${baseDateTime.year}"
+      "${baseDateTime.month.toString().padLeft(2, '0')}"
+      "${baseDateTime.day.toString().padLeft(2, '0')}";
 
-  // 3) 현재 시간 기준, 기상청 발표시각 계산 (02,05,08,11,14,17,20,23 중 하나)
-  final baseTime = getBaseTime(); // 이것도 이미 위에 정의돼 있음
+  final baseTime = "${baseDateTime.hour.toString().padLeft(2, '0')}00";
 
-  // 4) 실제 요청 URL
+  // 3) 요청 URL 생성
   final url = Uri.parse(
       "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst"
           "?serviceKey=51057168d0268149ec4c40985eb0d71e74031f0f2af50c1fde722ae944debfb5"
@@ -266,8 +276,32 @@ Future<Map<String, dynamic>> getWeather() async {
   print("🔍 statusCode: ${res.statusCode}");
 
   if (res.statusCode != 200) {
-    throw Exception("기상청 API 오류: ${res.statusCode} / ${res.body}");
+    throw Exception("기상청 HTTP 오류: ${res.statusCode} / ${res.body}");
   }
 
-  return jsonDecode(res.body);
+  final decoded = jsonDecode(res.body);
+
+  // 4) 응답 헤더 코드 체크
+  final header = decoded['response']?['header'];
+  final resultCode = header?['resultCode'];
+  final resultMsg  = header?['resultMsg'];
+
+  if (resultCode != "00") {
+    throw Exception("기상청 응답 오류 $resultCode : $resultMsg");
+  }
+
+  // 5) items 존재 여부 체크 (null 이면 여기서 막기)
+  final body  = decoded['response']?['body'];
+  final items = body?['items']?['item'];
+
+  if (items == null) {
+    // 콘솔에 전체 응답 찍어보고 싶은 경우:
+    print("⚠️ 기상청 응답에 item 이 없습니다: ${res.body}");
+    throw Exception("기상청에 예보 데이터가 없습니다. (items == null)");
+  }
+
+  // 이후 함수들은 raw["response"]["body"]["items"]["item"]을 쓰고 있으니
+  // decoded 전체를 그대로 리턴해 줌
+  return decoded;
 }
+

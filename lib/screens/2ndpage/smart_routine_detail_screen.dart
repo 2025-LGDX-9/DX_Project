@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/info_tutorial.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/smart_routine_aircon.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/smart_routine_humidifier.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/smart_routine_robot_cleaner.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/smart_routine_air_cleaner.dart';
 import '../../pregnancy_controller.dart';
 
 class SmartRoutineDetailScreen extends StatelessWidget {
@@ -17,6 +22,9 @@ class SmartRoutineDetailScreen extends StatelessWidget {
         elevation: 0,
         foregroundColor: Colors.black,
         title: const Text("맞춤 루틴 상세 설정"),
+        actions: [
+          IconButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (_)=>InfoTutorial()));}, icon: Icon(Icons.info_outline))
+        ],
       ),
 
       body: Stack(
@@ -115,11 +123,12 @@ class _DeviceListCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        children: const [
+        children: [
           _DeviceRow(
             icon: "assets/images/aircon.png",
             title: "에어컨",
             description: "온도 조절 : 24~26℃ 유지",
+            onTap: (){Navigator.push(context, MaterialPageRoute(builder: (_)=>SmartRoutineAircon()));},
           ),
 
           Divider(height: 1, color: Color(0xffe8e8e8)),
@@ -128,6 +137,7 @@ class _DeviceListCard extends StatelessWidget {
             icon: "assets/images/air_cleaner.png",
             title: "공기청정기",
             description: "오토 모드로 작동",
+            onTap: (){Navigator.push(context, MaterialPageRoute(builder: (_)=>SmartRoutineAirCleaner()));},
           ),
 
           Divider(height: 1, color: Color(0xffe8e8e8)),
@@ -136,6 +146,7 @@ class _DeviceListCard extends StatelessWidget {
             icon: "assets/images/humidifier.png",
             title: "가습기",
             description: "습도 조절 : 40~60% 유지",
+            onTap: (){Navigator.push(context, MaterialPageRoute(builder: (_)=>SmartRoutineHumidifier()));},
           ),
 
           Divider(height: 1, color: Color(0xffe8e8e8)),
@@ -144,6 +155,7 @@ class _DeviceListCard extends StatelessWidget {
             icon: "assets/images/robot_cleaner.png",
             title: "로봇청소기",
             description: "오전 10시, 오후 5시 작동",
+            onTap: (){Navigator.push(context, MaterialPageRoute(builder: (_)=>SmartRoutineRobotCleaner()));},
           ),
         ],
       ),
@@ -154,46 +166,76 @@ class _DeviceListCard extends StatelessWidget {
 ///////////////////////////////////////////////////////////////////////////////
 /// 🔥 단일 항목 (아이콘 + 텍스트)
 ///////////////////////////////////////////////////////////////////////////////
-class _DeviceRow extends StatelessWidget {
+class _DeviceRow extends StatefulWidget {
   final String icon;
   final String title;
   final String description;
+  final VoidCallback? onTap;
 
   const _DeviceRow({
     required this.icon,
     required this.title,
     required this.description,
+    this.onTap,
+    super.key,
   });
 
   @override
+  State<_DeviceRow> createState() => _DeviceRowState();
+}
+
+class _DeviceRowState extends State<_DeviceRow> {
+  bool isOn = false; // ON/OFF 상태
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-      child: Row(
-        children: [
-          Image.asset(icon, width: 32, height: 32),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    )),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xff7b8ba0),
-                  ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: widget.onTap ?? () {},
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          child: Row(
+            children: [
+              Image.asset(widget.icon, width: 32, height: 32),
+              const SizedBox(width: 14),
+
+              // 📌 텍스트 영역
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.title,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.description,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xff7b8ba0),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )
-        ],
+              ),
+
+              // 📌 오른쪽 ON/OFF 버튼
+              Switch(
+                value: isOn,
+                activeColor: Colors.redAccent,
+                onChanged: (value) {
+                  setState(() => isOn = value);
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

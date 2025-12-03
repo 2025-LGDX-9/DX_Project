@@ -102,13 +102,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: () async {
-                    if (_formKey.currentState!.validate() &&
-                        _startDate != null) {
+                    if (_formKey.currentState!.validate() && _startDate != null) {
                       widget.controller.saveInfo(
                         nickname: _nicknameCtrl.text.trim(),
                         start: _startDate!,
                       );
+
+                      // ★ HomeScreen이 튜토리얼을 띄울 수 있도록 true를 반환
                       widget.onCompleted();
+
+                      // HomeScreen으로 돌아가기
+                      Navigator.pop(context, true);
                     } else if (_startDate == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('임신 시작일을 선택해주세요')),

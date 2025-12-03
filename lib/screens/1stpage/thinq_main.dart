@@ -101,15 +101,19 @@ class ThinqHomeScreen extends StatelessWidget {
                                                         MaterialPageRoute(
                                                           builder: (_) => OnboardingScreen(
                                                             controller: controller,
-                                                            onCompleted: (){
-                                                              Navigator.pop(context, true);
-                                                            },
+                                                            onCompleted: () {},
                                                           ),
                                                         ),
                                                       );
+
                                                       if (result == true) {
-                                                        Navigator.pop(context);
-                                                        onOnboardingCompleted();
+                                                        // ★ Onboarding 종료 후 HomeScreen으로 이동
+                                                        Navigator.pushReplacement(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (_) => HomeScreen(controller: controller, showTutorial: true),
+                                                          ),
+                                                        );
                                                       }
                                                     },
                                                     child: Ink(
