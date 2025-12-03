@@ -1,3 +1,5 @@
+import 'package:hive/hive.dart';
+
 class PregnancyController {
   String? babyNickname; // 태명
   DateTime? startDate;  // 임신 시작일
@@ -7,6 +9,17 @@ class PregnancyController {
   void saveInfo({required String nickname, required DateTime start}) {
     babyNickname = nickname;
     startDate = start;
+  }
+
+  Future<void> loadSavedData() async {
+    final box = Hive.box('onboarding');
+
+    babyNickname = box.get('nickname');
+    final dateString = box.get('startDate');
+
+    if (dateString != null) {
+      startDate = DateTime.parse(dateString);
+    }
   }
 
   /// 현재 임신 주차 (1주부터 시작)

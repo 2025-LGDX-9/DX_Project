@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:pregnancy_mode_app/models/all_device.dart';
 import 'package:pregnancy_mode_app/models/favorite_device.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/invite_member.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/onboarding_screen.dart';
@@ -59,9 +61,12 @@ class _HomeScreenState extends State<HomeScreen> {
   String _randomTip = "";
   String _randomDeviceTip = "";
 
+  bool _editMode = false;
+
   @override
   void initState() {
     super.initState();
+    _checkAndShowTutorial();
 
     // ★ Onboarding 이후 첫 진입이면 튜토리얼 화면 띄우기
     if (widget.showTutorial) {
@@ -76,6 +81,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _randomTip = _tipMessages[Random().nextInt(_tipMessages.length)];
     _randomDeviceTip = _deviceTipMessages[Random().nextInt(_deviceTipMessages.length)];
+  }
+
+  void _checkAndShowTutorial() {
+    final box = Hive.box('onboarding');
+    final shown = box.get('tutorialShown', defaultValue: false);
+
+    if (!shown) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const TutorialScreen(),
+        );
+
+        // 다시는 안 뜨도록 저장
+        box.put('tutorialShown', true);
+      });
+    }
   }
 
   void _showSupplementPopup() {
@@ -759,78 +782,72 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(width: 4),
+
+            /// 편집 모드 토글 버튼
             IconButton(
-              icon: const Icon(Icons.edit, size: 18),
-              onPressed: _openFavoriteEditModal,
+              icon: Icon(_editMode ? Icons.check : Icons.edit, size: 20),
+              onPressed: () {
+                setState(() {
+                  _editMode = !_editMode;
+                });
+              },
             ),
           ],
         ),
+
         const SizedBox(height: 12),
-        SizedBox(
-          height: 110,
-          child: favorites.isEmpty
-              ? const Center(child: Text("즐겨찾기한 제품이 없습니다."))
-              : ListView(
-            scrollDirection: Axis.horizontal,
-            children: favorites.map((d) {
-              final icon = IconData(
-                d.iconCode,
-                fontFamily: 'MaterialIcons',
-              );
-              return FavoriteDeviceCard(
-                name: d.name,
-                icon: icon,
-              );
-            }).toList(),
+
+        /// 1) 즐겨찾기 없고 편집모드도 아닐 때 → 안내 문구
+        if (favorites.isEmpty && !_editMode)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            alignment: Alignment.center,
+            child: const Text(
+              "즐겨찾기한 제품이 없습니다.",
+              style: TextStyle(color: Colors.grey),
+            ),
           ),
-        ),
+
+        /// 2) 즐겨찾기 있거나 편집모드일 때 → 리스트 표시
+        if (favorites.isNotEmpty || _editMode)
+          SizedBox(
+            height: 110,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                /// 즐겨찾기 카드들
+                for (var d in favorites)
+                  FavoriteDeviceCard(
+                    name: d.name,
+                    icon: IconData(d.iconCode, fontFamily: 'MaterialIcons'),
+                    showDelete: _editMode,
+                    onDelete: () {
+                      FavoriteService.removeFavorite(d);
+                      setState(() {});
+                    },
+                  ),
+
+                /// ★ 편집모드일 때 +카드 항상 보임 (즐겨찾기가 없어도)
+                if (_editMode)
+                  AddFavoriteCard(
+                    onAdd: () => _openAddFavoriteModal(),
+                  ),
+              ],
+            ),
+          ),
       ],
     );
   }
 
-  void _openFavoriteEditModal() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) {
-        return SizedBox(
-          height: 220,
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              Container(
-                width: 40,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.black26,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "즐겨찾기 편집",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _openAddFavoriteModal();
-                },
-                child: const Text("제품 추가하기"),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   void _openAddFavoriteModal() {
+    final allDevicesBox = Hive.box<AllDevice>('all_devices');
+    final favoriteList = FavoriteService.getFavorites();
+
+    // 즐겨찾기 중복 제거
+    final addableDevices = allDevicesBox.values.where((d) {
+      return !favoriteList.any((f) => f.name == d.name);
+    }).toList();
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -843,41 +860,34 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             children: [
               const SizedBox(height: 20),
-              const Text("제품 추가", style: TextStyle(fontSize: 18)),
+              const Text("추가 가능한 제품", style: TextStyle(fontSize: 18)),
               Expanded(
-                child: ListView(
-                  children: [
-                    _buildAddDeviceTile("냉장고", Icons.kitchen),
-                    _buildAddDeviceTile("전기레인지", Icons.microwave),
-                    _buildAddDeviceTile("TV", Icons.tv),
-                    _buildAddDeviceTile("에어컨", Icons.ac_unit),
-                    _buildAddDeviceTile("공기청정기", Icons.air),
-                    _buildAddDeviceTile("가습기", Icons.water_drop),
-                    _buildAddDeviceTile("로봇청소기", Icons.cleaning_services),
-                    _buildAddDeviceTile(
-                        "워시타워", Icons.local_laundry_service),
-                  ],
+                child: ListView.builder(
+                  itemCount: addableDevices.length,
+                  itemBuilder: (_, i) {
+                    final device = addableDevices[i];
+                    return ListTile(
+                      leading: Icon(IconData(device.iconCode,
+                          fontFamily: 'MaterialIcons')),
+                      title: Text(device.name),
+                      onTap: () {
+                        FavoriteService.addFavorite(
+                          FavoriteDevice(
+                            name: device.name,
+                            iconCode: device.iconCode,
+                          ),
+                        );
+
+                        Navigator.pop(context);
+                        setState(() {});
+                      },
+                    );
+                  },
                 ),
               ),
             ],
           ),
         );
-      },
-    );
-  }
-
-  Widget _buildAddDeviceTile(String name, IconData icon) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(name),
-      onTap: () {
-        FavoriteService.addFavorite(
-          FavoriteDevice(name: name, iconCode: icon.codePoint),
-        );
-
-        // bottom sheet 닫고, 즐겨찾기 리스트 다시 그리기
-        Navigator.pop(context);
-        setState(() {});
       },
     );
   }
@@ -990,41 +1000,94 @@ class _TipCard extends StatelessWidget {
 class FavoriteDeviceCard extends StatelessWidget {
   final String name;
   final IconData icon;
+  final VoidCallback onDelete;
+  final bool showDelete;   // ★ 추가
 
   const FavoriteDeviceCard({
     super.key,
     required this.name,
     required this.icon,
+    required this.onDelete,
+    required this.showDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 110,
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: 110,
+          margin: const EdgeInsets.only(right: 12),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 28),
-          const SizedBox(height: 6),
-          Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-          const Text(
-            '즐겨찾기',
-            style: TextStyle(fontSize: 11, color: Colors.grey),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, size: 28),
+              const SizedBox(height: 6),
+              Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                '즐겨찾기',
+                style: TextStyle(fontSize: 11, color: Colors.grey),
+              ),
+            ],
           ),
-        ],
+        ),
+
+        /// ★ showDelete 가 true 일 때만 X 버튼 활성화
+        if (showDelete)
+          Positioned(
+            right: 11,
+            top: -0.5,
+            child: GestureDetector(
+              onTap: onDelete,
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close, size: 14, color: Colors.white),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class AddFavoriteCard extends StatelessWidget {
+  final VoidCallback onAdd;
+
+  const AddFavoriteCard({super.key, required this.onAdd});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onAdd,
+      child: Container(
+        width: 110,
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.grey.shade400),
+        ),
+        child: const Center(
+          child: Icon(Icons.add, size: 30, color: Colors.black87),
+        ),
       ),
     );
   }

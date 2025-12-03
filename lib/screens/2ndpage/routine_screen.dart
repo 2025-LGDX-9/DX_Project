@@ -447,27 +447,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                           setState(() {});
                         });
                       },
-                    ),
-                    _DeviceTile(
-                      width: cardWidth,
-                      name: '워시타워',
-                      status: """세탁    |     건조\n꺼짐    |     00:09 남음
-                                """,
-                      icon: Image.asset("assets/images/wash_tower.png"),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => RobotCleanerControlScreen(
-                              controller: controller,
-                            ),
-                          ),
-                        ).then((_) {
-                          // 제어 화면에서 돌아왔을 때 상태 갱신하고 싶으면 여기서 setState 호출
-                          setState(() {});
-                        });
-                      },
-                    ),
+                    )
                   ],
                 ),
               ],

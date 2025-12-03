@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:pregnancy_mode_app/models/all_device.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/thinq_main.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/splash_screen.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/home_screen.dart';
@@ -19,6 +20,11 @@ void main() async {
   Hive.registerAdapter(FavoriteDeviceAdapter()); // ★ 등록 필수
 
   await Hive.openBox<FavoriteDevice>('favorite_devices'); // ★ 박스 열기
+  await Hive.openBox('onboarding');
+  Hive.registerAdapter(AllDeviceAdapter());
+  await Hive.openBox<AllDevice>('all_devices');
+
+
   runApp(const PregnancyModeApp());
 }
 
@@ -42,9 +48,36 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
   /// 앱 켜졌을 때 잠깐 보여줄 LG ThinQ 스플래시 표시 여부
   bool _showSplash = true;
 
+  void seedAllDevices() {
+    final box = Hive.box<AllDevice>('all_devices');
+
+    if (box.isEmpty) {
+      final devices = [
+        AllDevice(name: "에어컨", iconCode: Icons.ac_unit.codePoint),
+        AllDevice(name: "공기청정기", iconCode: Icons.air.codePoint),
+        AllDevice(name: "가습기", iconCode: Icons.water_drop.codePoint),
+        AllDevice(name: "로봇청소기", iconCode: Icons.cleaning_services.codePoint),
+      ];
+
+      for (var d in devices) {
+        box.add(d);
+      }
+    }
+  }
+
+
   @override
   void initState() {
     super.initState();
+
+    final box = Hive.box('onboarding');
+    final completed = box.get('completed', defaultValue: false);
+    _onboardingDone = completed;
+
+    controller.loadSavedData();
+
+    seedAllDevices();
+
     // 2초 동안 스플래시 보여주고 나서 온보딩/홈으로 이동
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;

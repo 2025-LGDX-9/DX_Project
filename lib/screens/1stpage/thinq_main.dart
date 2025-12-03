@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pregnancy_mode_app/Test/WeatherDetailScreen.dart';
 import 'package:pregnancy_mode_app/Test/WeatherTestScreen.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/tutorial_screen.dart';
 import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/home_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
@@ -96,6 +97,10 @@ class ThinqHomeScreen extends StatelessWidget {
                                                   color: Colors.transparent,
                                                   child: InkWell(
                                                     onTap: () async {
+                                                      Navigator.pop(context); // ★★ 먼저 BottomSheet 닫기 ★★
+
+                                                      await Future.delayed(const Duration(milliseconds: 150));
+
                                                       final result = await Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
@@ -107,13 +112,7 @@ class ThinqHomeScreen extends StatelessWidget {
                                                       );
 
                                                       if (result == true) {
-                                                        // ★ Onboarding 종료 후 HomeScreen으로 이동
-                                                        Navigator.pushReplacement(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                            builder: (_) => HomeScreen(controller: controller, showTutorial: true),
-                                                          ),
-                                                        );
+                                                        onOnboardingCompleted();
                                                       }
                                                     },
                                                     child: Ink(

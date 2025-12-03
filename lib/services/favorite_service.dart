@@ -12,16 +12,8 @@ class FavoriteService {
     box.add(device);
   }
 
-  static void removeFavorite(String name) {
-    FavoriteDevice? item;
-
-    for (final e in box.values) {
-      if (e.name == name) {
-        item = e;
-        break;
-      }
-    }
-
-    item?.delete();
+  static void removeFavorite(FavoriteDevice device) {
+    device.delete(); // HiveObject 기능
   }
+
 }
