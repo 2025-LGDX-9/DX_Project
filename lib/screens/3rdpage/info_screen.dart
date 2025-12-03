@@ -197,9 +197,15 @@ class _MeditationCard extends StatelessWidget {
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   SizedBox(height: 4),
-                  Text(
-                    '집에서 따라하는 10분 명상',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  Row(
+                    children: [
+                      Text(
+                        '집에서 따라하는 10분 명상',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(width: 5,),
+                      Icon(Icons.open_in_new),
+                    ],
                   ),
                   SizedBox(height: 4),
                   Text(

@@ -1,18 +1,101 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/onboarding_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/edit_screen.dart';
 import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final PregnancyController controller;
 
   const HomeScreen({super.key, required this.controller});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  // final Random _random = Random();
+
+  final List<String> _tipMessages = [ // 축하 메시지 리스트 추가
+    "이 시기엔 카페인 섭취를 조금 줄여보는 게 좋아요.",
+    "임신 15주차에는 옆으로 누워 자는 습관을 들이면 더 편안해요.",
+    "지금은 칼슘이 풍부한 음식을 챙겨 먹어주는 것이 도움이 돼요.",
+    "이 때는 물을 자주 마셔서 치질·변비를 예방해보세요.",
+    "이 시점엔 가벼운 산책으로 기분을 환기해보는 것이 좋아요.",
+    "이 즈음엔 구강 관리를 꼼꼼히 해주면 치은염 예방에 도움이 돼요.",
+    "이 주차에는 오래 앉아 있기보다 중간중간 움직여주는 게 좋아요.",
+    "이 과정에서는 부드러운 스트레칭으로 몸의 긴장을 풀어주세요.",
+    "이 시기 특성상 감정 기복이 있을 수 있으니 충분히 휴식하세요.",
+  ];
+
+  final List<String> _deviceTipMessages = [
+    "실내 온도를 24–26°C로 유지해보세요.",
+    "가습기를 40–60%로 설정해두면 편안해요.",
+    "취침 전 에어컨 바람세기는 약풍으로 낮춰보세요.",
+    "이 시기엔 공기청정기를 자동 모드로 켜두는 게 좋아요.",
+    "집안 먼지를 줄이기 위해 로봇청소기를 매일 한 번 돌려보세요.",
+    "피부와 점막 건조를 막기 위해 실내 공기를 신선하게 유지해보세요.",
+    "밤에는 조명을 20–40%로 낮춰두면 숙면에 도움이 돼요.",
+    "임산부는 소음에 민감할 수 있어 공기청정기·가습기에 취침모드를 사용해보세요.",
+  ];
+
+  final List<String> _supplementTipMessages = [
+    "엽산 – 태아 신경관 형성을 위해 꼭 필요한 기본 영양제예요.",
+    "철분 – 임신 중기 이후 증가하는 혈액량을 보충해 피로를 줄여줘요.",
+    "비타민D – 칼슘 흡수를 돕고 면역력을 유지하는 데 중요해요.",
+    "칼슘 – 태아 뼈 발달을 위해 하루 1000mg 정도 꼭 챙겨주세요.",
+    "요오드 – 갑상선 호르몬 생성에 필요하지만 과다 섭취는 피해야 해요.",
+    "오메가3 – 조산 위험을 낮추고 태아 뇌 발달에 도움을 줄 수 있어요.",
+    "유산균 – 장 건강을 돕지만 체질마다 다를 수 있어 의사 상담이 좋아요.",
+    "비타민A 주의 – 5000 IU 이상 장기 복용은 기형 위험이 있어 피해야 해요.",
+  ];
+
+  String _randomTip = "";
+  String _randomDeviceTip = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _randomTip = _tipMessages[Random().nextInt(_tipMessages.length)];
+    _randomDeviceTip = _deviceTipMessages[Random().nextInt(_deviceTipMessages.length)];
+  }
+
+  void _showSupplementPopup() {
+    final randomMessage =
+    _supplementTipMessages[Random().nextInt(_supplementTipMessages.length)];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            "오늘의 영양제 추천",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            randomMessage,
+            style: const TextStyle(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("확인"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final weeks = controller.weeks;
-    final babyName = controller.babyNickname ?? '우리 아기';
+    final weeks = widget.controller.weeks;
+    final babyName = widget.controller.babyNickname ?? '우리 아기';
 
     return Scaffold(
       body: Container(
@@ -99,7 +182,7 @@ class HomeScreen extends StatelessWidget {
                                                       builder: (_) =>
                                                           OnboardingScreen(
                                                             controller:
-                                                                controller,
+                                                                widget.controller,
                                                             onCompleted: () {},
                                                           ),
                                                     ),
@@ -607,9 +690,9 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      controller.dDayString.isEmpty
+                      widget.controller.dDayString.isEmpty
                           ? '임신 ${weeks}주차'
-                          : controller.dDayString,
+                          : widget.controller.dDayString,
                       style: TextStyle(color: Colors.grey.shade700),
                     ),
                     const SizedBox(height: 16),
@@ -623,22 +706,14 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const _TipCard(
+                    _TipCard(
                       title: '오늘의 생활 꿀팁',
-                      description: '가습기를 40–60%로 유지해보세요.',
+                      description: _randomDeviceTip,
                       buttonText: '오늘의 영양제 추천 보기',
                       icon: Icons.medication_outlined,
+                      onPressed: _showSupplementPopup,
                     ),
                     const SizedBox(height: 24),
-                    // const Text(
-                    //   '에어컨 온도 조절',
-                    //   style: TextStyle(
-                    //     fontSize: 18,
-                    //     fontWeight: FontWeight.bold,
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 8),
-                    // const _TemperatureControl(),
                     _buildFavoriteDevicesSection(),
                   ],
                 ),
@@ -682,13 +757,16 @@ class HomeScreen extends StatelessWidget {
           SizedBox(
             height: 160,
             child: Image.asset(
-              'assets/images/baby.png', // 네가 넣은 태아 이미지
+              'assets/images/baby.png',
               fit: BoxFit.contain,
             ),
           ),
           const SizedBox(height: 12),
+
+          // 🔥 랜덤 문구 출력
           Text(
-            '임신 ${weeks}주차에는 이런 걸 해보세요!',
+            _randomTip,
+            textAlign: TextAlign.center,
             style: const TextStyle(fontWeight: FontWeight.w600),
           ),
         ],
@@ -702,12 +780,14 @@ class _TipCard extends StatelessWidget {
   final String description;
   final String buttonText;
   final IconData icon;
+  final VoidCallback onPressed;
 
   const _TipCard({
     required this.title,
     required this.description,
     required this.buttonText,
     required this.icon,
+    required this.onPressed,
   });
 
   @override
@@ -734,7 +814,7 @@ class _TipCard extends StatelessWidget {
           Text(description),
           const SizedBox(height: 12),
           OutlinedButton.icon(
-            onPressed: () {},
+            onPressed: onPressed,
             icon: Icon(icon, size: 18),
             label: Text(buttonText),
             style: OutlinedButton.styleFrom(
