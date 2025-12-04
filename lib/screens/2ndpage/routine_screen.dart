@@ -8,13 +8,12 @@ import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/smart_routine_detail_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/edit_screen.dart';
 
-/// 가전 루틴 화면
 class RoutineScreen extends StatefulWidget {
   final PregnancyController controller;
 
   const RoutineScreen({
     super.key,
-    required this.controller, // ← main.dart 에서 넘겨주는 컨트롤러
+    required this.controller,
   });
 
   @override
@@ -22,6 +21,56 @@ class RoutineScreen extends StatefulWidget {
 }
 
 class _RoutineScreenState extends State<RoutineScreen> {
+
+  /// 🔥 공통 상태 문자열 생성 — HomeScreen FavoriteCard와 동일 구조(+커스텀 적용)
+  String _getDeviceStatus(String type, PregnancyController c) {
+    switch (type) {
+      case "aircon":
+        final t = c.airconTargetTemp.toStringAsFixed(0);
+        final mode = c.airconSleepMode ? "취침" : "기본";
+        return "$t°C · $mode";
+
+      case "aircleaner":
+      // 단계 → 텍스트 변환
+        String levelText(int lv) {
+          switch (lv) {
+            case 1: return "약";
+            case 2: return "보통";
+            case 3: return "강";
+            default: return "-";
+          }
+        }
+
+        final clean = levelText(c.airCleanerCleanLevel);
+        final booster = levelText(c.airCleanerBoosterLevel);
+        return "청정: $clean · 부스터: $booster";
+
+      case "humidifier":
+        final hum = c.humidifierTargetHumidity.toStringAsFixed(0);
+
+        // 🔥 분무량 1/2/3 → 퍼센트로 변환
+        String mistPercent(int level) {
+          switch (level) {
+            case 1: return "50%";  // 약
+            case 2: return "75%";  // 보통
+            case 3: return "100%"; // 강
+            default: return "-";
+          }
+        }
+
+        final mist = mistPercent(c.humidifierMistLevel);
+
+        return "희망습도: $hum% · 분무량: $mist";
+
+      case "robot":
+        final turbo = c.robotTurbo ? "터보" : "일반";
+        return "모드: $turbo";
+
+      default:
+        return "";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = widget.controller;
@@ -36,6 +85,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
       backgroundColor: Color(0xffFAF0F0),
       body: Column(
         children: [
+          /// ---------------------- 상단바 ----------------------
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
             child: Row(
@@ -51,7 +101,6 @@ class _RoutineScreenState extends State<RoutineScreen> {
                         ),
                       ),
                       SizedBox(width: 10),
-                      // 홈 변경 버튼
                       GestureDetector(
                         onTap: () {},
                         child: Image.asset(
@@ -63,16 +112,17 @@ class _RoutineScreenState extends State<RoutineScreen> {
                     ],
                   ),
                 ),
+
                 Row(
                   children: [
-                    // 추가 등록 버튼
+                    /// 제품 추가 패널
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: () {
                           showModalBottomSheet(
                             context: context,
-                            isScrollControlled: true, // ★ 패널 높이 직접 제어 가능
+                            isScrollControlled: true,
                             backgroundColor: Colors.transparent,
                             builder: (context) {
                               return Container(
@@ -80,7 +130,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                                 decoration: BoxDecoration(
                                   color: Color(0xffEFF1F4),
                                   borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(24), // ★ 위쪽만 둥글게
+                                    top: Radius.circular(24),
                                   ),
                                 ),
                                 child: Column(
@@ -96,159 +146,49 @@ class _RoutineScreenState extends State<RoutineScreen> {
                                       ),
                                     ),
                                     SizedBox(height: 16),
-                                    // ★ 내부 내용
                                     Padding(
                                       padding: EdgeInsets.all(20),
                                       child: Column(
                                         children: [
-                                          //제품 추가 버튼
                                           Material(
                                             color: Colors.transparent,
                                             child: InkWell(
-                                              onTap: () {Navigator.push(context, MaterialPageRoute(builder: (_)=>EditScreen()));},
-                                              child: Ink(
-                                                width: MediaQuery.of(
+                                              onTap: () {
+                                                Navigator.push(
                                                   context,
-                                                ).size.width,
+                                                  MaterialPageRoute(
+                                                    builder: (_) => EditScreen(),
+                                                  ),
+                                                );
+                                              },
+                                              child: Ink(
+                                                width: MediaQuery.of(context).size.width,
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
+                                                  borderRadius: BorderRadius.circular(20),
                                                 ),
                                                 child: Padding(
                                                   padding: EdgeInsets.all(20),
                                                   child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
                                                     children: [
-                                                      Icon(
-                                                        Icons.add_circle,
-                                                        color: Color(
-                                                          0xff43BA84,
-                                                        ),
-                                                      ),
+                                                      Icon(Icons.add_circle,
+                                                          color: Color(0xff43BA84)),
                                                       SizedBox(width: 10),
                                                       Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
                                                           Text(
                                                             "제품 추가",
                                                             style: TextStyle(
                                                               fontSize: 20,
                                                               fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
+                                                              FontWeight.bold,
                                                             ),
                                                           ),
                                                           Text(
                                                             "LG와 다양한 브랜드의 제품",
                                                             style: TextStyle(
                                                               fontSize: 15,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 12),
-                                          //씽큐 플레이
-                                          Material(
-                                            color: Colors.transparent,
-                                            child: InkWell(
-                                              onTap: () {},
-                                              child: Ink(
-                                                width: MediaQuery.of(
-                                                  context,
-                                                ).size.width,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsets.all(20),
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Icon(
-                                                        Icons
-                                                            .add_home_work_rounded,
-                                                        color: Color(
-                                                          0xffDB4F4F,
-                                                        ),
-                                                      ),
-                                                      SizedBox(width: 10),
-                                                      Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            "우리 단지 연결",
-                                                            style: TextStyle(
-                                                              fontSize: 20,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 12),
-                                          Material(
-                                            color: Colors.transparent,
-                                            child: InkWell(
-                                              onTap: () {},
-                                              child: Ink(
-                                                width: MediaQuery.of(
-                                                  context,
-                                                ).size.width,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsets.all(20),
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Icon(
-                                                        Icons.add_circle,
-                                                        color: Color(
-                                                          0xff43BA84,
-                                                        ),
-                                                      ),
-                                                      SizedBox(width: 10),
-                                                      Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            "방 만들기",
-                                                            style: TextStyle(
-                                                              fontSize: 20,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
                                                             ),
                                                           ),
                                                         ],
@@ -276,14 +216,15 @@ class _RoutineScreenState extends State<RoutineScreen> {
                         ),
                       ),
                     ),
+
                     SizedBox(width: 10),
-                    // 알림 버튼
+
                     GestureDetector(
-                      onTap: () => {
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => notification()),
-                        ),
+                        );
                       },
                       child: Image.asset(
                         "assets/images/notification.png",
@@ -291,42 +232,15 @@ class _RoutineScreenState extends State<RoutineScreen> {
                         height: 25,
                       ),
                     ),
+
                     SizedBox(width: 10),
-                    // 메뉴 버튼
-                    PopupMenuButton(
-                      offset: Offset(0, 40),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      color: Color(0xff2E2E2E),
-                      itemBuilder: (context) => <PopupMenuEntry>[
-                        PopupMenuItem(
-                          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "방 설정",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                Icon(Icons.settings, color: Colors.white),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                      child: Image.asset(
-                        "assets/images/menu.png",
-                        width: 30,
-                        height: 30,
-                      ),
-                    ),
                   ],
                 ),
               ],
             ),
           ),
+
+          /// ---------------------- 본문 ----------------------
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(16),
@@ -347,6 +261,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                     Icon(Icons.chevron_right, color: Colors.grey),
                   ],
                 ),
+
                 const SizedBox(height: 8),
                 _SmartRoutineHeaderCard(controller: controller),
                 const SizedBox(height: 24),
@@ -357,21 +272,30 @@ class _RoutineScreenState extends State<RoutineScreen> {
                       '내 가전',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(width: 5,),
-                    GestureDetector(child: Icon(Icons.arrow_forward_ios, size: 18, color: Color(0xff8F8E8E),), onTap: (){Navigator.push(context, MaterialPageRoute(builder: (_)=>EditScreen()));},),
+                    SizedBox(width: 5),
+                    GestureDetector(
+                      child: Icon(Icons.arrow_forward_ios,
+                          size: 18, color: Color(0xff8F8E8E)),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => EditScreen()),
+                        );
+                      },
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
 
-                // 🔹 에어컨
                 Wrap(
                   spacing: betweenCard,
                   runSpacing: betweenCard,
                   children: [
+                    /// ---------------- 에어컨 ----------------
                     _DeviceTile(
                       width: cardWidth,
                       name: '에어컨',
-                      status: '온도 조절: 24–26℃ 유지',
+                      status: _getDeviceStatus("aircon", controller),
                       icon: Image.asset("assets/images/aircon.png"),
                       onTap: () {
                         Navigator.push(
@@ -380,18 +304,15 @@ class _RoutineScreenState extends State<RoutineScreen> {
                             builder: (_) =>
                                 AirconControlScreen(controller: controller),
                           ),
-                        ).then((_) {
-                          // 제어 화면에서 값 바뀌어도, 돌아오면 다시 그리기
-                          setState(() {});
-                        });
+                        ).then((_) => setState(() {}));
                       },
                     ),
 
-                    // ───────── 공기청정기 ─────────
+                    /// ---------------- 공기청정기 ----------------
                     _DeviceTile(
                       width: cardWidth,
                       name: '공기청정기',
-                      status: '냄새 제거 모드로 켜짐',
+                      status: _getDeviceStatus("aircleaner", controller),
                       icon: Image.asset("assets/images/air_cleaner.png"),
                       onTap: () {
                         Navigator.push(
@@ -400,22 +321,17 @@ class _RoutineScreenState extends State<RoutineScreen> {
                             builder: (_) =>
                                 AirCleanerControlScreen(controller: controller),
                           ),
-                        ).then((_) {
-                          // 제어화면에서 뭔가 바뀌었다고 가정하고 다시 그리기
-                          setState(() {});
-                        });
+                        ).then((_) => setState(() {}));
                       },
                     ),
 
-                    // 🔹 가습기 (컨트롤러와 완전히 연동되는 부분!)
+                    /// ---------------- 가습기 ----------------
                     _DeviceTile(
                       width: cardWidth,
                       name: '가습기',
-                      status:
-                          '습도 조절: ${controller.humidifierTargetHumidity.toStringAsFixed(0)}% 유지',
+                      status: _getDeviceStatus("humidifier", controller),
                       icon: Image.asset("assets/images/humidifier.png"),
                       onTap: () async {
-                        // 가습기 제어 화면으로 이동
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -423,31 +339,26 @@ class _RoutineScreenState extends State<RoutineScreen> {
                                 HumidifierControlScreen(controller: controller),
                           ),
                         );
-                        // 돌아오면 설정값 반영해서 다시 그리기
                         setState(() {});
                       },
                     ),
 
-                    // 🔹 로봇청소기
+                    /// ---------------- 로봇청소기 ----------------
                     _DeviceTile(
                       width: cardWidth,
                       name: '로봇청소기',
-                      status: '오전 10시, 오후 5시 작동',
+                      status: _getDeviceStatus("robot", controller),
                       icon: Image.asset("assets/images/robot_cleaner.png"),
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => RobotCleanerControlScreen(
-                              controller: controller,
-                            ),
+                            builder: (_) =>
+                                RobotCleanerControlScreen(controller: controller),
                           ),
-                        ).then((_) {
-                          // 제어 화면에서 돌아왔을 때 상태 갱신하고 싶으면 여기서 setState 호출
-                          setState(() {});
-                        });
+                        ).then((_) => setState(() {}));
                       },
-                    )
+                    ),
                   ],
                 ),
               ],
@@ -473,51 +384,43 @@ class _EnergyReportCard extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.03),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 상단 제목 + 자세히 보기
+        children: const [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 '12월 리포트',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              TextButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('에너지 리포트는 준비 중입니다.')),
-                  );
-                },
-                child: const Text(
-                  '자세히 보기',
-                  style: TextStyle(
-                    color: Color(0xff7b5cff),
-                    fontWeight: FontWeight.bold,
-                  ),
+              Text(
+                '자세히 보기',
+                style: TextStyle(
+                  color: Color(0xff7b5cff),
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          const Text(
+          SizedBox(height: 4),
+          Text(
             '제품 에너지 사용량',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
-          const SizedBox(height: 12),
-          const Text(
+          SizedBox(height: 12),
+          Text(
             '16,240원',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 4),
-          const Text('75.69 kWh', style: TextStyle(fontSize: 12)),
-          const SizedBox(height: 4),
-          const Text(
+          SizedBox(height: 4),
+          Text('75.69 kWh', style: TextStyle(fontSize: 12)),
+          SizedBox(height: 4),
+          Text(
             '지난달 같은 기간 대비 8% 사용량 증가',
             style: TextStyle(fontSize: 11, color: Colors.grey),
           ),
@@ -527,7 +430,6 @@ class _EnergyReportCard extends StatelessWidget {
   }
 }
 
-/// 🔹 각 가전 타일
 class _DeviceTile extends StatelessWidget {
   final String name;
   final double width;
@@ -559,7 +461,7 @@ class _DeviceTile extends StatelessWidget {
               BoxShadow(
                 color: Colors.black.withOpacity(0.03),
                 blurRadius: 8,
-                offset: const Offset(0, 4),
+                offset: Offset(0, 4),
               ),
             ],
           ),
@@ -567,7 +469,7 @@ class _DeviceTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(child: SizedBox(width: 40, height: 40, child: icon)),
-              const SizedBox(width: 10),
+              const SizedBox(height: 10),
               Text(
                 name,
                 style: const TextStyle(
@@ -600,7 +502,6 @@ class _SmartRoutineHeaderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // 맞춤 루틴 상세 설정 화면으로 이동
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -611,13 +512,13 @@ class _SmartRoutineHeaderCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xfff5efff),
+          color: Color(0xfff5efff),
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.03),
               blurRadius: 8,
-              offset: const Offset(0, 4),
+              offset: Offset(0, 4),
             ),
           ],
         ),
