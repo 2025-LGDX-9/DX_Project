@@ -119,29 +119,37 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: () async {
-                    if (_formKey.currentState!.validate() &&
-                        _startDate != null) {
+                    if (_formKey.currentState!.validate() && _startDate != null) {
+
                       // 1) 컨트롤러 저장
                       widget.controller.saveInfo(
                         nickname: _nicknameCtrl.text.trim(),
                         start: _startDate!,
                       );
 
-                      // 2) 랜덤 초대코드 생성
-                      String inviteCode = _generateInviteCode();
-
-                      // 3) Hive 저장
+                      // 2) Hive 박스 열기
                       final box = Hive.box('onboarding');
+
+                      final bool isFirstTime = !(box.get('completed') ?? false);
+
+                      // 3) 난수 코드 최초 1회만 생성
+                      String? inviteCode = box.get('inviteCode');
+                      if (inviteCode == null) {
+                        inviteCode = _generateInviteCode();
+                        box.put('inviteCode', inviteCode);
+                      }
+
+                      // 4) 데이터 저장 (난수는 덮어쓰지 않음)
                       box.put('nickname', _nicknameCtrl.text.trim());
                       box.put('startDate', _startDate!.toIso8601String());
                       box.put('completed', true);
-                      box.put('tutorialShown', false);
-
-                      /// 🔥 초대코드 저장
-                      box.put('inviteCode', inviteCode);
                       box.put('pregnancyMode', true);
 
-                      // 4) 이전 화면으로 true 반환
+                      if (isFirstTime) {
+                        box.put('tutorialShown', false);
+                      }
+
+                      // 5) 이전 화면으로 true 반환
                       Navigator.pop(context, true);
                     } else if (_startDate == null) {
                       ScaffoldMessenger.of(context).showSnackBar(

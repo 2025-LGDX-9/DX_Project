@@ -130,7 +130,7 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
       _homeScreen,
       RoutineScreen(controller: controller),
       InfoScreen(controller: controller),
-      MenuScreen(),
+      MenuScreen(controller: controller,),
     ];
 
     return MaterialApp(

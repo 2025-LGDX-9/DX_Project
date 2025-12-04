@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:pregnancy_mode_app/pregnancy_controller.dart';
+import 'package:pregnancy_mode_app/screens/4thpage/my_page_screen.dart';
 
 class MenuScreen extends StatelessWidget {
-  const MenuScreen({super.key});
+  const MenuScreen({super.key, required this.controller});
+
+  final PregnancyController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -75,18 +79,45 @@ class MenuScreen extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(
-                                  "마이 페이지",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                // ──────────────── 마이페이지 버튼 ────────────────
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.push(context, MaterialPageRoute(builder: (_)=>MyPageScreen(controller: controller,)));
+                                    },
+                                    child: Ink(
+                                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                      child: Text(
+                                        "마이 페이지",
+                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
                                 ),
+
+                                // 구분선
                                 Container(
                                   width: 1,
                                   height: 30,
                                   color: Colors.black54,
                                 ),
-                                Text(
-                                  "고객 지원",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+
+                                // ──────────────── 고객지원 버튼 ────────────────
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      // TODO: 고객지원 이동
+                                    },
+                                    child: Ink(
+                                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                      child: Text(
+                                        "고객 지원",
+                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
