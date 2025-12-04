@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:pregnancy_mode_app/Test/WeatherDetailScreen.dart';
 import 'package:pregnancy_mode_app/Test/WeatherTestScreen.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/invite_member.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/tutorial_screen.dart';
 import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/home_screen.dart';
@@ -29,10 +31,16 @@ Widget _buildTopBackground() {
 }
 
 class ThinqHomeScreen extends StatelessWidget {
-  const ThinqHomeScreen({super.key, required this.controller, required this.onOnboardingCompleted});
+  const ThinqHomeScreen({
+    super.key,
+    required this.controller,
+    required this.onOnboardingCompleted,
+    this.onPregnancyModeChanged,
+  });
 
   final PregnancyController controller;
   final VoidCallback onOnboardingCompleted;
+  final Function(bool)? onPregnancyModeChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +73,16 @@ class ThinqHomeScreen extends StatelessWidget {
                                   isScrollControlled: true, // ★ 패널 높이 직접 제어 가능
                                   backgroundColor: Colors.transparent,
                                   builder: (context) {
+                                    final onboardBox = Hive.box('onboarding');
+                                    final hasPregnancyInfo = onboardBox.get(
+                                      'completed',
+                                      defaultValue: false,
+                                    ); // 🔥 온보딩 여부
+                                    final pregnancyMode = onboardBox.get(
+                                      'pregnancyMode',
+                                      defaultValue: false,
+                                    ); // 🔥 현재 모드
+
                                     return Container(
                                       width: double.infinity,
                                       decoration: BoxDecoration(
@@ -93,84 +111,162 @@ class ThinqHomeScreen extends StatelessWidget {
                                             child: Column(
                                               children: [
                                                 //임산부 등록 버튼
-                                                Material(
-                                                  color: Colors.transparent,
-                                                  child: InkWell(
-                                                    onTap: () async {
-                                                      Navigator.pop(context); // ★★ 먼저 BottomSheet 닫기 ★★
+                                                if (hasPregnancyInfo)
+                                                  Material(
+                                                    color: Colors.transparent,
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        final newMode =
+                                                            !pregnancyMode;
+                                                        onboardBox.put(
+                                                          'pregnancyMode',
+                                                          newMode,
+                                                        );
 
-                                                      await Future.delayed(const Duration(milliseconds: 150));
+                                                        Navigator.pop(context);
 
-                                                      final result = await Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (_) => OnboardingScreen(
-                                                            controller: controller,
-                                                            onCompleted: () {},
+                                                        // 🔥 main.dart에 화면 전환 요청
+                                                        if (onPregnancyModeChanged !=
+                                                            null) {
+                                                          onPregnancyModeChanged!(
+                                                            newMode,
+                                                          );
+                                                        }
+                                                      },
+                                                      child: Ink(
+                                                        width: MediaQuery.of(
+                                                          context,
+                                                        ).size.width,
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                20,
+                                                              ),
+                                                        ),
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                20,
+                                                              ),
+                                                          child: Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Icon(
+                                                                Icons
+                                                                    .pregnant_woman,
+                                                                color:
+                                                                    pregnancyMode
+                                                                    ? Colors.red
+                                                                    : Colors
+                                                                          .green,
+                                                              ),
+                                                              SizedBox(
+                                                                width: 10,
+                                                              ),
+                                                              Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    pregnancyMode
+                                                                        ? "임산부 모드 해제"
+                                                                        : "임산부 모드 활성화",
+                                                                    style: TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    pregnancyMode
+                                                                        ? "일반 모드로 돌아갑니다."
+                                                                        : "임산부 전용 홈 화면을 활성화합니다.",
+                                                                    style: TextStyle(
+                                                                      fontSize:
+                                                                          15,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
                                                           ),
                                                         ),
-                                                      );
-
-                                                      if (result == true) {
-                                                        onOnboardingCompleted();
-                                                      }
-                                                    },
-                                                    child: Ink(
-                                                      width: MediaQuery.of(
-                                                        context,
-                                                      ).size.width,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              20,
-                                                            ),
                                                       ),
-                                                      child: Padding(
-                                                        padding: EdgeInsets.all(
-                                                          20,
+                                                    ),
+                                                  )
+                                                // =============================================================
+                                                // 🔵 ② 임산부 정보 없음 → 기존 “임산부 등록” 버튼 유지
+                                                // =============================================================
+                                                else
+                                                  Material(
+                                                    color: Colors.transparent,
+                                                    child: InkWell(
+                                                      onTap: () async {
+                                                        Navigator.pop(context);
+
+                                                        final result = await Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (_) => OnboardingScreen(
+                                                              controller: controller,
+                                                              onCompleted: () {},
+                                                            ),
+                                                          ),
+                                                        );
+
+                                                        if (result == true) {
+                                                          final box = Hive.box('onboarding');
+
+                                                          // 온보딩 완료 → 임산부 모드 활성화
+                                                          box.put('pregnancyMode', true);
+
+                                                          // 🔥 main.dart 에 즉시 반영
+                                                          if (onPregnancyModeChanged != null) {
+                                                            onPregnancyModeChanged!(true);
+                                                          }
+                                                        }
+                                                      },
+                                                      child: Ink(
+                                                        width: MediaQuery.of(context).size.width,
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius: BorderRadius.circular(20),
                                                         ),
-                                                        child: Row(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Icon(
-                                                              Icons
-                                                                  .pregnant_woman,
-                                                            ),
-                                                            SizedBox(width: 10),
-                                                            Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  "임산부 모드",
-                                                                  style: TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
+                                                        child: Padding(
+                                                          padding: EdgeInsets.all(20),
+                                                          child: Row(
+                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            children: [
+                                                              Icon(Icons.pregnant_woman),
+                                                              SizedBox(width: 10),
+                                                              Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                children: [
+                                                                  Text(
+                                                                    "임산부 모드",
+                                                                    style: TextStyle(
+                                                                      fontSize: 20,
+                                                                      fontWeight: FontWeight.bold,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                                Text(
-                                                                  "설명",
-                                                                  style:
-                                                                      TextStyle(
-                                                                        fontSize:
-                                                                            15,
-                                                                      ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
+                                                                  Text(
+                                                                    "설명",
+                                                                    style: TextStyle(fontSize: 15),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
                                                 SizedBox(height: 12),
                                                 //제품 추가 버튼
                                                 Material(
@@ -461,7 +557,15 @@ class ThinqHomeScreen extends StatelessWidget {
                                                       child: Column(
                                                         children: [
                                                           InkWell(
-                                                            onTap: () {},
+                                                            onTap: () {
+                                                              Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder: (_) =>
+                                                                      InviteMember(),
+                                                                ),
+                                                              );
+                                                            },
                                                             child: Ink(
                                                               child: Row(
                                                                 crossAxisAlignment:
@@ -682,12 +786,17 @@ class ThinqHomeScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => WeatherDetailScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => WeatherDetailScreen(),
+                        ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
                     ),
                     child: Text("날씨 상세 페이지", style: TextStyle(fontSize: 16)),
                   ),
@@ -759,12 +868,7 @@ class ThinqHomeScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 🔵 왼쪽 이미지 추가
-          Image.asset(
-            imagePath,
-            width: 70,
-            height: 70,
-            fit: BoxFit.contain,
-          ),
+          Image.asset(imagePath, width: 70, height: 70, fit: BoxFit.contain),
 
           const SizedBox(width: 16),
 
@@ -814,7 +918,6 @@ class ThinqHomeScreen extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _sectionTitle(String title) {
     return Padding(

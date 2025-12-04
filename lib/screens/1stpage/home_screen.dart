@@ -15,16 +15,22 @@ import 'package:pregnancy_mode_app/services/favorite_service.dart';
 class HomeScreen extends StatefulWidget {
   final PregnancyController controller;
   final bool showTutorial;
+  final Function(bool)? onPregnancyModeChanged;
 
-  const HomeScreen({super.key, required this.controller, this.showTutorial = false});
+  const HomeScreen({
+    super.key,
+    required this.controller,
+    this.showTutorial = false,
+    this.onPregnancyModeChanged,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
-  final List<String> _tipMessages = [ // 축하 메시지 리스트 추가
+  final List<String> _tipMessages = [
+    // 축하 메시지 리스트 추가
     "이 시기엔 카페인 섭취를 조금 줄여보는 게 좋아요.",
     "임신 15주차에는 옆으로 누워 자는 습관을 들이면 더 편안해요.",
     "지금은 칼슘이 풍부한 음식을 챙겨 먹어주는 것이 도움이 돼요.",
@@ -80,7 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     _randomTip = _tipMessages[Random().nextInt(_tipMessages.length)];
-    _randomDeviceTip = _deviceTipMessages[Random().nextInt(_deviceTipMessages.length)];
+    _randomDeviceTip =
+        _deviceTipMessages[Random().nextInt(_deviceTipMessages.length)];
   }
 
   void _checkAndShowTutorial() {
@@ -103,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showSupplementPopup() {
     final randomMessage =
-    _supplementTipMessages[Random().nextInt(_supplementTipMessages.length)];
+        _supplementTipMessages[Random().nextInt(_supplementTipMessages.length)];
 
     showDialog(
       context: context,
@@ -116,10 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
             "오늘의 영양제 추천",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          content: Text(
-            randomMessage,
-            style: const TextStyle(fontSize: 14),
-          ),
+          content: Text(randomMessage, style: const TextStyle(fontSize: 14)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -130,8 +134,6 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -184,6 +186,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               isScrollControlled: true, // ★ 패널 높이 직접 제어 가능
                               backgroundColor: Colors.transparent,
                               builder: (context) {
+                                final onboardBox = Hive.box('onboarding');
+                                final hasPregnancyInfo = onboardBox.get(
+                                  'pregnancyMode',
+                                  defaultValue: false,
+                                );
+
                                 return Container(
                                   width: double.infinity,
                                   decoration: BoxDecoration(
@@ -213,6 +221,125 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Column(
                                           children: [
                                             //임산부 등록 버튼
+                                            if (hasPregnancyInfo)
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    onboardBox.put(
+                                                      'pregnancyMode',
+                                                      false,
+                                                    ); // DB 저장
+
+                                                    // ★ main에게 전달 → 화면 전환 발생
+                                                    if (widget
+                                                            .onPregnancyModeChanged !=
+                                                        null) {
+                                                      widget
+                                                          .onPregnancyModeChanged!(
+                                                        false,
+                                                      );
+                                                    }
+
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Ink(
+                                                    width: MediaQuery.of(
+                                                      context,
+                                                    ).size.width,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: EdgeInsets.all(
+                                                        20,
+                                                      ),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.close,
+                                                            color: Colors.red,
+                                                          ),
+                                                          SizedBox(width: 10),
+                                                          Text(
+                                                            "임산부 모드 해제",
+                                                            style: TextStyle(
+                                                              fontSize: 20,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            else
+                                              // =============================
+                                              // 임산부 모드 OFF 상태 → 기존 '임산부 등록' 버튼 그대로
+                                              // =============================
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (_) =>
+                                                            OnboardingScreen(
+                                                              controller: widget
+                                                                  .controller,
+                                                              onCompleted:
+                                                                  () {},
+                                                            ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Ink(
+                                                    width: MediaQuery.of(
+                                                      context,
+                                                    ).size.width,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: EdgeInsets.all(
+                                                        20,
+                                                      ),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .pregnant_woman,
+                                                          ),
+                                                          SizedBox(width: 10),
+                                                          Text(
+                                                            "임산부 모드",
+                                                            style: TextStyle(
+                                                              fontSize: 20,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            SizedBox(height: 12),
+                                            //제품 추가 버튼
                                             Material(
                                               color: Colors.transparent,
                                               child: InkWell(
@@ -221,11 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     context,
                                                     MaterialPageRoute(
                                                       builder: (_) =>
-                                                          OnboardingScreen(
-                                                            controller:
-                                                            widget.controller,
-                                                            onCompleted: () {},
-                                                          ),
+                                                          EditScreen(),
                                                     ),
                                                   );
                                                 },
@@ -236,72 +359,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                      20,
-                                                    ),
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
                                                   ),
                                                   child: Padding(
                                                     padding: EdgeInsets.all(20),
                                                     child: Row(
                                                       crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .center,
-                                                      children: [
-                                                        Icon(
-                                                          Icons.pregnant_woman,
-                                                        ),
-                                                        SizedBox(width: 10),
-                                                        Column(
-                                                          crossAxisAlignment:
                                                           CrossAxisAlignment
-                                                              .start,
-                                                          children: [
-                                                            Text(
-                                                              "임산부 모드",
-                                                              style: TextStyle(
-                                                                fontSize: 20,
-                                                                fontWeight:
-                                                                FontWeight
-                                                                    .bold,
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              "설명",
-                                                              style: TextStyle(
-                                                                fontSize: 15,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(height: 12),
-                                            //제품 추가 버튼
-                                            Material(
-                                              color: Colors.transparent,
-                                              child: InkWell(
-                                                onTap: () {Navigator.push(context, MaterialPageRoute(builder: (_)=>EditScreen()));},
-                                                child: Ink(
-                                                  width: MediaQuery.of(
-                                                    context,
-                                                  ).size.width,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                    BorderRadius.circular(
-                                                      20,
-                                                    ),
-                                                  ),
-                                                  child: Padding(
-                                                    padding: EdgeInsets.all(20),
-                                                    child: Row(
-                                                      crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .center,
+                                                              .center,
                                                       children: [
                                                         Icon(
                                                           Icons.add_circle,
@@ -312,16 +379,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         SizedBox(width: 10),
                                                         Column(
                                                           crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Text(
                                                               "제품 추가",
                                                               style: TextStyle(
                                                                 fontSize: 20,
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                    FontWeight
+                                                                        .bold,
                                                               ),
                                                             ),
                                                             Text(
@@ -351,16 +418,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                      20,
-                                                    ),
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
                                                   ),
                                                   child: Padding(
                                                     padding: EdgeInsets.all(20),
                                                     child: Row(
                                                       crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .center,
+                                                          CrossAxisAlignment
+                                                              .center,
                                                       children: [
                                                         Icon(
                                                           Icons
@@ -372,16 +439,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         SizedBox(width: 10),
                                                         Column(
                                                           crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Text(
                                                               "ThinQ PLAY",
                                                               style: TextStyle(
                                                                 fontSize: 20,
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                    FontWeight
+                                                                        .bold,
                                                               ),
                                                             ),
                                                             Text(
@@ -408,7 +475,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                  BorderRadius.circular(20),
+                                                      BorderRadius.circular(20),
                                                 ),
                                                 child: Padding(
                                                   padding: EdgeInsets.all(20),
@@ -419,8 +486,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         child: Ink(
                                                           child: Row(
                                                             crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
+                                                                CrossAxisAlignment
+                                                                    .center,
                                                             children: [
                                                               Icon(
                                                                 Icons
@@ -434,17 +501,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               ),
                                                               Column(
                                                                 crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
+                                                                    CrossAxisAlignment
+                                                                        .start,
                                                                 children: [
                                                                   Text(
                                                                     "루틴 만들기",
                                                                     style: TextStyle(
                                                                       fontSize:
-                                                                      20,
+                                                                          20,
                                                                       fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                                                          FontWeight
+                                                                              .bold,
                                                                     ),
                                                                   ),
                                                                 ],
@@ -460,8 +527,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         onTap: () {},
                                                         child: Row(
                                                           crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
+                                                              CrossAxisAlignment
+                                                                  .center,
                                                           children: [
                                                             Icon(
                                                               Icons
@@ -473,17 +540,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             SizedBox(width: 10),
                                                             Column(
                                                               crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                                  CrossAxisAlignment
+                                                                      .start,
                                                               children: [
                                                                 Text(
                                                                   "우리 단지 연결",
                                                                   style: TextStyle(
                                                                     fontSize:
-                                                                    20,
+                                                                        20,
                                                                     fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                        FontWeight
+                                                                            .bold,
                                                                   ),
                                                                 ),
                                                               ],
@@ -498,8 +565,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         onTap: () {},
                                                         child: Row(
                                                           crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
+                                                              CrossAxisAlignment
+                                                                  .center,
                                                           children: [
                                                             Icon(
                                                               Icons.drafts,
@@ -510,17 +577,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             SizedBox(width: 10),
                                                             Column(
                                                               crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                                  CrossAxisAlignment
+                                                                      .start,
                                                               children: [
                                                                 Text(
                                                                   "3D 홈뷰 만들기",
                                                                   style: TextStyle(
                                                                     fontSize:
-                                                                    20,
+                                                                        20,
                                                                     fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                        FontWeight
+                                                                            .bold,
                                                                   ),
                                                                 ),
                                                               ],
@@ -543,19 +610,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                  BorderRadius.circular(20),
+                                                      BorderRadius.circular(20),
                                                 ),
                                                 child: Padding(
                                                   padding: EdgeInsets.all(20),
                                                   child: Column(
                                                     children: [
                                                       InkWell(
-                                                        onTap: () {Navigator.push(context, MaterialPageRoute(builder: (_)=>InviteMember()));},
+                                                        onTap: () {
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (_) =>
+                                                                  InviteMember(),
+                                                            ),
+                                                          );
+                                                        },
                                                         child: Ink(
                                                           child: Row(
                                                             crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
+                                                                CrossAxisAlignment
+                                                                    .center,
                                                             children: [
                                                               Icon(
                                                                 Icons
@@ -569,17 +644,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               ),
                                                               Column(
                                                                 crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
+                                                                    CrossAxisAlignment
+                                                                        .start,
                                                                 children: [
                                                                   Text(
                                                                     "멤버 초대",
                                                                     style: TextStyle(
                                                                       fontSize:
-                                                                      20,
+                                                                          20,
                                                                       fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                                                          FontWeight
+                                                                              .bold,
                                                                     ),
                                                                   ),
                                                                 ],
@@ -595,8 +670,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         onTap: () {},
                                                         child: Row(
                                                           crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
+                                                              CrossAxisAlignment
+                                                                  .center,
                                                           children: [
                                                             Icon(
                                                               Icons.add_home,
@@ -607,17 +682,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             SizedBox(width: 10),
                                                             Column(
                                                               crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                                  CrossAxisAlignment
+                                                                      .start,
                                                               children: [
                                                                 Text(
                                                                   "새로운 홈 만들기",
                                                                   style: TextStyle(
                                                                     fontSize:
-                                                                    20,
+                                                                        20,
                                                                     fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                        FontWeight
+                                                                            .bold,
                                                                   ),
                                                                 ),
                                                               ],
@@ -675,7 +750,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               padding: EdgeInsets.all(10),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "화면 편집",
@@ -692,7 +767,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               padding: EdgeInsets.all(10),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "홈 설정",
@@ -776,10 +851,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const Text(
               '즐겨 찾는 제품',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 4),
 
@@ -820,8 +892,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   FavoriteDeviceCard(
                     name: d.name,
                     icon: IconData(d.iconCode, fontFamily: 'MaterialIcons'),
-                    type: d.type,                            // ★ 추가됨
-                    controller: widget.controller,           // ★ 추가됨
+                    type: d.type,
+                    // ★ 추가됨
+                    controller: widget.controller,
+                    // ★ 추가됨
                     showDelete: _editMode,
                     onDelete: () {
                       FavoriteService.removeFavorite(d);
@@ -831,9 +905,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 /// ★ 편집모드일 때 +카드 항상 보임 (즐겨찾기가 없어도)
                 if (_editMode)
-                  AddFavoriteCard(
-                    onAdd: () => _openAddFavoriteModal(),
-                  ),
+                  AddFavoriteCard(onAdd: () => _openAddFavoriteModal()),
               ],
             ),
           ),
@@ -869,8 +941,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (_, i) {
                     final device = addableDevices[i];
                     return ListTile(
-                      leading: Icon(IconData(device.iconCode,
-                          fontFamily: 'MaterialIcons')),
+                      leading: Icon(
+                        IconData(device.iconCode, fontFamily: 'MaterialIcons'),
+                      ),
                       title: Text(device.name),
                       onTap: () {
                         FavoriteService.addFavorite(
@@ -925,10 +998,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 12),
           SizedBox(
             height: 160,
-            child: Image.asset(
-              'assets/images/baby.png',
-              fit: BoxFit.contain,
-            ),
+            child: Image.asset('assets/images/baby.png', fit: BoxFit.contain),
           ),
           const SizedBox(height: 12),
 
@@ -1028,10 +1098,14 @@ class FavoriteDeviceCard extends StatelessWidget {
       case "aircleaner":
         String levelText(int lv) {
           switch (lv) {
-            case 1: return "약";
-            case 2: return "보통";
-            case 3: return "강";
-            default: return "-";
+            case 1:
+              return "약";
+            case 2:
+              return "보통";
+            case 3:
+              return "강";
+            default:
+              return "-";
           }
         }
 
@@ -1044,10 +1118,14 @@ class FavoriteDeviceCard extends StatelessWidget {
 
         String mistPercent(int level) {
           switch (level) {
-            case 1: return "50%";
-            case 2: return "75%";
-            case 3: return "100%";
-            default: return "-";
+            case 1:
+              return "50%";
+            case 2:
+              return "75%";
+            case 3:
+              return "100%";
+            default:
+              return "-";
           }
         }
 
@@ -1072,7 +1150,8 @@ class FavoriteDeviceCard extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         Container(
-          width: 110,   // +카드와 동일한 크기
+          width: 110,
+          // +카드와 동일한 크기
           margin: const EdgeInsets.only(right: 12),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(

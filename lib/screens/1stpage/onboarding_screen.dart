@@ -139,6 +139,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                       /// 🔥 초대코드 저장
                       box.put('inviteCode', inviteCode);
+                      box.put('pregnancyMode', true);
 
                       // 4) 이전 화면으로 true 반환
                       Navigator.pop(context, true);
