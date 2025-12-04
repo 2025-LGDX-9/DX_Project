@@ -10,5 +10,12 @@ class AllDevice extends HiveObject {
   @HiveField(1)
   int iconCode;
 
-  AllDevice({required this.name, required this.iconCode});
+  @HiveField(2)
+  String type;  // ← 필수 추가: aircon, aircleaner, humidifier, robot
+
+  AllDevice({
+    required this.name,
+    required this.iconCode,
+    required this.type,
+  });
 }

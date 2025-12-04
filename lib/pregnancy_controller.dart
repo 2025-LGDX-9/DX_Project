@@ -11,6 +11,106 @@ class PregnancyController {
     startDate = start;
   }
 
+  // =========================
+  // 에어컨 상태
+  // =========================
+  bool airconOn = false;
+  double airconTargetTemp = 24.0;
+  bool airconSleepMode = false;
+
+  // =========================
+  // 공기청정기 상태
+  // =========================
+  bool airCleanerPowerOn = true;
+  int airCleanerCleanLevel = 1;
+  int airCleanerBoosterLevel = 0;
+  bool airCleanerAiMode = true;
+  bool airCleanerSmartCare = true;
+
+  // =========================
+  // 가습기 상태
+  // =========================
+  bool humidifierPowerOn = true;
+  int humidifierMistLevel = 3;
+  int humidifierTargetHumidity = 50;
+  bool humidifierComfortCare = true;
+  bool humidifierAutoMode = true;
+  int humidifierReservationHour = 0;
+  bool humidifierSilentMode = false;
+
+  // =========================
+  // 로봇청소기 상태
+  // =========================
+  bool robotPowerOn = true;
+  bool robotTurbo = false;
+  bool robotSmartTurbo = true;
+  bool robotHasReservation = false;
+
+  // ============================================================
+  // 🔵 모든 디바이스 저장
+  // ============================================================
+  Future<void> saveAllDeviceSettings() async {
+    final box = Hive.box('device_settings');
+
+    // 에어컨
+    box.put('airconOn', airconOn);
+    box.put('airconTemp', airconTargetTemp);
+    box.put('airconSleep', airconSleepMode);
+
+    // 공기청정기
+    box.put('ac_power', airCleanerPowerOn);
+    box.put('ac_clean', airCleanerCleanLevel);
+    box.put('ac_booster', airCleanerBoosterLevel);
+    box.put('ac_ai', airCleanerAiMode);
+    box.put('ac_smart', airCleanerSmartCare);
+
+    // 가습기
+    box.put('hum_power', humidifierPowerOn);
+    box.put('hum_mist', humidifierMistLevel);
+    box.put('hum_target', humidifierTargetHumidity);
+    box.put('hum_comfort', humidifierComfortCare);
+    box.put('hum_auto', humidifierAutoMode);
+    box.put('hum_resv', humidifierReservationHour);
+    box.put('hum_silent', humidifierSilentMode);
+
+    // 로봇청소기
+    box.put('robot_on', robotPowerOn);
+    box.put('robot_turbo', robotTurbo);
+    box.put('robot_smartTurbo', robotSmartTurbo);
+    box.put('robot_resv', robotHasReservation);
+  }
+
+  void loadAllDeviceSettings() {
+    final box = Hive.box('device_settings');
+
+    // 에어컨
+    airconOn = box.get('airconOn', defaultValue: false);
+    airconTargetTemp = box.get('airconTemp', defaultValue: 24.0);
+    airconSleepMode = box.get('airconSleep', defaultValue: false);
+
+    // 공기청정기
+    airCleanerPowerOn = box.get('ac_power', defaultValue: true);
+    airCleanerCleanLevel = box.get('ac_clean', defaultValue: 1);
+    airCleanerBoosterLevel = box.get('ac_booster', defaultValue: 0);
+    airCleanerAiMode = box.get('ac_ai', defaultValue: true);
+    airCleanerSmartCare = box.get('ac_smart', defaultValue: true);
+
+    // 가습기
+    humidifierPowerOn = box.get('hum_power', defaultValue: true);
+    humidifierMistLevel = box.get('hum_mist', defaultValue: 3);
+    humidifierTargetHumidity = box.get('hum_target', defaultValue: 50);
+    humidifierComfortCare = box.get('hum_comfort', defaultValue: true);
+    humidifierAutoMode = box.get('hum_auto', defaultValue: true);
+    humidifierReservationHour = box.get('hum_resv', defaultValue: 0);
+    humidifierSilentMode = box.get('hum_silent', defaultValue: false);
+
+    // 로봇청소기
+    robotPowerOn = box.get('robot_on', defaultValue: true);
+    robotTurbo = box.get('robot_turbo', defaultValue: false);
+    robotSmartTurbo = box.get('robot_smartTurbo', defaultValue: true);
+    robotHasReservation = box.get('robot_resv', defaultValue: false);
+  }
+
   Future<void> loadSavedData() async {
     final box = Hive.box('onboarding');
 
@@ -39,55 +139,4 @@ class PregnancyController {
     final d = dueDate.day.toString().padLeft(2, '0');
     return 'D-$diff  $y.$m.$d 예정';
   }
-
-  // =========================
-  // 가전 제어 상태 - 가습기
-  // =========================
-
-  /// 가습기 전원 ON/OFF
-  bool humidifierPower = true;
-
-  /// 목표 습도 (%)
-  double humidifierTargetHumidity = 50;
-
-  /// 세기 모드 (약 / 표준 / 강풍 / 취침)
-  String humidifierMode = '표준';
-
-  /// 예약 시간 (시간 단위, 0이면 예약 없음)
-  int humidifierReserveHours = 0;
-
-  // =========================
-  // 가전 제어 상태 - 에어컨
-  // =========================
-
-  /// 에어컨 전원 ON/OFF
-  bool airconOn = false;
-
-  /// 목표 온도 (℃)
-  double airconTargetTemp = 24.0;
-
-  /// 운전 모드 (냉방 / 제습 / 송풍 / 자동 등)
-  String airconMode = '냉방';
-
-  /// 풍량 단계 (1~3 정도로 사용)
-  int airconFanLevel = 2;
-
-  /// 에어컨 수면모드
-  bool airconSleepMode = false;
-
-  // =========================
-  // 가전 제어 상태 - 로봇청소기 (나중에 쓸 예정)
-  // =========================
-
-  /// 로봇청소기 전원 ON/OFF
-  bool robotOn = true;
-
-  /// 하루 자동 청소 횟수
-  int robotDailyCount = 2;
-
-  /// 오전 청소 시간 (예: 10시)
-  int robotMorningHour = 10;
-
-  /// 오후 청소 시간 (예: 17시)
-  int robotEveningHour = 17;
 }

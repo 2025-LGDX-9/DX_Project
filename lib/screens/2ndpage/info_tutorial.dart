@@ -32,11 +32,11 @@ class InfoTutorial extends StatelessWidget {
           children: [
 
             //////////////////////////////////////////////////////////////////////
-            /// 🔴 섹션 1 — 맞춤형 루틴 소개
+            /// ⭐ 섹션 1 — 맞춤형 루틴
             //////////////////////////////////////////////////////////////////////
             _SectionCard(
-              icon: Icons.home_outlined,
-              iconColor: Colors.redAccent,
+              icon: Icons.home,
+              iconColor: const Color(0xffDB4F4F),
               title: "맞춤형 루틴",
               description:
               "임산부는 일상의 작은 가전 조작도 종종 불편함을 느낄 수 있습니다. "
@@ -45,19 +45,21 @@ class InfoTutorial extends StatelessWidget {
                   "당신의 삶에 자연스럽게 맞춰 움직이는 스마트 케어를 경험해보세요.",
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 26),
 
             //////////////////////////////////////////////////////////////////////
-            /// 🔴 섹션 2 — 루틴은 어떻게 실행될까?
+            /// ⭐ 섹션 2 — 루틴은 어떻게 실행될까?
             //////////////////////////////////////////////////////////////////////
             _SectionCard(
-              icon: Icons.home_outlined,
-              iconColor: Colors.redAccent,
+              icon: Icons.home,
+              iconColor: const Color(0xffDB4F4F),
               title: "루틴은 어떻게 실행될까?",
               description: "",
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
+                  const SizedBox(height: 10),
 
                   const Text(
                     "언제 할까요?",
@@ -67,9 +69,8 @@ class InfoTutorial extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
 
-                  /// 시작 조건 카드
                   _ConditionCard(),
 
                   const SizedBox(height: 18),
@@ -79,15 +80,14 @@ class InfoTutorial extends StatelessWidget {
                         "실내 공기질과 관련된 가전이라면 임산부에게 적절한 온도인 "
                         "24~26℃를 벗어날 경우 가전을 작동시킵니다.",
                     style: TextStyle(
-                      height: 1.4,
+                      height: 1.45,
                       fontSize: 14,
                       color: Colors.black87,
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 26),
 
-                  /// 행동 카드 제목
                   const Text(
                     "무엇을 할까요?",
                     style: TextStyle(
@@ -96,9 +96,8 @@ class InfoTutorial extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
 
-                  /// 에어컨 액션 카드
                   _ActionCard(),
 
                   const SizedBox(height: 16),
@@ -107,7 +106,7 @@ class InfoTutorial extends StatelessWidget {
                     "작동된 가전은 실내 온도를 적정 범위로 맞춰주어, "
                         "더욱 편안한 환경에서 지낼 수 있도록 도와줍니다.",
                     style: TextStyle(
-                      height: 1.4,
+                      height: 1.45,
                       fontSize: 14,
                       color: Colors.black87,
                     ),
@@ -116,37 +115,38 @@ class InfoTutorial extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 28),
+            const SizedBox(height: 30),
 
             //////////////////////////////////////////////////////////////////////
-            /// 🔴 섹션 3 — 나에게 맞는 루틴
+            /// ⭐ 섹션 3 — 나에게 꼭 맞는 루틴
             //////////////////////////////////////////////////////////////////////
             _SectionCard(
-              icon: Icons.home_outlined,
-              iconColor: Colors.redAccent,
+              icon: Icons.home,
+              iconColor: const Color(0xffDB4F4F),
               title: "나에게 더 꼭 맞는 루틴이 필요하다면?",
               description:
-              "각 가전의 루틴은 수정할 수 있어요. 수정을 원하는 가전을 클릭한 후, "
-                  "상단바에 있는 편집 기능을 통해 더욱 나에게 알맞는 루틴으로 "
+              "각 가전의 루틴은 수정할 수 있어요. 수정을 원하는 조건 "
+                  "또는 가전을 클릭한 후 편집하여 더욱 나에게 알맞는 루틴으로 "
                   "변경할 수 있습니다.",
               child: Padding(
-                padding: const EdgeInsets.only(top: 16),
+                padding: const EdgeInsets.only(top: 18),
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
                     Container(
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 18,
+                        horizontal: 20,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      child: Row(
+                      child: const Row(
                         children: [
-                          const Icon(Icons.arrow_back,
-                              size: 26, color: Colors.black87),
-                          const SizedBox(width: 10),
-                          const Text(
+                          Icon(Icons.arrow_back, size: 26, color: Colors.black87),
+                          SizedBox(width: 10),
+                          Text(
                             "에어컨",
                             style: TextStyle(
                               fontSize: 18,
@@ -157,7 +157,6 @@ class InfoTutorial extends StatelessWidget {
                       ),
                     ),
 
-                    /// 오른쪽 아래 동그란 편집 버튼
                     Positioned(
                       right: 12,
                       bottom: 12,
@@ -167,7 +166,7 @@ class InfoTutorial extends StatelessWidget {
                           color: Colors.white,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: const Color(0xFFE85C5C),  // 빨간 테두리
+                            color: Color(0xffE85C5C),
                             width: 3,
                           ),
                           boxShadow: const [
@@ -185,7 +184,6 @@ class InfoTutorial extends StatelessWidget {
                         ),
                       ),
                     )
-
                   ],
                 ),
               ),
@@ -226,7 +224,6 @@ class _SectionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// 아이콘 + 제목
           Row(
             children: [
               Icon(icon, color: iconColor, size: 26),
@@ -283,6 +280,7 @@ class _ConditionCard extends StatelessWidget {
             ),
             child: const Icon(Icons.thermostat, color: Colors.redAccent, size: 28),
           ),
+
           const SizedBox(width: 16),
 
           Column(
@@ -334,6 +332,7 @@ class _ActionCard extends StatelessWidget {
       child: Row(
         children: [
           Image.asset("assets/images/aircon.png", width: 48, height: 48),
+
           const SizedBox(width: 16),
 
           Column(

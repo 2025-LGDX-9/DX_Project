@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/register_phone.dart';
 
 class InviteMember extends StatelessWidget {
   const InviteMember({super.key});
@@ -60,7 +61,7 @@ class InviteMember extends StatelessWidget {
                     SizedBox(height: 20),
 
                     // 캐릭터 이미지
-                    Image.asset("assets/image.png"),
+                    Image.asset("assets/images/invite_header.png"),
                     SizedBox(height: 20),
 
                     // 함께 쓸 제품
@@ -111,7 +112,7 @@ class InviteMember extends StatelessWidget {
                         children: [
                           // 첫 번째 카드 - 제품 작동하기
                           _buildFeatureCard(
-                            iconPath: "assets/ic_touch_yellow.png",
+                            iconPath: "assets/images/operator.png",
                             title: "제품 작동하기",
                             description: "홈 안의 제품을 작동할 수 있어요. 홈과 제품의 설정을 바꾸는 것도 가능해요.",
                           ),
@@ -119,7 +120,7 @@ class InviteMember extends StatelessWidget {
 
                           // 두 번째 카드 - 스마트 루틴 사용하기
                           _buildFeatureCard(
-                            iconPath: "assets/ic_refresh_purple.png",
+                            iconPath: "assets/images/check_purple.png",
                             title: "스마트 루틴 사용하기",
                             description: "생활 패턴에 맞춰 홈에 등록된 제품을 자동으로 한번에 작동할 수 있어요.",
                           ),
@@ -127,7 +128,7 @@ class InviteMember extends StatelessWidget {
 
                           // 세 번째 카드 - 서비스 이용하기
                           _buildFeatureCard(
-                            iconPath: "assets/ic_heart_hand.png",
+                            iconPath: "assets/images/heart.png",
                             title: "서비스 이용하기",
                             description: "제품에 대한 다양한 서비스를 이용할 수 있어요. 고객 지원, 가전 리포트를 사용해보세요.",
                           ),
@@ -165,7 +166,7 @@ class InviteMember extends StatelessWidget {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (_)=>RegisterPhone()));},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF5A67FF),
                     shape: RoundedRectangleBorder(

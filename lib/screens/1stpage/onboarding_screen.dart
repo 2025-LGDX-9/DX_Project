@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
@@ -21,6 +22,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final TextEditingController _nicknameCtrl = TextEditingController();
   DateTime? _startDate;
 
+  /// 🔥 6자리 랜덤 코드 생성 함수
+  String _generateInviteCode() {
+    final random = Random();
+    return List.generate(6, (_) => random.nextInt(10)).join(); // 000000~999999
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +50,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
+
+              /// 태명 입력
               TextFormField(
                 controller: _nicknameCtrl,
                 decoration: const InputDecoration(
@@ -56,12 +65,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   return null;
                 },
               ),
+
               const SizedBox(height: 32),
+
               const Text(
                 '임신 시작일을 알려주세요',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
+
+              /// 날짜 선택
               InkWell(
                 onTap: () async {
                   final now = DateTime.now();
@@ -98,26 +111,36 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
               ),
+
               const Spacer(),
+
+              /// 완료 버튼
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: () async {
-                    if (_formKey.currentState!.validate() && _startDate != null) {
-                      // 1) 컨트롤러 업데이트
+                    if (_formKey.currentState!.validate() &&
+                        _startDate != null) {
+                      // 1) 컨트롤러 저장
                       widget.controller.saveInfo(
                         nickname: _nicknameCtrl.text.trim(),
                         start: _startDate!,
                       );
 
-                      // 2) 로컬 DB로 저장
+                      // 2) 랜덤 초대코드 생성
+                      String inviteCode = _generateInviteCode();
+
+                      // 3) Hive 저장
                       final box = Hive.box('onboarding');
                       box.put('nickname', _nicknameCtrl.text.trim());
                       box.put('startDate', _startDate!.toIso8601String());
-                      box.put('completed', true);       // <- 온보딩 완료 여부 저장
-                      box.put('tutorialShown', false);  // <- 처음 들어갈 때 튜토리얼 띄우기 위해
+                      box.put('completed', true);
+                      box.put('tutorialShown', false);
 
-                      // 3) 이전 화면에 true 반환
+                      /// 🔥 초대코드 저장
+                      box.put('inviteCode', inviteCode);
+
+                      // 4) 이전 화면으로 true 반환
                       Navigator.pop(context, true);
                     } else if (_startDate == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -131,7 +154,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('완료', style: TextStyle(fontSize: 18)),
+                  child: const Text(
+                    '완료',
+                    style: TextStyle(fontSize: 18),
+                  ),
                 ),
               ),
             ],

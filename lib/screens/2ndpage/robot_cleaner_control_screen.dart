@@ -12,12 +12,35 @@ class RobotCleanerControlScreen extends StatefulWidget {
       _RobotCleanerControlScreenState();
 }
 
-class _RobotCleanerControlScreenState
-    extends State<RobotCleanerControlScreen> {
-  bool powerOn = true;
-  bool turbo = false;
-  bool smartTurbo = true;
-  bool hasReservation = false;
+class _RobotCleanerControlScreenState extends State<RobotCleanerControlScreen> {
+  late bool powerOn;
+  late bool turbo;
+  late bool smartTurbo;
+  late bool hasReservation;
+
+  @override
+  void initState() {
+    super.initState();
+    final c = widget.controller;
+
+    // Controller에서 기존 저장값 불러오기
+    powerOn = c.robotPowerOn;
+    turbo = c.robotTurbo;
+    smartTurbo = c.robotSmartTurbo;
+    hasReservation = c.robotHasReservation;
+  }
+
+  /// 변경사항 저장 (controller + Hive)
+  void _save() {
+    final c = widget.controller;
+
+    c.robotPowerOn = powerOn;
+    c.robotTurbo = turbo;
+    c.robotSmartTurbo = smartTurbo;
+    c.robotHasReservation = hasReservation;
+
+    c.saveAllDeviceSettings();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +65,7 @@ class _RobotCleanerControlScreenState
                 const SizedBox(width: 8),
                 const Text(
                   '충전 완료',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 Text(
@@ -68,19 +89,21 @@ class _RobotCleanerControlScreenState
                 onPressed: () {
                   setState(() {
                     powerOn = true;
+                    _save();
                   });
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('전체 청소를 시작합니다.')),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color( 0xff385a92),
+                  backgroundColor: const Color(0xff385a92),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                icon: const Icon(Icons.play_arrow, color: Colors.white,),
+                icon: const Icon(Icons.play_arrow, color: Colors.white),
                 label: const Text(
                   '전체 청소 시작',
                   style: TextStyle(fontSize: 16, color: Colors.white),
@@ -105,14 +128,25 @@ class _RobotCleanerControlScreenState
                   title: '터보',
                   subtitle: '강하게 한 번에 청소하고 싶을 때 사용해요.',
                   value: turbo,
-                  onChanged: (v) => setState(() => turbo = v),
+                  onChanged: (v) {
+                    setState(() {
+                      turbo = v;
+                      _save();
+                    });
+                  },
                 ),
                 const Divider(height: 24),
                 _modeRow(
                   title: '스마트 터보',
-                  subtitle: '구석, 카펫, 먼지가 많은 곳을 감지하면 더 강력한 흡입력으로 청소해요.',
+                  subtitle:
+                  '구석, 카펫, 먼지가 많은 곳을 감지하면 더 강력한 흡입력으로 청소해요.',
                   value: smartTurbo,
-                  onChanged: (v) => setState(() => smartTurbo = v),
+                  onChanged: (v) {
+                    setState(() {
+                      smartTurbo = v;
+                      _save();
+                    });
+                  },
                 ),
               ],
             ),
@@ -129,11 +163,12 @@ class _RobotCleanerControlScreenState
               borderRadius: BorderRadius.circular(16),
             ),
             child: InkWell(
-              onTap: () async {
-                // 일단은 간단하게 토글만 해두기
+              onTap: () {
                 setState(() {
                   hasReservation = !hasReservation;
+                  _save();
                 });
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -150,10 +185,7 @@ class _RobotCleanerControlScreenState
                   const SizedBox(width: 12),
                   const Text(
                     '청소 예약',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   const Spacer(),
                   Text(
@@ -174,7 +206,7 @@ class _RobotCleanerControlScreenState
 
           const Spacer(),
 
-          // 하단 탭 비슷한 영역 (디자인만)
+          // 하단 탭 디자인
           Container(
             height: 56,
             decoration: const BoxDecoration(
@@ -233,16 +265,11 @@ class _RobotCleanerControlScreenState
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: const TextStyle(fontSize: 11, color: Colors.grey),
-              ),
+              Text(subtitle,
+                  style: const TextStyle(fontSize: 11, color: Colors.grey)),
             ],
           ),
         ),

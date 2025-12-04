@@ -820,6 +820,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   FavoriteDeviceCard(
                     name: d.name,
                     icon: IconData(d.iconCode, fontFamily: 'MaterialIcons'),
+                    type: d.type,                            // ★ 추가됨
+                    controller: widget.controller,           // ★ 추가됨
                     showDelete: _editMode,
                     onDelete: () {
                       FavoriteService.removeFavorite(d);
@@ -875,9 +877,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           FavoriteDevice(
                             name: device.name,
                             iconCode: device.iconCode,
+                            type: device.type,
                           ),
                         );
-
                         Navigator.pop(context);
                         setState(() {});
                       },
@@ -1000,24 +1002,57 @@ class _TipCard extends StatelessWidget {
 class FavoriteDeviceCard extends StatelessWidget {
   final String name;
   final IconData icon;
+  final String type;     // ← 추가됨
+  final PregnancyController controller;
   final VoidCallback onDelete;
-  final bool showDelete;   // ★ 추가
+  final bool showDelete;
 
   const FavoriteDeviceCard({
     super.key,
     required this.name,
     required this.icon,
+    required this.type,
+    required this.controller,
     required this.onDelete,
     required this.showDelete,
   });
 
+  /// type별 현재 상태 불러오기
+  String getStatus() {
+    switch (type) {
+      case "aircon":
+        final t = controller.airconTargetTemp.toStringAsFixed(0);
+        final mode = controller.airconSleepMode ? "취침" : "기본";
+        return "$t°C · $mode";
+
+      case "aircleaner":
+        final level = controller.airCleanerCleanLevel;
+        final booster = controller.airCleanerBoosterLevel;
+        return "청정:$level · 부스터:$booster";
+
+      case "humidifier":
+        final hum = controller.humidifierTargetHumidity;
+        final mist = controller.humidifierMistLevel;
+        return "$hum% · 미스트:$mist";
+
+      case "robot":
+        final turbo = controller.robotTurbo ? "터보" : "일반";
+        return "모드: $turbo";
+
+      default:
+        return "";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final status = getStatus();
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
         Container(
-          width: 110,
+          width: 130,
           margin: const EdgeInsets.only(right: 12),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -1036,16 +1071,25 @@ class FavoriteDeviceCard extends StatelessWidget {
             children: [
               Icon(icon, size: 28),
               const SizedBox(height: 6),
-              Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              const Text(
-                '즐겨찾기',
-                style: TextStyle(fontSize: 11, color: Colors.grey),
+
+              Text(
+                name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 4),
+
+              Text(
+                status,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey,
+                ),
               ),
             ],
           ),
         ),
 
-        /// ★ showDelete 가 true 일 때만 X 버튼 활성화
         if (showDelete)
           Positioned(
             right: 11,

@@ -13,14 +13,37 @@ class AirCleanerControlScreen extends StatefulWidget {
 }
 
 class _AirCleanerControlScreenState extends State<AirCleanerControlScreen> {
-  bool powerOn = true;
+  late bool powerOn;
+  late int cleanLevel;
+  late int boosterLevel;
+  late bool aiMode;
+  late bool smartCare;
 
-  // 세기 단계 (0: 약, 1: 보통, 2: 강)
-  int cleanLevel = 1;
-  int boosterLevel = 0;
+  @override
+  void initState() {
+    super.initState();
 
-  bool aiMode = true;
-  bool smartCare = true;
+    widget.controller.loadAllDeviceSettings();
+
+    // Controller 값 로드
+    powerOn = widget.controller.airCleanerPowerOn;
+    cleanLevel = widget.controller.airCleanerCleanLevel;
+    boosterLevel = widget.controller.airCleanerBoosterLevel;
+    aiMode = widget.controller.airCleanerAiMode;
+    smartCare = widget.controller.airCleanerSmartCare;
+  }
+
+  void _saveToController() {
+    final c = widget.controller;
+
+    c.airCleanerPowerOn = powerOn;
+    c.airCleanerCleanLevel = cleanLevel;
+    c.airCleanerBoosterLevel = boosterLevel;
+    c.airCleanerAiMode = aiMode;
+    c.airCleanerSmartCare = smartCare;
+
+    c.saveAllDeviceSettings();
+  }
 
   String _levelText(int level) {
     switch (level) {
@@ -42,6 +65,7 @@ class _AirCleanerControlScreenState extends State<AirCleanerControlScreen> {
       } else {
         boosterLevel = (boosterLevel + delta).clamp(0, 2);
       }
+      _saveToController();
     });
   }
 
@@ -80,8 +104,8 @@ class _AirCleanerControlScreenState extends State<AirCleanerControlScreen> {
                   ),
                   const SizedBox(height: 12),
                   Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.green.shade100,
                       borderRadius: BorderRadius.circular(20),
@@ -101,11 +125,13 @@ class _AirCleanerControlScreenState extends State<AirCleanerControlScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
+
                   // 전원 버튼
                   GestureDetector(
                     onTap: () {
                       setState(() {
                         powerOn = !powerOn;
+                        _saveToController();
                       });
                     },
                     child: Container(
@@ -166,7 +192,6 @@ class _AirCleanerControlScreenState extends State<AirCleanerControlScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // 청정 세기 + 부스터 세기 카드 2개
                   Row(
                     children: [
                       Expanded(
@@ -217,19 +242,31 @@ class _AirCleanerControlScreenState extends State<AirCleanerControlScreen> {
 
                   const SizedBox(height: 20),
 
-                  // 인공지능+ / 스마트케어 토글
+                  // AI 모드
                   _toggleRow(
                     title: '인공지능+',
                     subtitle: '실내 공기질이 좋을 때 절전 운전해요.',
                     value: aiMode,
-                    onChanged: (v) => setState(() => aiMode = v),
+                    onChanged: (v) {
+                      setState(() {
+                        aiMode = v;
+                        _saveToController();
+                      });
+                    },
                   ),
                   const SizedBox(height: 8),
+
+                  // 스마트케어
                   _toggleRow(
                     title: '스마트케어',
                     subtitle: '사용환경과 방식에 맞춰 제품 운전해요.',
                     value: smartCare,
-                    onChanged: (v) => setState(() => smartCare = v),
+                    onChanged: (v) {
+                      setState(() {
+                        smartCare = v;
+                        _saveToController();
+                      });
+                    },
                   ),
                 ],
               ),
@@ -272,10 +309,7 @@ class _AirCleanerControlScreenState extends State<AirCleanerControlScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _roundIconButton(
-                icon: Icons.chevron_left,
-                onTap: onDecrease,
-              ),
+              _roundIconButton(icon: Icons.chevron_left, onTap: onDecrease),
               Text(
                 levelText,
                 style: const TextStyle(
@@ -283,10 +317,7 @@ class _AirCleanerControlScreenState extends State<AirCleanerControlScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              _roundIconButton(
-                icon: Icons.chevron_right,
-                onTap: onIncrease,
-              ),
+              _roundIconButton(icon: Icons.chevron_right, onTap: onIncrease),
             ],
           ),
         ],
@@ -337,9 +368,7 @@ class _AirCleanerControlScreenState extends State<AirCleanerControlScreen> {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 2),
               Text(

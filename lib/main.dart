@@ -23,6 +23,7 @@ void main() async {
   await Hive.openBox('onboarding');
   Hive.registerAdapter(AllDeviceAdapter());
   await Hive.openBox<AllDevice>('all_devices');
+  await Hive.openBox('device_settings');
 
 
   runApp(const PregnancyModeApp());
@@ -53,10 +54,26 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
 
     if (box.isEmpty) {
       final devices = [
-        AllDevice(name: "에어컨", iconCode: Icons.ac_unit.codePoint),
-        AllDevice(name: "공기청정기", iconCode: Icons.air.codePoint),
-        AllDevice(name: "가습기", iconCode: Icons.water_drop.codePoint),
-        AllDevice(name: "로봇청소기", iconCode: Icons.cleaning_services.codePoint),
+        AllDevice(
+          name: "에어컨",
+          iconCode: Icons.ac_unit.codePoint,
+          type: "aircon",
+        ),
+        AllDevice(
+          name: "공기청정기",
+          iconCode: Icons.air.codePoint,
+          type: "aircleaner",
+        ),
+        AllDevice(
+          name: "가습기",
+          iconCode: Icons.water_drop.codePoint,
+          type: "humidifier",
+        ),
+        AllDevice(
+          name: "로봇청소기",
+          iconCode: Icons.cleaning_services.codePoint,
+          type: "robot",
+        ),
       ];
 
       for (var d in devices) {
@@ -75,6 +92,7 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
     _onboardingDone = completed;
 
     controller.loadSavedData();
+    controller.loadAllDeviceSettings();
 
     seedAllDevices();
 

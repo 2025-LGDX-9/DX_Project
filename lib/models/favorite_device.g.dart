@@ -19,17 +19,20 @@ class FavoriteDeviceAdapter extends TypeAdapter<FavoriteDevice> {
     return FavoriteDevice(
       name: fields[0] as String,
       iconCode: fields[1] as int,
+      type: fields[2] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, FavoriteDevice obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
-      ..write(obj.iconCode);
+      ..write(obj.iconCode)
+      ..writeByte(2)
+      ..write(obj.type);
   }
 
   @override

@@ -12,14 +12,43 @@ class HumidifierControlScreen extends StatefulWidget {
 }
 
 class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
-  // --------- 실제로 바뀌는 "설정 값"들 ---------
-  bool isPowerOn = true;          // 전원 ON/OFF
-  int mistLevel = 3;              // 분무량 단계 (1~3)
-  int targetHumidity = 50;        // 희망 습도(%)
-  bool isComfortCare = true;      // '쾌적 케어' 모드
-  bool isAutoMode = true;         // 자동 / 수동
-  int reservationHour = 3;        // 예약 시간 (0, 3, 6 등)
-  bool isSilentMode = false;      // 조용(취침) 모드
+  late bool isPowerOn;
+  late int mistLevel;
+  late int targetHumidity;
+  late bool isComfortCare;
+  late bool isAutoMode;
+  late int reservationHour;
+  late bool isSilentMode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final c = widget.controller;
+
+    isPowerOn = c.humidifierPowerOn;
+    mistLevel = c.humidifierMistLevel;
+    targetHumidity = c.humidifierTargetHumidity;
+    isComfortCare = c.humidifierComfortCare;
+    isAutoMode = c.humidifierAutoMode;
+    reservationHour = c.humidifierReservationHour;
+    isSilentMode = c.humidifierSilentMode;
+  }
+
+  /// 변경된 값 → controller → Hive 저장
+  void _save() {
+    final c = widget.controller;
+
+    c.humidifierPowerOn = isPowerOn;
+    c.humidifierMistLevel = mistLevel;
+    c.humidifierTargetHumidity = targetHumidity;
+    c.humidifierComfortCare = isComfortCare;
+    c.humidifierAutoMode = isAutoMode;
+    c.humidifierReservationHour = reservationHour;
+    c.humidifierSilentMode = isSilentMode;
+
+    c.saveAllDeviceSettings();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +62,8 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
       ),
       body: Column(
         children: [
-          // 상단 제품/습도/온도 영역 (심플 버전)
           _buildTopStatus(),
 
-          // 하단 제어 패널
           Expanded(
             child: Container(
               margin: const EdgeInsets.all(16),
@@ -55,7 +82,6 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // "가습 설정" + 전원 버튼
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -66,10 +92,12 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+
                       IconButton(
                         onPressed: () {
                           setState(() {
                             isPowerOn = !isPowerOn;
+                            _save();
                           });
                         },
                         icon: Icon(
@@ -79,20 +107,23 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 12),
 
-                  // 상단 2칸 (세기, 희망 습도)
                   Row(
                     children: [
-                      Expanded(child: _buildStrengthCard()),
+                      Expanded(
+                        child: _buildStrengthCard(),
+                      ),
                       const SizedBox(width: 8),
-                      Expanded(child: _buildTargetHumidityCard()),
+                      Expanded(
+                        child: _buildTargetHumidityCard(),
+                      ),
                     ],
                   ),
 
                   const SizedBox(height: 12),
 
-                  // 하단 3x2 작은 타일들
                   Expanded(
                     child: GridView.count(
                       crossAxisCount: 3,
@@ -100,7 +131,6 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
                       crossAxisSpacing: 8,
                       childAspectRatio: 1.1,
                       children: [
-                        // 전원 (켜짐 / 꺼짐)
                         SmallSettingTile(
                           icon: Icons.power_settings_new,
                           title: isPowerOn ? '켜짐' : '꺼짐',
@@ -109,11 +139,11 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
                           onTap: () {
                             setState(() {
                               isPowerOn = !isPowerOn;
+                              _save();
                             });
                           },
                         ),
 
-                        // 분무량 100% / 50% 토글 예시
                         SmallSettingTile(
                           icon: Icons.opacity,
                           title: '${mistLevel * 25 + 25}%',
@@ -121,13 +151,12 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
                           isActive: mistLevel == 3,
                           onTap: () {
                             setState(() {
-                              // 1→2→3→1 순환
                               mistLevel = mistLevel % 3 + 1;
+                              _save();
                             });
                           },
                         ),
 
-                        // 쾌적 케어 모드
                         SmallSettingTile(
                           icon: Icons.favorite_border,
                           title: isComfortCare ? '쾌적' : '일반',
@@ -136,11 +165,11 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
                           onTap: () {
                             setState(() {
                               isComfortCare = !isComfortCare;
+                              _save();
                             });
                           },
                         ),
 
-                        // 자동 / 수동 모드
                         SmallSettingTile(
                           icon: Icons.autorenew,
                           title: isAutoMode ? '자동' : '수동',
@@ -149,11 +178,11 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
                           onTap: () {
                             setState(() {
                               isAutoMode = !isAutoMode;
+                              _save();
                             });
                           },
                         ),
 
-                        // 예약 시간 (0→3→6→0)
                         SmallSettingTile(
                           icon: Icons.timer,
                           title: reservationHour == 0
@@ -170,11 +199,11 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
                               } else {
                                 reservationHour = 0;
                               }
+                              _save();
                             });
                           },
                         ),
 
-                        // 조용(취침) 모드
                         SmallSettingTile(
                           icon: Icons.nights_stay,
                           title: '조용',
@@ -183,6 +212,7 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
                           onTap: () {
                             setState(() {
                               isSilentMode = !isSilentMode;
+                              _save();
                             });
                           },
                         ),
@@ -198,7 +228,6 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
     );
   }
 
-  /// 상단 상태 영역
   Widget _buildTopStatus() {
     return Container(
       width: double.infinity,
@@ -211,23 +240,23 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
         ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 간단한 현재 상태 텍스트
           Row(
             children: [
               const Icon(Icons.opacity, size: 18),
               const SizedBox(width: 4),
-              Text('실내 습도 34%  ·  설정 ${targetHumidity}%',
-                  style: const TextStyle(fontSize: 13)),
+              Text(
+                '실내 습도 34%  ·  설정 $targetHumidity%',
+                style: const TextStyle(fontSize: 13),
+              ),
             ],
           ),
           const SizedBox(height: 4),
           Row(
-            children: [
-              const Icon(Icons.thermostat, size: 18),
-              const SizedBox(width: 4),
-              const Text('실내 온도 21°C  ·  상태 좋음',
+            children: const [
+              Icon(Icons.thermostat, size: 18),
+              SizedBox(width: 4),
+              Text('실내 온도 21°C  ·  상태 좋음',
                   style: TextStyle(fontSize: 13)),
             ],
           ),
@@ -235,7 +264,6 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
           Center(
             child: Column(
               children: [
-                // 제품 간단한 일러스트 대신 아이콘
                 const Icon(Icons.air, size: 80, color: Color(0xff4da3ff)),
                 const SizedBox(height: 8),
                 Text(
@@ -259,16 +287,9 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
     );
   }
 
-  /// 세기 카드
   Widget _buildStrengthCard() {
-    String levelText;
-    if (mistLevel == 1) {
-      levelText = '약풍';
-    } else if (mistLevel == 2) {
-      levelText = '중간';
-    } else {
-      levelText = '강풍';
-    }
+    String levelText =
+    mistLevel == 1 ? '약풍' : mistLevel == 2 ? '중간' : '강풍';
 
     return _BigSettingCard(
       title: '세기',
@@ -276,17 +297,18 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
       onMinus: () {
         setState(() {
           if (mistLevel > 1) mistLevel--;
+          _save();
         });
       },
       onPlus: () {
         setState(() {
           if (mistLevel < 3) mistLevel++;
+          _save();
         });
       },
     );
   }
 
-  /// 희망 습도 카드
   Widget _buildTargetHumidityCard() {
     return _BigSettingCard(
       title: '희망 습도',
@@ -294,18 +316,19 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
       onMinus: () {
         setState(() {
           if (targetHumidity > 30) targetHumidity -= 5;
+          _save();
         });
       },
       onPlus: () {
         setState(() {
           if (targetHumidity < 70) targetHumidity += 5;
+          _save();
         });
       },
     );
   }
 }
 
-/// 상단 두 개(세기 / 희망 습도) 큰 카드
 class _BigSettingCard extends StatelessWidget {
   final String title;
   final String value;
@@ -357,7 +380,6 @@ class _BigSettingCard extends StatelessWidget {
   }
 }
 
-/// 동그란 + / - 버튼
 class _CircleIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -389,7 +411,6 @@ class _CircleIconButton extends StatelessWidget {
   }
 }
 
-/// 아래 3x2 작은 타일
 class SmallSettingTile extends StatelessWidget {
   final IconData icon;
   final String title;

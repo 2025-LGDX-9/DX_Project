@@ -11,6 +11,31 @@ class AirconControlScreen extends StatefulWidget {
 }
 
 class _AirconControlScreenState extends State<AirconControlScreen> {
+  late bool airconOn;
+  late double targetTemp;
+  late bool sleepMode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Controller → 화면 변수 로드
+    airconOn = widget.controller.airconOn;
+    targetTemp = widget.controller.airconTargetTemp;
+    sleepMode = widget.controller.airconSleepMode;
+  }
+
+  /// 변경 사항을 PregnancyController + Hive 저장
+  void _saveToController() {
+    final c = widget.controller;
+
+    c.airconOn = airconOn;
+    c.airconTargetTemp = targetTemp;
+    c.airconSleepMode = sleepMode;
+
+    c.saveAllDeviceSettings(); // Hive 저장
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = widget.controller;
@@ -33,22 +58,49 @@ class _AirconControlScreenState extends State<AirconControlScreen> {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
-          _AirconTopSection(controller: c), // 이미지 + 상태정보 + 전원버튼
+          _AirconTopSection(
+            controller: c,
+            powerOn: airconOn,
+            onTogglePower: () {
+              setState(() {
+                airconOn = !airconOn;
+                _saveToController();
+              });
+            },
+          ),
+
           const SizedBox(height: 60),
 
-          _CoolingSection(controller: c),   // 냉방/난방 모드
+          _CoolingSection(controller: c),
           const SizedBox(height: 16),
 
-          _TemperatureCard(controller: c),  // 온도조절 UI
+          _TemperatureCard(
+            temp: targetTemp,
+            onChange: (v) {
+              setState(() {
+                targetTemp = v;
+                _saveToController();
+              });
+            },
+          ),
+
           const SizedBox(height: 16),
 
-          _WindOptions(controller: c),      // 바람세기 + 바람방향
+          _WindOptions(),
           const SizedBox(height: 16),
 
-          _ReservationCard(),               // 예약
+          _ReservationCard(),
           const SizedBox(height: 12),
 
-          _TropicalNightCard(controller: c) // 열대야/취침
+          _TropicalNightCard(
+            sleepMode: sleepMode,
+            onToggle: (v) {
+              setState(() {
+                sleepMode = v;
+                _saveToController();
+              });
+            },
+          ),
         ],
       ),
     );
@@ -56,12 +108,19 @@ class _AirconControlScreenState extends State<AirconControlScreen> {
 }
 
 /////////////////////////////////////////////////////////////////
-// 🔵 상단 UI (이미지 + 현재온도 + 상태 + 전원버튼) ★ LG ThinQ 1:1 복제
+// TOP SECTION (이미지 + 상태 + 전원)
 /////////////////////////////////////////////////////////////////
+
 class _AirconTopSection extends StatelessWidget {
   final PregnancyController controller;
+  final bool powerOn;
+  final VoidCallback onTogglePower;
 
-  const _AirconTopSection({required this.controller});
+  const _AirconTopSection({
+    required this.controller,
+    required this.powerOn,
+    required this.onTogglePower,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -80,11 +139,9 @@ class _AirconTopSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-
-              // 현재온도(실내)+습도는 필요 시 추가 가능
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Icon(Icons.thermostat, size: 18, color: Colors.black87),
                   Text(" 28°C   ", style: TextStyle(fontSize: 14)),
                   Icon(Icons.water_drop, size: 16, color: Colors.black87),
@@ -92,11 +149,9 @@ class _AirconTopSection extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-
-              // 공기정보
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Text("종합청정도  ", style: TextStyle(color: Colors.black)),
                   Icon(Icons.circle, size: 10, color: Colors.lightBlueAccent),
                   Text("  좋음", style: TextStyle(color: Colors.black)),
@@ -106,22 +161,16 @@ class _AirconTopSection extends StatelessWidget {
             ],
           ),
 
-          // 🔵 우하단 전원버튼 (ThinQ와 동일한 위치/디자인)
           Positioned(
             bottom: -30,
             right: 16,
             child: GestureDetector(
-              onTap: () {
-                controller.airconOn = !controller.airconOn;
-                (context as Element).markNeedsBuild();
-              },
+              onTap: onTogglePower,
               child: Container(
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: controller.airconOn
-                      ? const Color(0xff19c3e6)
-                      : Colors.grey.shade300,
+                  color: powerOn ? const Color(0xff19c3e6) : Colors.grey.shade300,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
@@ -134,7 +183,7 @@ class _AirconTopSection extends StatelessWidget {
                 child: Icon(
                   Icons.power_settings_new,
                   size: 35,
-                  color: controller.airconOn ? Colors.white : Colors.black45,
+                  color: powerOn ? Colors.white : Colors.black45,
                 ),
               ),
             ),
@@ -146,8 +195,9 @@ class _AirconTopSection extends StatelessWidget {
 }
 
 /////////////////////////////////////////////////////////////////
-// 🔵 "냉방 ↓" 섹션 (상단 타이틀) – LG 동일
+// 냉방 ↓
 /////////////////////////////////////////////////////////////////
+
 class _CoolingSection extends StatelessWidget {
   final PregnancyController controller;
 
@@ -156,74 +206,59 @@ class _CoolingSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: [
-        const Text(
+      children: const [
+        Text(
           "냉방",
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        const Icon(Icons.keyboard_arrow_down),
+        Icon(Icons.keyboard_arrow_down),
       ],
     );
   }
 }
 
 /////////////////////////////////////////////////////////////////
-// 🔵 온도 조절 카드
+// 온도 조절
 /////////////////////////////////////////////////////////////////
-class _TemperatureCard extends StatefulWidget {
-  final PregnancyController controller;
 
-  const _TemperatureCard({required this.controller});
+class _TemperatureCard extends StatelessWidget {
+  final double temp;
+  final ValueChanged<double> onChange;
 
-  @override
-  State<_TemperatureCard> createState() => _TemperatureCardState();
-}
+  const _TemperatureCard({required this.temp, required this.onChange});
 
-class _TemperatureCardState extends State<_TemperatureCard> {
   @override
   Widget build(BuildContext context) {
-    final c = widget.controller;
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: _cardStyle(),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text("희망 온도", style: TextStyle(color: Colors.grey.shade600)),
-
           const SizedBox(height: 8),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _tempButton("-", () {
-                setState(() => c.airconTargetTemp -= 1);
-              }),
-
-              SizedBox(width: 20),
+              _tempButton("-", () => onChange(temp - 1)),
+              const SizedBox(width: 20),
 
               Text(
-                "${c.airconTargetTemp.toStringAsFixed(0)}°C",
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                "${temp.toStringAsFixed(0)}°C",
+                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
 
-              SizedBox(width: 20),
-
-              _tempButton("+", () {
-                setState(() => c.airconTargetTemp += 1);
-              }),
+              const SizedBox(width: 20),
+              _tempButton("+", () => onChange(temp + 1)),
             ],
           ),
 
           Slider(
             min: 16,
             max: 30,
-            value: c.airconTargetTemp,
+            value: temp,
             activeColor: const Color(0xff19c3e6),
-            onChanged: (v) {
-              setState(() => c.airconTargetTemp = v);
-            },
+            onChanged: onChange,
           ),
         ],
       ),
@@ -249,11 +284,11 @@ class _TemperatureCardState extends State<_TemperatureCard> {
 }
 
 /////////////////////////////////////////////////////////////////
-// 🔵 바람세기/바람방향 UI
+// 바람세기 / 바람방향 (현재 UI용 – DB 저장 항목 아님)
 /////////////////////////////////////////////////////////////////
+
 class _WindOptions extends StatelessWidget {
-  final PregnancyController controller;
-  const _WindOptions({required this.controller});
+  const _WindOptions();
 
   @override
   Widget build(BuildContext context) {
@@ -285,8 +320,9 @@ class _WindOptions extends StatelessWidget {
 }
 
 /////////////////////////////////////////////////////////////////
-// 🔵 예약 카드
+// 예약 (아직 기능 없음)
 /////////////////////////////////////////////////////////////////
+
 class _ReservationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -305,17 +341,18 @@ class _ReservationCard extends StatelessWidget {
 }
 
 /////////////////////////////////////////////////////////////////
-// 🔵 열대야/취침 + 스위치
+// 취침모드 스위치
 /////////////////////////////////////////////////////////////////
-class _TropicalNightCard extends StatefulWidget {
-  final PregnancyController controller;
-  const _TropicalNightCard({required this.controller});
 
-  @override
-  State<_TropicalNightCard> createState() => _TropicalNightCardState();
-}
+class _TropicalNightCard extends StatelessWidget {
+  final bool sleepMode;
+  final ValueChanged<bool> onToggle;
 
-class _TropicalNightCardState extends State<_TropicalNightCard> {
+  const _TropicalNightCard({
+    required this.sleepMode,
+    required this.onToggle,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -332,11 +369,9 @@ class _TropicalNightCardState extends State<_TropicalNightCard> {
             ],
           ),
           Switch(
-            value: widget.controller.airconSleepMode,
-            onChanged: (v) {
-              setState(() => widget.controller.airconSleepMode = v);
-            },
-          )
+            value: sleepMode,
+            onChanged: onToggle,
+          ),
         ],
       ),
     );
@@ -344,8 +379,9 @@ class _TropicalNightCardState extends State<_TropicalNightCard> {
 }
 
 /////////////////////////////////////////////////////////////////
-// 공용 카드 스타일
+// 카드는 공용 스타일
 /////////////////////////////////////////////////////////////////
+
 BoxDecoration _cardStyle() {
   return BoxDecoration(
     color: Colors.white,
