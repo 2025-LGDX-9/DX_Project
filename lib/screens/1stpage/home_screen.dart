@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pregnancy_mode_app/models/all_device.dart';
 import 'package:pregnancy_mode_app/models/favorite_device.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/calendar_screen.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/invite_member.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/onboarding_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
@@ -736,6 +737,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: 30,
                             height: 30,
                           ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () => {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => CalendarScreen()),
+                          ),
+                        },
+                        child: Image.asset(
+                          "assets/images/calendar.png",
+                          width: 25,
+                          height: 25,
                         ),
                       ),
                       SizedBox(width: 10),
