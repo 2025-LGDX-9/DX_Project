@@ -31,6 +31,7 @@ void main() async {
   await Hive.openBox('device_settings');
   await Hive.openBox("routine_settings");
   await Hive.openBox('pregnancyBox');
+  await Hive.openBox('diary');
 
   final box = Hive.box('pregnancyBox');
   String? savedUniqueKey = box.get('unique_key');
