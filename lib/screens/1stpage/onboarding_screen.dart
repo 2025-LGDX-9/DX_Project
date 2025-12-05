@@ -24,11 +24,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final TextEditingController _nicknameCtrl = TextEditingController();
   DateTime? _startDate;
 
-  /// 🔥 6자리 랜덤 코드 생성 함수
-  String _generateInviteCode() {
-    final random = Random();
-    return List.generate(6, (_) => random.nextInt(10)).join(); // 000000~999999
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +130,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                       if (result.success) {
                         final box = Hive.box('onboarding');
+                        final pregBox = Hive.box('pregnancyBox');
+
                         box.put("unique_key", result.uniqueKey);
+                        pregBox.put("unique_key", result.uniqueKey);
 
                         widget.controller.saveInfo(
                           nickname: _nicknameCtrl.text.trim(),
@@ -148,12 +146,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         final bool isFirstTime = !(box.get('completed') ??
                             false);
 
-                        // 3) 난수 코드 최초 1회만 생성
-                        String? inviteCode = box.get('inviteCode');
-                        if (inviteCode == null) {
-                          inviteCode = _generateInviteCode();
-                          box.put('inviteCode', inviteCode);
-                        }
 
                         // 4) 데이터 저장 (난수는 덮어쓰지 않음)
                         box.put('nickname', _nicknameCtrl.text.trim());

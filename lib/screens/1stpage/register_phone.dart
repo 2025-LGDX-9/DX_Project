@@ -19,10 +19,10 @@ class _RegisterPhoneState extends State<RegisterPhone> {
   }
 
   Future<void> _loadInviteCode() async {
-    final box = Hive.box('onboarding');
+    final box = Hive.box('pregnancyBox');
 
     setState(() {
-      inviteCode = box.get('inviteCode', defaultValue: "------");
+      inviteCode = box.get('unique_key', defaultValue: "------");
       // 저장 안돼있으면 빈값 대신 ------ 표시
     });
   }
