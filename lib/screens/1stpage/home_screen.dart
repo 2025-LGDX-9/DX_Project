@@ -68,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _randomDeviceTip = "";
 
   bool _editMode = false;
+  String _babyName = "우리 아기";
 
   @override
   void initState() {
@@ -87,7 +88,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _randomTip = _tipMessages[Random().nextInt(_tipMessages.length)];
     _randomDeviceTip =
-        _deviceTipMessages[Random().nextInt(_deviceTipMessages.length)];
+      _deviceTipMessages[Random().nextInt(_deviceTipMessages.length)];
+    _babyName = widget.controller.babyNickname ?? "우리 아기";
   }
 
   void _checkAndShowTutorial() {
@@ -137,8 +139,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final box = Hive.box('pregnancyBox');
+    _babyName = box.get('nickname', defaultValue: "우리 아기");
+
+    final savedDate = box.get('startDate');
+    if (savedDate != null) {
+      widget.controller.setStartDate(DateTime.parse(savedDate));
+    }
+
     final weeks = widget.controller.weeks;
-    final babyName = widget.controller.babyNickname ?? '우리 아기';
+
+    Text(
+      _babyName,
+      style: const TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+      ),
+    );
 
     return Scaffold(
       body: Container(
@@ -798,7 +815,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      babyName,
+                      _babyName,
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,

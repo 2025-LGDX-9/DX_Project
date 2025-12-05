@@ -49,6 +49,26 @@ class ApiService {
       return null;
     }
   }
+
+  Future<bool> updatePregnancyInfo(String uniqueKey, String nickname, String startDate) async {
+    final url = Uri.parse("$baseUrl/pregnancy/update");
+
+    final response = await http.put(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "uniqueKey": uniqueKey,
+        "babyNickname": nickname,
+        "startDate": startDate,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
 
 /// FastAPI 응답을 담기 위한 모델
@@ -61,3 +81,4 @@ class RegisterResponse {
     required this.uniqueKey,
   });
 }
+

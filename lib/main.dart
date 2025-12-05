@@ -12,22 +12,27 @@ import 'package:pregnancy_mode_app/screens/4thpage/menu_screen.dart';
 import 'package:pregnancy_mode_app/services/api_service.dart';
 import 'models/favorite_device.dart';
 
+Future<void> safeOpenBox<T>(String name) async {
+  if (!Hive.isBoxOpen(name)) {
+    await Hive.openBox<T>(name);
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
   Hive.registerAdapter(FavoriteDeviceAdapter());
+  Hive.registerAdapter(AllDeviceAdapter());
 
   await Hive.openBox<FavoriteDevice>('favorite_devices');
   await Hive.openBox('onboarding');
-  Hive.registerAdapter(AllDeviceAdapter());
   await Hive.openBox<AllDevice>('all_devices');
   await Hive.openBox('device_settings');
   await Hive.openBox("routine_settings");
-
   await Hive.openBox('pregnancyBox');
-  var box = Hive.box('pregnancyBox');
 
+  final box = Hive.box('pregnancyBox');
   String? savedUniqueKey = box.get('unique_key');
 
   PregnancyController controller = PregnancyController();
@@ -45,21 +50,19 @@ void main() async {
     }
   }
 
-  runApp(const PregnancyModeApp());
+  runApp(PregnancyModeApp(controller: controller,));
 }
 
 class PregnancyModeApp extends StatefulWidget {
-  const PregnancyModeApp({super.key});
+  final PregnancyController controller;
+  const PregnancyModeApp({super.key, required this.controller});
 
   @override
   State<PregnancyModeApp> createState() => _PregnancyModeAppState();
 }
 
 class _PregnancyModeAppState extends State<PregnancyModeApp> {
-  final PregnancyController controller = PregnancyController();
-
   int _selectedIndex = 0;
-
   bool _pregnancyMode = false;
   bool _showSplash = true;
 
@@ -70,8 +73,8 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
     final box = Hive.box('onboarding');
     _pregnancyMode = box.get('pregnancyMode', defaultValue: false);
 
-    controller.loadSavedData();
-    controller.loadAllDeviceSettings();
+    widget.controller.loadSavedData();
+    widget.controller.loadAllDeviceSettings();
 
     seedAllDevices();
 
@@ -116,23 +119,19 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
 
   /// 🔥 HomeScreen에서 모드 변경 시 호출됨
   void _handlePregnancyModeChanged(bool isOn) {
-    final box = Hive.box('onboarding');
-    box.put('pregnancyMode', isOn); // DB 저장
-
-    setState(() {
-      _pregnancyMode = isOn; // 화면 즉시 전환
-    });
+    Hive.box('onboarding').put('pregnancyMode', isOn);
+    setState(() => _pregnancyMode = isOn);
   }
 
   Widget get _homeScreen {
     if (_pregnancyMode) {
       return HomeScreen(
-        controller: controller,
+        controller: widget.controller,
         onPregnancyModeChanged: _handlePregnancyModeChanged, // ★ 추가됨
       );
     } else {
       return ThinqHomeScreen(
-        controller: controller,
+        controller: widget.controller,
         onOnboardingCompleted: () {},
         onPregnancyModeChanged: _handlePregnancyModeChanged,
       );
@@ -150,9 +149,9 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
 
     final screens = [
       _homeScreen,
-      RoutineScreen(controller: controller),
-      InfoScreen(controller: controller),
-      MenuScreen(controller: controller,),
+      RoutineScreen(controller: widget.controller),
+      InfoScreen(controller: widget.controller),
+      MenuScreen(controller: widget.controller),
     ];
 
     return MaterialApp(

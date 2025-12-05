@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
-class PregnancyController {
+class PregnancyController extends ChangeNotifier{
   String? babyNickname; // 태명
   DateTime? startDate;  // 임신 시작일
   String? uniqueKey;
@@ -11,6 +12,13 @@ class PregnancyController {
     babyNickname = nickname;
     startDate = start;
     this.uniqueKey = uniqueKey;
+
+    notifyListeners();
+  }
+
+  void setStartDate(DateTime date) {
+    startDate = date;
+    notifyListeners();  // weeks, dDayString getter가 자동으로 최신 계산됨
   }
 
   // =========================

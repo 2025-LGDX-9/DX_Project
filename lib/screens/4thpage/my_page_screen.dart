@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
-import 'package:pregnancy_mode_app/screens/1stpage/onboarding_screen.dart';
+import 'package:pregnancy_mode_app/screens/4thpage/update_mypage.dart';
 
 class MyPageScreen extends StatelessWidget {
   const MyPageScreen({super.key, required this.controller});
@@ -87,7 +87,7 @@ class MyPageScreen extends StatelessWidget {
                     Row(
                       children: const [
                         Text(
-                          "새싹이",
+                          "새싹맘",
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
@@ -108,8 +108,16 @@ class MyPageScreen extends StatelessWidget {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(20),
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_)=>OnboardingScreen(controller: controller, onCompleted: (){})));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => UpdateMyPageScreen(
+                                controller: controller,
+                              ),
+                            ),
+                          );
                         },
+
                         child: Ink(
                           decoration: BoxDecoration(
                             color: Colors.white,
