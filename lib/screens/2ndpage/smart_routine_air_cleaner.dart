@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/smart_air_cleaner_control.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/timer.dart';
 
-class SmartRoutineAirCleaner extends StatelessWidget {
+class SmartRoutineAirCleaner extends StatefulWidget {
   const SmartRoutineAirCleaner({super.key});
 
+  @override
+  State<SmartRoutineAirCleaner> createState() =>
+      _SmartRoutineAirCleanerState();
+}
+
+class _SmartRoutineAirCleanerState extends State<SmartRoutineAirCleaner> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,9 +50,14 @@ class SmartRoutineAirCleaner extends StatelessWidget {
               const SizedBox(height: 14),
 
               _ClickableCard(
-                child: const _TimeConditionCard(),
-                onTap: () {
-                  print("정해진 시간 클릭됨");
+                child: _TimeConditionCard(),
+                onTap: () async {
+                  final changed = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const Timer()),
+                  );
+
+                  if (changed == true) setState(() {}); // 즉시 반영
                 },
               ),
 
@@ -61,9 +75,7 @@ class SmartRoutineAirCleaner extends StatelessWidget {
 
               _ClickableCard(
                 child: const _StoveConditionCard(),
-                onTap: () {
-                  print("전기레인지 클릭됨");
-                },
+                onTap: () {},
               ),
 
               const SizedBox(height: 40),
@@ -78,9 +90,14 @@ class SmartRoutineAirCleaner extends StatelessWidget {
               const SizedBox(height: 14),
 
               _ClickableCard(
-                child: const _AirCleanerActionCard(),
-                onTap: () {
-                  print("공기청정기 오토모드 클릭됨");
+                child: _AirCleanerActionCard(),
+                onTap: () async {
+                  final changed = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SmartAirCleanerControl()),
+                  );
+
+                  if (changed == true) setState(() {}); // 즉시 반영
                 },
               ),
             ],
@@ -91,9 +108,55 @@ class SmartRoutineAirCleaner extends StatelessWidget {
   }
 }
 
-/// --------------------------------------------------------------
-/// 🔥 카드 전체를 클릭 가능하게 만드는 공통 Wrapper
-/// --------------------------------------------------------------
+//
+// --------------------------------------------------------------
+// 🔵 요약 문자열
+// --------------------------------------------------------------
+//
+
+String getTimerSummary() {
+  final box = Hive.box("routine_settings");
+
+  String detail = box.get("timer_detail_type", defaultValue: "~시");
+  int hour = box.get("timer_hour", defaultValue: 10);
+  int minute = box.get("timer_minute", defaultValue: 0);
+  List days = box.get("timer_days",
+      defaultValue: [false, false, false, false, false, false, false]);
+
+  final dayLabels = ["일", "월", "화", "수", "목", "금", "토"];
+  List<String> selectedDayLabels = [];
+
+  for (int i = 0; i < 7; i++) {
+    if (days[i] == true) selectedDayLabels.add(dayLabels[i]);
+  }
+
+  String dayString =
+  selectedDayLabels.isEmpty ? "반복 없음" : selectedDayLabels.join("·");
+
+  String timeString =
+      "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
+
+  return "$dayString $timeString $detail";
+}
+
+String getAirCleanerSummary() {
+  final box = Hive.box("routine_settings");
+
+  String power = box.get("aircleaner_power", defaultValue: "끄기");
+  String clean =
+  box.get("aircleaner_clean_level", defaultValue: "보통");
+  String booster =
+  box.get("aircleaner_booster_level", defaultValue: "약");
+
+  return "$power · 청정 $clean · 부스터 $booster";
+}
+
+//
+// --------------------------------------------------------------
+// 🔵 클릭 카드 Wrapper
+// --------------------------------------------------------------
+//
+
 class _ClickableCard extends StatelessWidget {
   final Widget child;
   final VoidCallback onTap;
@@ -122,14 +185,17 @@ class _ClickableCard extends StatelessWidget {
   }
 }
 
-/// --------------------------------------------------------------
-/// 🔵 시작 조건 1 — 정해진 시간
-/// --------------------------------------------------------------
-class _TimeConditionCard extends StatelessWidget {
-  const _TimeConditionCard();
+//
+// --------------------------------------------------------------
+// 🔵 정해진 시간 카드 — **즉시 반영형**
+// --------------------------------------------------------------
+//
 
+class _TimeConditionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    String summary = getTimerSummary(); // ← build마다 최신값 읽기
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       child: Row(
@@ -148,20 +214,22 @@ class _TimeConditionCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
+            children: [
+              const Text(
                 "정해진 시간",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
+
               Text(
-                "매일, 24시간",
-                style: TextStyle(
+                summary,
+                style: const TextStyle(
                   fontSize: 14,
                   color: Color(0xff80a4c2),
                 ),
@@ -174,9 +242,12 @@ class _TimeConditionCard extends StatelessWidget {
   }
 }
 
-/// --------------------------------------------------------------
-/// 🔵 시작 조건 2 — 전기레인지 작동
-/// --------------------------------------------------------------
+//
+// --------------------------------------------------------------
+// 🔵 전기레인지 카드
+// --------------------------------------------------------------
+//
+
 class _StoveConditionCard extends StatelessWidget {
   const _StoveConditionCard();
 
@@ -218,14 +289,17 @@ class _StoveConditionCard extends StatelessWidget {
   }
 }
 
-/// --------------------------------------------------------------
-/// 🔵 행동 카드 — 공기청정기 오토모드
-/// --------------------------------------------------------------
-class _AirCleanerActionCard extends StatelessWidget {
-  const _AirCleanerActionCard();
+//
+// --------------------------------------------------------------
+// 🔵 공기청정기 행동 요약 카드 — **즉시 반영형**
+// --------------------------------------------------------------
+//
 
+class _AirCleanerActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    String summary = getAirCleanerSummary(); // ← build 시마다 최신 Hive 값 읽음
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       child: Row(
@@ -236,20 +310,22 @@ class _AirCleanerActionCard extends StatelessWidget {
             height: 48,
           ),
           const SizedBox(width: 16),
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
+            children: [
+              const Text(
                 "공기청정기",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
+
               Text(
-                "오토모드",
-                style: TextStyle(
+                summary,  // 최신 데이터 출력
+                style: const TextStyle(
                   fontSize: 14,
                   color: Color(0xff80a4c2),
                 ),

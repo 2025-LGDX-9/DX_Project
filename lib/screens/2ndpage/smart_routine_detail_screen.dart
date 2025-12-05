@@ -27,11 +27,12 @@ class SmartRoutineDetailScreen extends StatelessWidget {
         title: const Text("맞춤 루틴 상세 설정"),
         actions: [
           IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => InfoTutorial()));
-              },
-              icon: const Icon(Icons.info_outline))
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => InfoTutorial()));
+            },
+            icon: const Icon(Icons.info_outline),
+          )
         ],
       ),
 
@@ -96,6 +97,10 @@ class SmartRoutineDetailScreen extends StatelessWidget {
   }
 }
 
+// ======================================================================
+// 기기 목록 카드
+// ======================================================================
+
 class _DeviceListCard extends StatelessWidget {
   final PregnancyController controller;
 
@@ -122,12 +127,12 @@ class _DeviceListCard extends StatelessWidget {
           _DeviceRow(
             icon: "assets/images/aircon.png",
             title: "에어컨",
-            description: "온도 조절 : 24~26℃ 유지",
+            description: "루틴에 따라 온도·바람 설정 자동 적용",
             deviceType: "aircon",
             controller: controller,
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => SmartRoutineAircon()));
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => SmartRoutineAircon()));
             },
           ),
 
@@ -136,12 +141,12 @@ class _DeviceListCard extends StatelessWidget {
           _DeviceRow(
             icon: "assets/images/air_cleaner.png",
             title: "공기청정기",
-            description: "오토 모드로 작동",
+            description: "루틴에 따라 청정·부스터 자동 설정",
             deviceType: "aircleaner",
             controller: controller,
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => SmartRoutineAirCleaner()));
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => SmartRoutineAirCleaner()));
             },
           ),
 
@@ -150,12 +155,12 @@ class _DeviceListCard extends StatelessWidget {
           _DeviceRow(
             icon: "assets/images/humidifier.png",
             title: "가습기",
-            description: "습도 조절 : 40~60% 유지",
+            description: "루틴에 따라 목표 습도 자동 적용",
             deviceType: "humidifier",
             controller: controller,
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => SmartRoutineHumidifier()));
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => SmartRoutineHumidifier()));
             },
           ),
 
@@ -164,12 +169,12 @@ class _DeviceListCard extends StatelessWidget {
           _DeviceRow(
             icon: "assets/images/robot_cleaner.png",
             title: "로봇청소기",
-            description: "오전 10시, 오후 5시 작동",
+            description: "루틴에 따라 모드 자동 적용",
             deviceType: "robot",
             controller: controller,
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => SmartRoutineRobotCleaner()));
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => SmartRoutineRobotCleaner()));
             },
           ),
         ],
@@ -178,11 +183,15 @@ class _DeviceListCard extends StatelessWidget {
   }
 }
 
+// ======================================================================
+// 각 기기 Row — "루틴 적용 여부"만 저장 / 전원은 절대 건드리지 않음
+// ======================================================================
+
 class _DeviceRow extends StatefulWidget {
   final String icon;
   final String title;
   final String description;
-  final String deviceType;     // aircon / aircleaner / humidifier / robot
+  final String deviceType;
   final PregnancyController controller;
   final VoidCallback? onTap;
 
@@ -201,62 +210,104 @@ class _DeviceRow extends StatefulWidget {
 }
 
 class _DeviceRowState extends State<_DeviceRow> {
-  late bool isOn;
+  late bool routineEnabled;
 
   @override
   void initState() {
     super.initState();
-    final box = Hive.box('device_settings');
 
-    switch (widget.deviceType) {
-      case "aircon":
-        isOn = box.get('airconOn', defaultValue: false);
-        break;
+    final routine = Hive.box('routine_settings');
 
-      case "aircleaner":
-        isOn = box.get('ac_power', defaultValue: true);
-        break;
-
-      case "humidifier":
-        isOn = box.get('hum_power', defaultValue: true);
-        break;
-
-      case "robot":
-        isOn = box.get('robot_on', defaultValue: true);
-        break;
-
-      default:
-        isOn = false;
-    }
+    routineEnabled =
+        routine.get("routine_${widget.deviceType}_enabled", defaultValue: true);
   }
 
   Future<void> _toggle(bool value) async {
-    setState(() => isOn = value);
-    final box = Hive.box('device_settings');
+    setState(() => routineEnabled = value);
+
+    final routine = Hive.box('routine_settings');
+    final c = widget.controller;
+
+    // 루틴 스위치 저장
+    routine.put("routine_${widget.deviceType}_enabled", value);
+
+    if (!value) return;
 
     switch (widget.deviceType) {
+    // ------------------------------------------------------------------
+    // ⭐ 에어컨
+    // ------------------------------------------------------------------
       case "aircon":
-        widget.controller.airconOn = value;
-        await box.put('airconOn', value);
+        final temp = routine.get("aircon_target_temp");
+        final strength = routine.get("aircon_wind_strength");
+        final direction = routine.get("aircon_wind_direction");
+        final power = routine.get("aircon_power");
+
+        if (temp != null) c.airconTargetTemp = temp.toDouble();
+        if (strength != null) c.airconWindStrength = strength;
+        if (direction != null) c.airconWindDirection = direction;
+        if (power != null) c.airconOn = (power == "켜기");
         break;
 
+    // ------------------------------------------------------------------
+    // ⭐ 공기청정기
+    // ------------------------------------------------------------------
       case "aircleaner":
-        widget.controller.airCleanerPowerOn = value;
-        await box.put('ac_power', value);
+        final power = routine.get("aircleaner_power");
+        final clean = routine.get("aircleaner_clean_level");     // "약" "보통" "강"
+        final booster = routine.get("aircleaner_booster_level"); // "약" "보통" "강"
+
+        if (power != null) c.airCleanerPowerOn = (power == "켜기");
+
+        if (clean != null) {
+          c.airCleanerCleanLevel = ["약", "보통", "강"].indexOf(clean).clamp(0, 2);
+        }
+
+        if (booster != null) {
+          c.airCleanerBoosterLevel =
+              ["약", "보통", "강"].indexOf(booster).clamp(0, 2);
+        }
         break;
 
+    // ------------------------------------------------------------------
+    // ⭐ 가습기
+    // ------------------------------------------------------------------
       case "humidifier":
-        widget.controller.humidifierPowerOn = value;
-        await box.put('hum_power', value);
+        final powerH = routine.get("humid_power");
+        final level = routine.get("humid_level");
+        final target = routine.get("humid_target");
+        final care = routine.get("humid_care");
+        final auto = routine.get("humid_auto");
+        final resv = routine.get("humid_reservation");
+        final silent = routine.get("humid_silent");
+
+        if (powerH != null) c.humidifierPowerOn = powerH;
+        if (level != null) c.humidifierMistLevel = level;
+        if (target != null) c.humidifierTargetHumidity = target;
+        if (care != null) c.humidifierComfortCare = care;
+        if (auto != null) c.humidifierAutoMode = auto;
+        if (resv != null) c.humidifierReservationHour = resv;
+        if (silent != null) c.humidifierSilentMode = silent;
         break;
 
+    // ------------------------------------------------------------------
+    // ⭐ 로봇청소기
+    // ------------------------------------------------------------------
       case "robot":
-        widget.controller.robotPowerOn = value;
-        await box.put('robot_on', value);
+        final powerR = routine.get("robot_power");
+        final turbo = routine.get("robot_turbo");
+        final smart = routine.get("robot_smart");
+        final resv = routine.get("robot_reservation");
+
+        if (powerR != null) c.robotPowerOn = powerR;
+        if (turbo != null) c.robotTurbo = turbo;
+        if (smart != null) c.robotSmartTurbo = smart;
+        if (resv != null) c.robotHasReservation = resv;
         break;
     }
 
-    print("[${widget.deviceType}] 변경됨 → $value");
+    // 저장
+    c.saveAllDeviceSettings();
   }
 
   @override
@@ -298,7 +349,7 @@ class _DeviceRowState extends State<_DeviceRow> {
               ),
 
               Switch(
-                value: isOn,
+                value: routineEnabled,
                 activeColor: Colors.redAccent,
                 onChanged: _toggle,
               ),

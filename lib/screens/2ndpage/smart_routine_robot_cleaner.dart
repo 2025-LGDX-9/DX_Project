@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/smart_robot_cleaner_control.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/timer.dart';
 
-class SmartRoutineRobotCleaner extends StatelessWidget {
+class SmartRoutineRobotCleaner extends StatefulWidget {
   const SmartRoutineRobotCleaner({super.key});
 
+  @override
+  State<SmartRoutineRobotCleaner> createState() =>
+      _SmartRoutineRobotCleanerState();
+}
+
+class _SmartRoutineRobotCleanerState extends State<SmartRoutineRobotCleaner> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,36 +40,45 @@ class SmartRoutineRobotCleaner extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// 제목
               const Text(
                 "언제 할까요?",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 14),
 
-              /// 시작 조건 클릭 카드
+              /// 🔵 Timer 페이지 이동 + 즉시 반영
               _ClickableCard(
                 onTap: () {
-                  print("정해진 시간 클릭됨");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => Timer()),
+                  ).then((value) {
+                    if (value == true) setState(() {});
+                  });
                 },
-                child: const _ConditionCard(),
+                child: _ConditionCard(),
               ),
 
               const SizedBox(height: 40),
 
-              /// 제목
               const Text(
                 "무엇을 할까요?",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 14),
 
-              /// 로봇청소기 동작 클릭 카드
+              /// 🔵 로봇청소기 제어 페이지 + 즉시 반영
               _ClickableCard(
                 onTap: () {
-                  print("로봇청소기 실행 클릭됨");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => SmartRobotCleanerControl()),
+                  ).then((value) {
+                    if (value == true) setState(() {});
+                  });
                 },
-                child: const _ActionCard(),
+                child: _ActionCard(),
               ),
             ],
           ),
@@ -70,9 +88,48 @@ class SmartRoutineRobotCleaner extends StatelessWidget {
   }
 }
 
-/// --------------------------------------------------------------
-/// 🔥 공통 클릭 가능 Wrapper — Material + Ink + InkWell
-/// --------------------------------------------------------------
+////////////////////////////////////////////////////////////
+/// 🔵 Timer 요약 계산 함수
+////////////////////////////////////////////////////////////
+String getTimerSummary() {
+  final box = Hive.box("routine_settings");
+
+  String detail = box.get("timer_detail_type", defaultValue: "~시");
+  int hour = box.get("timer_hour", defaultValue: 10);
+  int minute = box.get("timer_minute", defaultValue: 0);
+  List days = box.get("timer_days",
+      defaultValue: [false, false, false, false, false, false, false]);
+
+  final dayLabels = ["일", "월", "화", "수", "목", "금", "토"];
+  List<String> selectedDayLabels = [];
+
+  for (int i = 0; i < 7; i++) {
+    if (days[i] == true) selectedDayLabels.add(dayLabels[i]);
+  }
+
+  String dayString =
+  selectedDayLabels.isEmpty ? "반복 없음" : selectedDayLabels.join("·");
+
+  String timeString =
+      "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
+
+  return "$dayString $timeString $detail";
+}
+
+////////////////////////////////////////////////////////////
+/// 🔵 로봇청소기 동작 요약 함수
+////////////////////////////////////////////////////////////
+String getRobotActionSummary() {
+  final box = Hive.box("routine_settings");
+
+  String action = box.get("robot_action", defaultValue: "clean");
+
+  return action == "clean" ? "청소 시작" : "충전 시작";
+}
+
+////////////////////////////////////////////////////////////
+/// 🔵 공통 클릭 카드 Wrapper
+////////////////////////////////////////////////////////////
 class _ClickableCard extends StatelessWidget {
   final Widget child;
   final VoidCallback onTap;
@@ -98,14 +155,16 @@ class _ClickableCard extends StatelessWidget {
   }
 }
 
-////////////////////////////////////////////////////
-/// 🔵 시작 조건 카드 (정해진 시간)
-////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+/// 🔵 Timer 요약 카드 — 즉시 반영됨
+////////////////////////////////////////////////////////////
 class _ConditionCard extends StatelessWidget {
   const _ConditionCard();
 
   @override
   Widget build(BuildContext context) {
+    final summary = getTimerSummary();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       child: Row(
@@ -126,15 +185,16 @@ class _ConditionCard extends StatelessWidget {
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
+            children: [
+              const Text(
                 "정해진 시간",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
-                "매일, 10:00, 17:00",
-                style: TextStyle(fontSize: 14, color: Color(0xff80a4c2)),
+                summary,
+                style:
+                const TextStyle(fontSize: 14, color: Color(0xff80a4c2)),
               ),
             ],
           ),
@@ -144,14 +204,16 @@ class _ConditionCard extends StatelessWidget {
   }
 }
 
-////////////////////////////////////////////////////
-/// 🔵 로봇청소기 동작 카드
-////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+/// 🔵 로봇청소기 행동 요약 카드 — 즉시 반영됨
+////////////////////////////////////////////////////////////
 class _ActionCard extends StatelessWidget {
   const _ActionCard();
 
   @override
   Widget build(BuildContext context) {
+    final summary = getRobotActionSummary();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       child: Row(
@@ -164,15 +226,16 @@ class _ActionCard extends StatelessWidget {
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
+            children: [
+              const Text(
                 "로봇청소기",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
-                "청소 시작",
-                style: TextStyle(fontSize: 14, color: Color(0xff80a4c2)),
+                summary,
+                style:
+                const TextStyle(fontSize: 14, color: Color(0xff80a4c2)),
               ),
             ],
           ),

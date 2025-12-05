@@ -14,6 +14,8 @@ class _AirconControlScreenState extends State<AirconControlScreen> {
   late bool airconOn;
   late double targetTemp;
   late bool sleepMode;
+  late String windStrength;
+  late String windDirection;
 
   @override
   void initState() {
@@ -23,6 +25,8 @@ class _AirconControlScreenState extends State<AirconControlScreen> {
     airconOn = widget.controller.airconOn;
     targetTemp = widget.controller.airconTargetTemp;
     sleepMode = widget.controller.airconSleepMode;
+    windStrength = widget.controller.airconWindStrength;
+    windDirection = widget.controller.airconWindDirection;
   }
 
   /// 변경 사항을 PregnancyController + Hive 저장
@@ -32,6 +36,8 @@ class _AirconControlScreenState extends State<AirconControlScreen> {
     c.airconOn = airconOn;
     c.airconTargetTemp = targetTemp;
     c.airconSleepMode = sleepMode;
+    c.airconWindStrength = windStrength;
+    c.airconWindDirection = windDirection;
 
     c.saveAllDeviceSettings(); // Hive 저장
   }
@@ -86,7 +92,22 @@ class _AirconControlScreenState extends State<AirconControlScreen> {
 
           const SizedBox(height: 16),
 
-          _WindOptions(),
+          _WindOptions(
+            windStrength: windStrength,
+            windDirection: windDirection,
+            onStrengthChange: (v) {
+              setState(() {
+                windStrength = v;
+                _saveToController();
+              });
+            },
+            onDirectionChange: (v) {
+              setState(() {
+                windDirection = v;
+                _saveToController();
+              });
+            },
+          ),
           const SizedBox(height: 16),
 
           _ReservationCard(),
@@ -288,20 +309,54 @@ class _TemperatureCard extends StatelessWidget {
 /////////////////////////////////////////////////////////////////
 
 class _WindOptions extends StatelessWidget {
-  const _WindOptions();
+  final String windStrength;
+  final String windDirection;
+  final ValueChanged<String> onStrengthChange;
+  final ValueChanged<String> onDirectionChange;
+
+  const _WindOptions({
+    required this.windStrength,
+    required this.windDirection,
+    required this.onStrengthChange,
+    required this.onDirectionChange,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: _windCell(Icons.toys, "바람세기", "약풍")),
+        Expanded(
+          child: _windCell(
+            Icons.toys,
+            "바람세기",
+            windStrength,
+            ["약풍", "보통", "강풍"],
+            onStrengthChange,
+          ),
+        ),
         const SizedBox(width: 12),
-        Expanded(child: _windCell(Icons.air, "바람방향", "집중")),
+        Expanded(
+          child: _windCell(
+            Icons.air,
+            "바람방향",
+            windDirection,
+            ["와이드", "집중", "분리", "좌", "우"],
+            onDirectionChange,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _windCell(IconData icon, String title, String value) {
+  Widget _windCell(
+      IconData icon,
+      String title,
+      String value,
+      List<String> options,
+      ValueChanged<String> onChanged,
+      ) {
+    int currentIndex = options.indexOf(value);
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: _cardStyle(),
@@ -310,10 +365,48 @@ class _WindOptions extends StatelessWidget {
           Icon(icon, size: 30, color: Colors.blue.shade300),
           const SizedBox(height: 10),
           Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text(value,
-              style: const TextStyle(
-                  color: Colors.blue, fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.blue,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          /// 🔥 여기만 추가된 부분 (좌/우 화살표)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _arrowButton(Icons.chevron_left, () {
+                int next = (currentIndex - 1 + options.length) % options.length;
+                onChanged(options[next]);
+              }),
+              const SizedBox(width: 20),
+              _arrowButton(Icons.chevron_right, () {
+                int next = (currentIndex + 1) % options.length;
+                onChanged(options[next]);
+              }),
+            ],
+          )
         ],
+      ),
+    );
+  }
+
+  Widget _arrowButton(IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: 32,
+        height: 32,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, size: 24, color: Colors.grey),
       ),
     );
   }

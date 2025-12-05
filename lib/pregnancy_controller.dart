@@ -19,11 +19,13 @@ class PregnancyController {
   bool airconOn = false;
   double airconTargetTemp = 24.0;
   bool airconSleepMode = false;
+  String airconWindStrength = "약풍";  // 약풍 / 보통 / 강풍
+  String airconWindDirection = "집중"; // 와이드 / 집중 / 분리 / 좌 / 우
 
   // =========================
   // 공기청정기 상태
   // =========================
-  bool airCleanerPowerOn = true;
+  bool airCleanerPowerOn = false;
   int airCleanerCleanLevel = 1;
   int airCleanerBoosterLevel = 0;
   bool airCleanerAiMode = true;
@@ -32,7 +34,7 @@ class PregnancyController {
   // =========================
   // 가습기 상태
   // =========================
-  bool humidifierPowerOn = true;
+  bool humidifierPowerOn = false;
   int humidifierMistLevel = 3;
   int humidifierTargetHumidity = 50;
   bool humidifierComfortCare = true;
@@ -43,7 +45,7 @@ class PregnancyController {
   // =========================
   // 로봇청소기 상태
   // =========================
-  bool robotPowerOn = true;
+  bool robotPowerOn = false;
   bool robotTurbo = false;
   bool robotSmartTurbo = true;
   bool robotHasReservation = false;
@@ -58,6 +60,8 @@ class PregnancyController {
     box.put('airconOn', airconOn);
     box.put('airconTemp', airconTargetTemp);
     box.put('airconSleep', airconSleepMode);
+    box.put('airconWindStrength', airconWindStrength);
+    box.put('airconWindDirection', airconWindDirection);
 
     // 공기청정기
     box.put('ac_power', airCleanerPowerOn);
@@ -89,6 +93,9 @@ class PregnancyController {
     airconOn = box.get('airconOn', defaultValue: false);
     airconTargetTemp = box.get('airconTemp', defaultValue: 24.0);
     airconSleepMode = box.get('airconSleep', defaultValue: false);
+    airconWindStrength = box.get('airconWindStrength', defaultValue: "약풍");
+    airconWindDirection = box.get('airconWindDirection', defaultValue: "집중");
+
 
     // 공기청정기
     airCleanerPowerOn = box.get('ac_power', defaultValue: true);

@@ -1,7 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'inner_temper.dart';
+import 'smart_aircon_control.dart';
 
-class SmartRoutineAircon extends StatelessWidget {
+class SmartRoutineAircon extends StatefulWidget {
   const SmartRoutineAircon({super.key});
+
+  @override
+  State<SmartRoutineAircon> createState() => _SmartRoutineAirconState();
+}
+
+class _SmartRoutineAirconState extends State<SmartRoutineAircon> {
+  /// 시작 조건 요약 (InnerTemper)
+  String conditionSubtitle = "조건을 설정하세요";
+
+  /// 에어컨 동작 요약 (SmartAirconControl)
+  String actionSubtitle = "설정 없음";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSummary();
+  }
+
+  /// ✅ Hive에서 시작 조건 + 에어컨 동작 설정 모두 불러와서 요약 문구로 만든다
+  void _loadSummary() {
+    final box = Hive.box("routine_settings");
+
+    // ---------- 시작 조건 (실내 온도) ----------
+    int? innerTemp = box.get("innerTempValue");
+    String? innerCond = box.get("innerTempCondition");
+
+    if (innerTemp != null && innerCond != null) {
+      // 예: "26°C 이상이면" / "24°C 이하면"
+      conditionSubtitle = "$innerTemp°C $innerCond";
+    } else {
+      conditionSubtitle = "조건을 설정하세요";
+    }
+
+    // ---------- 에어컨 동작 ----------
+    int? temp = box.get("aircon_target_temp");
+    String? strength = box.get("aircon_wind_strength");
+    String? direction = box.get("aircon_wind_direction");
+    String? power = box.get("aircon_power");
+
+    if (temp != null && strength != null && direction != null && power != null) {
+      // 예: "24°C · 약 · 집중 · 켜기"
+      actionSubtitle = "$temp°C · $strength · $direction · $power";
+    } else {
+      actionSubtitle = "설정 없음";
+    }
+
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,15 +101,18 @@ class SmartRoutineAircon extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            /// 🔵 클릭 가능한 시작 조건 카드
+            /// 🔵 시작 조건 카드 (→ InnerTemper에서 설정한 값 표시)
             _ClickableCard(
               onTap: () {
-                print("에어컨 시작 조건 클릭됨");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const InnerTemper()),
+                ).then((_) => _loadSummary());  // 돌아오면 요약 다시 로드
               },
               child: _ConditionCard(
                 icon: Icons.thermostat,
                 title: "실내 온도",
-                subtitle: "24~26°C를 벗어나면",
+                subtitle: conditionSubtitle,    // ← 여기
               ),
             ),
 
@@ -73,15 +127,18 @@ class SmartRoutineAircon extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            /// 🔵 클릭 가능한 동작 카드
+            /// 🔵 에어컨 동작 카드 (→ SmartAirconControl에서 설정한 값 표시)
             _ClickableCard(
               onTap: () {
-                print("에어컨 동작 카드 클릭됨");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SmartAirconControl()),
+                ).then((_) => _loadSummary());  // 돌아오면 요약 다시 로드
               },
               child: _ActionCard(
                 imagePath: "assets/images/aircon.png",
                 title: "에어컨",
-                subtitle: "온도 조절 : 24~26°C 유지",
+                subtitle: actionSubtitle,       // ← 여기
               ),
             ),
           ],
@@ -92,8 +149,9 @@ class SmartRoutineAircon extends StatelessWidget {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/// 🔥 공통 클릭 Wrapper — Material + InkWell + Ink
+///   공통 클릭 Wrapper — Material + InkWell + Ink
 ///////////////////////////////////////////////////////////////////////////////
+
 class _ClickableCard extends StatelessWidget {
   final Widget child;
   final VoidCallback onTap;
@@ -130,8 +188,9 @@ class _ClickableCard extends StatelessWidget {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/// 🔵 시작 조건 카드
+///   시작 조건 카드
 ///////////////////////////////////////////////////////////////////////////////
+
 class _ConditionCard extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -176,7 +235,7 @@ class _ConditionCard extends StatelessWidget {
               const SizedBox(height: 2),
 
               Text(
-                subtitle,
+                subtitle,  // ← Hive 값 요약 표시
                 style: const TextStyle(
                   fontSize: 14,
                   color: Color(0xff4A90E2),
@@ -191,8 +250,9 @@ class _ConditionCard extends StatelessWidget {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/// 🔵 에어컨 동작 카드
+///   에어컨 동작 카드
 ///////////////////////////////////////////////////////////////////////////////
+
 class _ActionCard extends StatelessWidget {
   final String imagePath;
   final String title;
@@ -227,7 +287,7 @@ class _ActionCard extends StatelessWidget {
               const SizedBox(height: 2),
 
               Text(
-                subtitle,
+                subtitle,  // ← "24°C · 약 · 집중 · 켜기" 같은 문구
                 style: const TextStyle(
                   fontSize: 14,
                   color: Color(0xff4A90E2),

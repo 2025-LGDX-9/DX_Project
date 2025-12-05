@@ -23,6 +23,7 @@ void main() async {
   Hive.registerAdapter(AllDeviceAdapter());
   await Hive.openBox<AllDevice>('all_devices');
   await Hive.openBox('device_settings');
+  await Hive.openBox("routine_settings");
 
   await Hive.openBox('pregnancyBox');
   var box = Hive.box('pregnancyBox');
