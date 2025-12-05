@@ -46,6 +46,14 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
       }
       currentWeather = current;
 
+      if (current != null) {
+        current["SKY_TEXT"] = {
+          "1": "맑음",
+          "3": "구름많음",
+          "4": "흐림",
+        }[current["SKY"]] ?? "알수없음";
+      }
+
       //  2) 이후 시간대만 필터링
       hourlyWeather = todayList
           .where((d) => int.parse(d["time"]) >= currentTime)
@@ -111,6 +119,10 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
       appBar: AppBar(
         title: Text("현재 위치 날씨",style: TextStyle(color : Colors.white)),
         backgroundColor: Color(0xFF0D1A3A),
+
+        iconTheme: IconThemeData(
+          color: Colors.white,   // 뒤로가기 버튼(화살표) 색상
+        ),
       ),
       body: loading
           ? Center(child: CircularProgressIndicator(color: Colors.white))
@@ -146,7 +158,7 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
                     buildWeatherRow("기온", "${currentWeather!["TMP"]}°C"),
                     buildWeatherRow("습도", "${currentWeather!["REH"]}%"),
                     buildWeatherRow("강수확률", "${currentWeather!["POP"]}%"),
-                    buildWeatherRow("하늘상태", "${currentWeather!["SKY"]}"),
+                    buildWeatherRow("하늘상태", "${currentWeather!["SKY_TEXT"]}"),
                   ],
                 ),
               ),

@@ -9,19 +9,40 @@ import 'package:pregnancy_mode_app/screens/2ndpage/routine_screen.dart';
 import 'package:pregnancy_mode_app/screens/3rdpage/info_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 import 'package:pregnancy_mode_app/screens/4thpage/menu_screen.dart';
+import 'package:pregnancy_mode_app/services/api_service.dart';
 import 'models/favorite_device.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
-
   Hive.registerAdapter(FavoriteDeviceAdapter());
+
   await Hive.openBox<FavoriteDevice>('favorite_devices');
   await Hive.openBox('onboarding');
   Hive.registerAdapter(AllDeviceAdapter());
   await Hive.openBox<AllDevice>('all_devices');
   await Hive.openBox('device_settings');
+
+  await Hive.openBox('pregnancyBox');
+  var box = Hive.box('pregnancyBox');
+
+  String? savedUniqueKey = box.get('unique_key');
+
+  PregnancyController controller = PregnancyController();
+
+  if (savedUniqueKey != null) {
+    final api = ApiService();
+    final info = await api.getPregnancyInfoByKey(savedUniqueKey);
+
+    if (info != null) {
+      controller.saveInfo(
+        nickname: info["babyNickname"],
+        start: DateTime.parse(info["startDate"]),
+        uniqueKey: savedUniqueKey,
+      );
+    }
+  }
 
   runApp(const PregnancyModeApp());
 }

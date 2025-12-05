@@ -1,7 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:pregnancy_mode_app/models/pregnancy_user.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
+import 'package:pregnancy_mode_app/services/api_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final PregnancyController controller;
@@ -120,37 +122,57 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: FilledButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate() && _startDate != null) {
+                      String formattedDate =
+                          "${_startDate!.year}-${_startDate!.month.toString().padLeft(2, '0')}-${_startDate!.day.toString().padLeft(2, '0')}";
 
-                      // 1) 컨트롤러 저장
-                      widget.controller.saveInfo(
-                        nickname: _nicknameCtrl.text.trim(),
-                        start: _startDate!,
+                      final user = PregnancyUser(
+                        babyNickname: _nicknameCtrl.text.trim(),
+                        startDate: formattedDate,
                       );
 
-                      // 2) Hive 박스 열기
-                      final box = Hive.box('onboarding');
+                      final api = ApiService();
+                      final result = await api.registerPregnancyUser(user);
 
-                      final bool isFirstTime = !(box.get('completed') ?? false);
+                      if (result.success) {
+                        final box = Hive.box('onboarding');
+                        box.put("unique_key", result.uniqueKey);
 
-                      // 3) 난수 코드 최초 1회만 생성
-                      String? inviteCode = box.get('inviteCode');
-                      if (inviteCode == null) {
-                        inviteCode = _generateInviteCode();
-                        box.put('inviteCode', inviteCode);
+                        widget.controller.saveInfo(
+                          nickname: _nicknameCtrl.text.trim(),
+                          start: _startDate!,
+                          uniqueKey: result.uniqueKey!,
+                        );
+
+                        // 2) Hive 박스 열기
+
+                        final bool isFirstTime = !(box.get('completed') ??
+                            false);
+
+                        // 3) 난수 코드 최초 1회만 생성
+                        String? inviteCode = box.get('inviteCode');
+                        if (inviteCode == null) {
+                          inviteCode = _generateInviteCode();
+                          box.put('inviteCode', inviteCode);
+                        }
+
+                        // 4) 데이터 저장 (난수는 덮어쓰지 않음)
+                        box.put('nickname', _nicknameCtrl.text.trim());
+                        box.put('startDate', _startDate!.toIso8601String());
+                        box.put('completed', true);
+                        box.put('pregnancyMode', true);
+
+                        if (isFirstTime) {
+                          box.put('tutorialShown', false);
+                        }
+
+                        // 5) 이전 화면으로 true 반환
+                        Navigator.pop(context, true);
                       }
-
-                      // 4) 데이터 저장 (난수는 덮어쓰지 않음)
-                      box.put('nickname', _nicknameCtrl.text.trim());
-                      box.put('startDate', _startDate!.toIso8601String());
-                      box.put('completed', true);
-                      box.put('pregnancyMode', true);
-
-                      if (isFirstTime) {
-                        box.put('tutorialShown', false);
+                      else{
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("서버 저장 실패")),
+                        );
                       }
-
-                      // 5) 이전 화면으로 true 반환
-                      Navigator.pop(context, true);
                     } else if (_startDate == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('임신 시작일을 선택해주세요')),

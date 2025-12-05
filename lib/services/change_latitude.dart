@@ -215,50 +215,62 @@ Future<Weather_map_xy> getCurrentXY() async {
   if (!allowed) throw Exception("위치 권한이 거부되었습니다.");
 
   Position pos = await Geolocator.getCurrentPosition();
+
+  print("📍 pos.lat=${pos.latitude}, pos.lon=${pos.longitude}");
+
+  // 🔥 위도/경도 0.0이면 다시 요청
+  if (pos.latitude == 0.0 || pos.longitude == 0.0) {
+    pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    await Future.delayed(Duration(milliseconds: 300));
+  }
+
+  // 그래도 0.0이면 오류
+  if (pos.latitude == 0.0 || pos.longitude == 0.0) {
+    throw Exception("GPS 좌표 오류: lat/lon이 0입니다.");
+  }
+
   return WeatherXYConverter.toGrid(pos.longitude, pos.latitude);
+}
+
+String getBaseTime() {
+  final now = DateTime.now();
+
+  // 발표 시간 목록
+  final baseTimes = [
+    2300, 2000, 1700, 1400, 1100, 800, 500, 200
+  ];
+
+  int nowTime = now.hour * 100 + now.minute;
+
+  // 지금시간보다 작거나 같은 가장 큰 baseTime 사용
+  for (int bt in baseTimes) {
+    if (nowTime >= bt) {
+      return bt.toString().padLeft(4, '0');
+    }
+  }
+
+  // 자정~01:59 → 전날 23시 발표 사용
+  return "2300";
+}
+
+
+String getBaseDate(String baseTime) {
+  final now = DateTime.now();
+  if (baseTime == "2300" && now.hour < 2) {
+    final yesterday = now.subtract(Duration(days: 1));
+    return "${yesterday.year}${yesterday.month.toString().padLeft(2, '0')}${yesterday.day.toString().padLeft(2, '0')}";
+  }
+  return "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
 }
 
 
 Future<Map<String, dynamic>> getWeather() async {
-  // 1) 내 현재 위치를 위·경도로 가져와서 → 기상청 격자좌표로 변환
   Weather_map_xy xy = await getCurrentXY();
 
-  // 2) 기상청 기준 baseDate / baseTime 계산
-  final now = DateTime.now();
-  late DateTime baseDateTime;
-  final hour = now.hour;
+  // 1) Base Time 계산
+  String baseTime = getBaseTime();
+  String baseDate = getBaseDate(baseTime);
 
-  // 🔹 00~01시는 "전날 23시" 발표분을 사용해야 함
-  if (hour < 2) {
-    final yesterday = now.subtract(Duration(days: 1));
-    baseDateTime = DateTime(yesterday.year, yesterday.month, yesterday.day, 23);
-  } else if (hour < 5) {
-    baseDateTime = DateTime(now.year, now.month, now.day, 2);
-  } else if (hour < 8) {
-    baseDateTime = DateTime(now.year, now.month, now.day, 5);
-  } else if (hour < 11) {
-    baseDateTime = DateTime(now.year, now.month, now.day, 8);
-  } else if (hour < 14) {
-    baseDateTime = DateTime(now.year, now.month, now.day, 11);
-  } else if (hour < 17) {
-    baseDateTime = DateTime(now.year, now.month, now.day, 14);
-  } else if (hour < 20) {
-    baseDateTime = DateTime(now.year, now.month, now.day, 17);
-  } else if (hour < 23) {
-    baseDateTime = DateTime(now.year, now.month, now.day, 20);
-  } else {
-    baseDateTime = DateTime(now.year, now.month, now.day, 23);
-  }
-
-  // 최종 baseDate / baseTime 문자열
-  final baseDate =
-      "${baseDateTime.year}"
-      "${baseDateTime.month.toString().padLeft(2, '0')}"
-      "${baseDateTime.day.toString().padLeft(2, '0')}";
-
-  final baseTime = "${baseDateTime.hour.toString().padLeft(2, '0')}00";
-
-  // 3) 요청 URL 생성
   final url = Uri.parse(
       "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst"
           "?serviceKey=51057168d0268149ec4c40985eb0d71e74031f0f2af50c1fde722ae944debfb5"
@@ -270,38 +282,20 @@ Future<Map<String, dynamic>> getWeather() async {
           "&nx=${xy.x}&ny=${xy.y}"
   );
 
-  print("🔍 요청 URL: $url");
+  print("📡 요청 BaseDate: $baseDate / BaseTime: $baseTime");
+  print("📡 URL: $url");
 
   final res = await http.get(url);
-  print("🔍 statusCode: ${res.statusCode}");
 
   if (res.statusCode != 200) {
-    throw Exception("기상청 HTTP 오류: ${res.statusCode} / ${res.body}");
+    throw Exception("HTTP ERROR: ${res.statusCode}");
   }
 
   final decoded = jsonDecode(res.body);
 
-  // 4) 응답 헤더 코드 체크
-  final header = decoded['response']?['header'];
-  final resultCode = header?['resultCode'];
-  final resultMsg  = header?['resultMsg'];
-
-  if (resultCode != "00") {
-    throw Exception("기상청 응답 오류 $resultCode : $resultMsg");
+  if (decoded["response"]["header"]["resultCode"] != "00") {
+    throw Exception("기상청 오류: ${decoded["response"]["header"]["resultMsg"]}");
   }
 
-  // 5) items 존재 여부 체크 (null 이면 여기서 막기)
-  final body  = decoded['response']?['body'];
-  final items = body?['items']?['item'];
-
-  if (items == null) {
-    // 콘솔에 전체 응답 찍어보고 싶은 경우:
-    print("⚠️ 기상청 응답에 item 이 없습니다: ${res.body}");
-    throw Exception("기상청에 예보 데이터가 없습니다. (items == null)");
-  }
-
-  // 이후 함수들은 raw["response"]["body"]["items"]["item"]을 쓰고 있으니
-  // decoded 전체를 그대로 리턴해 줌
   return decoded;
 }
-

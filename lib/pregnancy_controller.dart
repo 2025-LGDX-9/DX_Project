@@ -3,12 +3,14 @@ import 'package:hive/hive.dart';
 class PregnancyController {
   String? babyNickname; // 태명
   DateTime? startDate;  // 임신 시작일
+  String? uniqueKey;
 
   bool get isInitialized => babyNickname != null && startDate != null;
 
-  void saveInfo({required String nickname, required DateTime start}) {
+  void saveInfo({required String nickname, required DateTime start, required String uniqueKey}) {
     babyNickname = nickname;
     startDate = start;
+    this.uniqueKey = uniqueKey;
   }
 
   // =========================
