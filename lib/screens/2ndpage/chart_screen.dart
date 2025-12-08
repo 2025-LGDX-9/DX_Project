@@ -137,12 +137,6 @@ class _ChartScreenState extends State<ChartScreen> {
   void initState() {
     super.initState();
     final box = Hive.box<EnergyLog>('energy_logs');
-
-    // 기존 로그 삭제
-    box.clear();
-
-    // 새 로그 생성
-    EnergyRepository().fetchAndSaveLogs();
   }
 
   @override

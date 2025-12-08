@@ -14,6 +14,7 @@ import 'package:pregnancy_mode_app/screens/3rdpage/info_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 import 'package:pregnancy_mode_app/screens/4thpage/menu_screen.dart';
 import 'package:pregnancy_mode_app/services/api_service.dart';
+import 'package:pregnancy_mode_app/services/energy_repository.dart';
 import 'models/favorite_device.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -70,6 +71,8 @@ void main() async {
       memberIndex: savedMemberIndex,
     );
   }
+  EnergyRepository().fetchAndSaveLogs();
+
   runApp(PregnancyModeApp(controller: controller,));
 
 }
