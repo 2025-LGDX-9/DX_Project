@@ -50,7 +50,7 @@ class InfoScreen extends StatelessWidget {
             // (width / height), 값 낮을수록 셀 높이가 커짐
             children: [
               CategoryButton(
-                icon: Image.asset("assets/images/calender.png"),
+                icon: Image.asset("assets/images/calendar.png"),
                 label: '주차별\n건강 정보',
                 onTap: () {
                   Navigator.push(

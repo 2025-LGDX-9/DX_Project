@@ -155,6 +155,7 @@ class InviteMember extends StatelessWidget {
           ),
 
           // 하단 고정 초대하기 버튼
+
           Container(
             padding: EdgeInsets.fromLTRB(20, 12, 20, 20),
             decoration: BoxDecoration(

@@ -152,6 +152,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         box.put('startDate', _startDate!.toIso8601String());
                         box.put('completed', true);
                         box.put('pregnancyMode', true);
+                        pregBox.put('nickname', _nicknameCtrl.text.trim());
+                        pregBox.put('startDate', _startDate!.toIso8601String());
 
                         if (isFirstTime) {
                           box.put('tutorialShown', false);

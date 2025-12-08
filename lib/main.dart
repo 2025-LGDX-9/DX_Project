@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:pregnancy_mode_app/models/all_device.dart';
@@ -11,6 +14,8 @@ import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 import 'package:pregnancy_mode_app/screens/4thpage/menu_screen.dart';
 import 'package:pregnancy_mode_app/services/api_service.dart';
 import 'models/favorite_device.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> safeOpenBox<T>(String name) async {
   if (!Hive.isBoxOpen(name)) {
@@ -20,6 +25,7 @@ Future<void> safeOpenBox<T>(String name) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('ko_KR', null);
 
   await Hive.initFlutter();
   Hive.registerAdapter(FavoriteDeviceAdapter());
@@ -52,6 +58,7 @@ void main() async {
   }
 
   runApp(PregnancyModeApp(controller: controller,));
+
 }
 
 class PregnancyModeApp extends StatefulWidget {
@@ -157,6 +164,7 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      locale: const Locale('ko', 'KR'),  // ← ★ 한국어 Locale 적용
       home: Scaffold(
         body: SafeArea(child: screens[_selectedIndex]),
         bottomNavigationBar: BottomNavigationBar(
