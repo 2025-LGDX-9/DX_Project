@@ -71,7 +71,11 @@ void main() async {
       memberIndex: savedMemberIndex,
     );
   }
-  EnergyRepository().fetchAndSaveLogs();
+
+  final energyBox = Hive.box<EnergyLog>('energy_logs');
+  if (energyBox.isEmpty) {
+    await EnergyRepository().fetchAndSaveLogs();
+  }
 
   runApp(PregnancyModeApp(controller: controller,));
 

@@ -55,7 +55,7 @@ class _SmartRoutineHumidifierState extends State<SmartRoutineHumidifier> {
                   );
                   if (changed == true) setState(() {});
                 },
-                child: const _ConditionCard(),
+                child: _ConditionCard(),
               ),
 
               const SizedBox(height: 40),
@@ -75,7 +75,7 @@ class _SmartRoutineHumidifierState extends State<SmartRoutineHumidifier> {
                   );
                   if (changed == true) setState(() {});
                 },
-                child: const _ActionCard(),
+                child: _ActionCard(),
               ),
             ],
           ),
@@ -150,9 +150,14 @@ class _ClickableCard extends StatelessWidget {
 // ================================================================
 //
 
-class _ConditionCard extends StatelessWidget {
+class _ConditionCard extends StatefulWidget {
   const _ConditionCard();
 
+  @override
+  State<_ConditionCard> createState() => _ConditionCardState();
+}
+
+class _ConditionCardState extends State<_ConditionCard> {
   @override
   Widget build(BuildContext context) {
     final summary = getHumidityConditionSummary();
@@ -207,9 +212,14 @@ class _ConditionCard extends StatelessWidget {
 // ================================================================
 //
 
-class _ActionCard extends StatelessWidget {
+class _ActionCard extends StatefulWidget {
   const _ActionCard();
 
+  @override
+  State<_ActionCard> createState() => _ActionCardState();
+}
+
+class _ActionCardState extends State<_ActionCard> {
   @override
   Widget build(BuildContext context) {
     final summary = getHumidifierActionSummary();
