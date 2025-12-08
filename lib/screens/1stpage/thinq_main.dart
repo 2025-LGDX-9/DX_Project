@@ -270,6 +270,63 @@ class ThinqHomeScreen extends StatelessWidget {
                                                     ),
                                                   ),
                                                 SizedBox(height: 12),
+
+                                                // =============================
+                                                // 🔵 가족 계정 참여하기 버튼 (수정 버전) — bottom sheet 유지됨!
+                                                // =============================
+                                                Material(
+                                                  color: Colors.transparent,
+                                                  child: InkWell(
+                                                    onTap: () async {
+                                                      // ❗ bottom sheet 닫지 않음
+                                                      final result = await Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (_) => JoinGroupScreen(controller: controller),
+                                                        ),
+                                                      );
+
+                                                      if (result == true) {
+                                                        if (onPregnancyModeChanged != null) {
+                                                          onPregnancyModeChanged!(true);
+                                                        }
+                                                      }
+                                                    },
+                                                    child: Ink(
+                                                      width: MediaQuery.of(context).size.width,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius: BorderRadius.circular(20),
+                                                      ),
+                                                      child: Padding(
+                                                        padding: EdgeInsets.all(20),
+                                                        child: Row(
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                          children: [
+                                                            Icon(Icons.group_add, color: Color(0xff4A90E2)),
+                                                            SizedBox(width: 10),
+                                                            Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: [
+                                                                Text(
+                                                                  "가족 그룹 참여하기",
+                                                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                                ),
+                                                                Text(
+                                                                  "초대코드를 입력하여 그룹에 참여하세요.",
+                                                                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 12),
+
+
                                                 //제품 추가 버튼
                                                 Material(
                                                   color: Colors.transparent,
@@ -551,58 +608,58 @@ class ThinqHomeScreen extends StatelessWidget {
                                                       padding: EdgeInsets.all(20),
                                                       child: Column(
                                                         children: [
-                                                          // 🔵 멤버 가입 버튼
-                                                          InkWell(
-                                                            onTap: () async {
-                                                              final result = await Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                  builder: (_) => JoinGroupScreen(controller: controller),
+                                                          // // 🔵 멤버 가입 버튼
+                                                          // InkWell(
+                                                          //   onTap: () async {
+                                                          //     final result = await Navigator.push(
+                                                          //       context,
+                                                          //       MaterialPageRoute(
+                                                          //         builder: (_) => JoinGroupScreen(controller: controller),
+                                                          //
+                                                          //       ),
+                                                          //     );
+                                                          //
+                                                          //     if (result == true) {
+                                                          //       // join_group_screen.dart에서 pop(true) 되었다는 뜻
+                                                          //       if (onPregnancyModeChanged != null) {
+                                                          //         onPregnancyModeChanged!(true);
+                                                          //       }
+                                                          //     }
+                                                          //   },
+                                                          //   child: Row(
+                                                          //     crossAxisAlignment: CrossAxisAlignment.center,
+                                                          //     children: [
+                                                          //       Icon(
+                                                          //         Icons.login,
+                                                          //         color: Color(0xff4A90E2),
+                                                          //       ),
+                                                          //       SizedBox(width: 10),
+                                                          //       Column(
+                                                          //         crossAxisAlignment: CrossAxisAlignment.start,
+                                                          //         children: [
+                                                          //           Text(
+                                                          //             "멤버 가입",
+                                                          //             style: TextStyle(
+                                                          //               fontSize: 20,
+                                                          //               fontWeight: FontWeight.bold,
+                                                          //             ),
+                                                          //           ),
+                                                          //           Text(
+                                                          //             "초대코드를 입력해 그룹에 참여하세요",
+                                                          //             style: TextStyle(
+                                                          //               fontSize: 14,
+                                                          //               color: Colors.black54,
+                                                          //             ),
+                                                          //           ),
+                                                          //         ],
+                                                          //       ),
+                                                          //     ],
+                                                          //   ),
+                                                          // ),
 
-                                                                ),
-                                                              );
-
-                                                              if (result == true) {
-                                                                // join_group_screen.dart에서 pop(true) 되었다는 뜻
-                                                                if (onPregnancyModeChanged != null) {
-                                                                  onPregnancyModeChanged!(true);
-                                                                }
-                                                              }
-                                                            },
-                                                            child: Row(
-                                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                                              children: [
-                                                                Icon(
-                                                                  Icons.login,
-                                                                  color: Color(0xff4A90E2),
-                                                                ),
-                                                                SizedBox(width: 10),
-                                                                Column(
-                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                  children: [
-                                                                    Text(
-                                                                      "멤버 가입",
-                                                                      style: TextStyle(
-                                                                        fontSize: 20,
-                                                                        fontWeight: FontWeight.bold,
-                                                                      ),
-                                                                    ),
-                                                                    Text(
-                                                                      "초대코드를 입력해 그룹에 참여하세요",
-                                                                      style: TextStyle(
-                                                                        fontSize: 14,
-                                                                        color: Colors.black54,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-
-                                                          SizedBox(height: 12),
-                                                          Divider(height: 1),
-                                                          SizedBox(height: 12),
+                                                          // SizedBox(height: 12),
+                                                          // Divider(height: 1),
+                                                          // SizedBox(height: 12),
 
                                                           // 🔵 새로운 홈 만들기 버튼 (기존 기능 유지)
                                                           InkWell(

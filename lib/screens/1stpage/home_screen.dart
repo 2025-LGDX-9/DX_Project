@@ -451,13 +451,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 🔥 항상 최신 DB 기반 정보로 업데이트
     final box = Hive.box('pregnancyBox');
-    _babyName = box.get('nickname', defaultValue: "우리 아기");
 
-    final savedDate = box.get('startDate');
-    if (savedDate != null) {
-      widget.controller.setStartDate(DateTime.parse(savedDate));
+// 태명
+    final nickname = box.get('nickname');
+    if (nickname != null) {
+      _babyName = nickname;
+      widget.controller.setBabyNickname(nickname);
     }
+
+// 임신 시작일
+    final startDate = box.get('startDate');
+    if (startDate != null) {
+      final parsed = DateTime.tryParse(startDate);
+      if (parsed != null) {
+        widget.controller.setStartDate(parsed);
+      }
+    }
+
 
     final weeks = widget.controller.weeks;
 
@@ -982,7 +994,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                         .start,
                                                                 children: [
                                                                   Text(
-                                                                    "멤버 초대",
+                                                                    "홈 멤버 초대",
                                                                     style: TextStyle(
                                                                       fontSize:
                                                                           20,
