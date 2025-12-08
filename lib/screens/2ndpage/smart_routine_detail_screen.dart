@@ -127,7 +127,7 @@ class _DeviceListCard extends StatelessWidget {
           _DeviceRow(
             icon: "assets/images/aircon.png",
             title: "에어컨",
-            description: "루틴에 따라 온도·바람 설정 자동 적용",
+            description: "24℃~26℃로 설정",
             deviceType: "aircon",
             controller: controller,
             onTap: () {
@@ -141,7 +141,7 @@ class _DeviceListCard extends StatelessWidget {
           _DeviceRow(
             icon: "assets/images/air_cleaner.png",
             title: "공기청정기",
-            description: "루틴에 따라 청정·부스터 자동 설정",
+            description: "오토모드로 설정",
             deviceType: "aircleaner",
             controller: controller,
             onTap: () {
@@ -155,7 +155,7 @@ class _DeviceListCard extends StatelessWidget {
           _DeviceRow(
             icon: "assets/images/humidifier.png",
             title: "가습기",
-            description: "루틴에 따라 목표 습도 자동 적용",
+            description: "40%~60%로 설정",
             deviceType: "humidifier",
             controller: controller,
             onTap: () {
@@ -169,7 +169,7 @@ class _DeviceListCard extends StatelessWidget {
           _DeviceRow(
             icon: "assets/images/robot_cleaner.png",
             title: "로봇청소기",
-            description: "루틴에 따라 모드 자동 적용",
+            description: "오전10시, 오후 5시에 실행",
             deviceType: "robot",
             controller: controller,
             onTap: () {

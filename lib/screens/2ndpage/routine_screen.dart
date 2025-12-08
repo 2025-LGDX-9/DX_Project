@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/air_cleaner_control_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/aircon_control_screen.dart';
+import 'package:pregnancy_mode_app/screens/2ndpage/chart_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/humidifier_control_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/robot_cleaner_control_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
@@ -399,7 +400,7 @@ class _EnergyReportCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -407,11 +408,25 @@ class _EnergyReportCard extends StatelessWidget {
                 '12월 리포트',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              Text(
-                '자세히 보기',
-                style: TextStyle(
-                  color: Color(0xff7b5cff),
-                  fontWeight: FontWeight.bold,
+              InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChartScreen(), // ← 이동할 화면
+                    ),
+                  );
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+                  child: Text(
+                    '자세히 보기',
+                    style: TextStyle(
+                      color: Color(0xff7b5cff),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ],

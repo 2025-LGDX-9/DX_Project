@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:pregnancy_mode_app/models/all_device.dart';
 import 'package:pregnancy_mode_app/models/favorite_device.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/calendar_screen.dart';
@@ -33,6 +34,313 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool isDiaryEditing = false;
+  int editingMoodIndex = 2;
+
+// ⭐ 날짜 이동을 위한 기준 날짜 (기본: 오늘)
+  DateTime selectedDiaryDate = DateTime.now();
+
+  /// 날짜를 Hive key 형태로 변환
+  String _dateKey(DateTime date) {
+    return DateFormat('yyyy-MM-dd').format(date);
+  }
+
+// -------------------------------
+// 📌 오늘의 다이어리 카드 (← 날짜 이동 가능하도록 개선됨)
+// -------------------------------
+  Widget todayDiaryCard(BuildContext context) {
+    final diaryBox = Hive.box('diary');
+
+    // ⭐ 오늘이 아닌 selectedDiaryDate 기준으로 조회
+    final String key = DateFormat('yyyy-MM-dd').format(selectedDiaryDate);
+    final todayDiary = diaryBox.get(key);
+
+    // mood → emoji 변환
+    final moodEmoji = ["😄", "😊", "😐", "😡", "😢"];
+    String emoji = "😐";
+
+    if (todayDiary != null && todayDiary["mood"] != null) {
+      final moodIndex = todayDiary["mood"];
+      if (moodIndex >= 0 && moodIndex < moodEmoji.length) {
+        emoji = moodEmoji[moodIndex];
+      }
+    }
+
+    const fixedBgColor = Color(0xFFFFEFF4);
+
+    return Container(
+      margin: const EdgeInsets.only(top: 20, bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: fixedBgColor,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 6,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+
+      // ⭐ 여기!! 기존 child 대신 Column 구조
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // -------------------------------
+          // 📅 날짜 + 화살표
+          // -------------------------------
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.chevron_left),
+                onPressed: () {
+                  setState(() {
+                    selectedDiaryDate =
+                        selectedDiaryDate.subtract(const Duration(days: 1));
+                  });
+                },
+              ),
+
+              Text(
+                DateFormat('yyyy년 MM월 dd일').format(selectedDiaryDate),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              IconButton(
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.chevron_right),
+                onPressed: () {
+                  setState(() {
+                    selectedDiaryDate =
+                        selectedDiaryDate.add(const Duration(days: 1));
+                  });
+                },
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // -------------------------------
+          // 📘 기존 다이어리 UI 렌더링
+          // -------------------------------
+          if (todayDiary == null)
+            _buildEmptyDiaryUI()
+          else if (isDiaryEditing)
+            _buildEditDiaryUI(todayDiary)
+          else
+            _buildReadDiaryUI(todayDiary, emoji),
+        ],
+      ),
+    );
+  }
+
+
+// -------------------------------
+// 📌 다이어리 없음 UI
+// -------------------------------
+  Widget _buildEmptyDiaryUI() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        Row(
+          children: [
+            _DiaryIcon(),
+            SizedBox(width: 10),
+            Text("오늘의 다이어리",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        SizedBox(height: 10),
+        Text("오늘의 감정과 하루를 간단히 기록해보세요 😊",
+            style: TextStyle(fontSize: 14)),
+      ],
+    );
+  }
+
+// -------------------------------
+// 📌 다이어리 읽기 UI
+// -------------------------------
+  Widget _buildReadDiaryUI(dynamic todayDiary, String emoji) {
+    final weight = todayDiary["weight"]?.toString() ?? "-";
+    String memo = todayDiary["note"] ?? "";
+    if (memo.trim().isEmpty) memo = "아직 기록이 없어요!";
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const _DiaryIcon(),
+            const SizedBox(width: 10),
+            const Text("오늘의 다이어리",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Spacer(),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  editingMoodIndex = todayDiary["mood"] ?? 2;
+                  isDiaryEditing = true;
+                });
+              },
+              child: Icon(Icons.edit, size: 18, color: Colors.grey.shade700),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 12),
+        Text("$weight kg  $emoji", style: const TextStyle(fontSize: 15)),
+        const SizedBox(height: 14),
+
+        const Text("기록",
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 6),
+
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.black12),
+          ),
+          child: Text(
+            memo,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 14, height: 1.4),
+          ),
+        ),
+      ],
+    );
+  }
+
+// -------------------------------
+// 📌 다이어리 수정 UI
+// -------------------------------
+  Widget _buildEditDiaryUI(dynamic todayDiary) {
+    final diaryBox = Hive.box('diary');
+
+    final weightCtrl =
+    TextEditingController(text: todayDiary["weight"]?.toString() ?? "");
+    final noteCtrl = TextEditingController(text: todayDiary["note"] ?? "");
+
+    final moodEmoji = ["😄", "😊", "😐", "😡", "😢"];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const _DiaryIcon(),
+            const SizedBox(width: 10),
+            const Text("다이어리 수정",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Spacer(),
+            GestureDetector(
+              onTap: () => setState(() => isDiaryEditing = false),
+              child: const Icon(Icons.close, size: 20),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 12),
+
+        // 체중 입력
+        Row(
+          children: [
+            SizedBox(
+              width: 100,
+              child: TextField(
+                controller: weightCtrl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: "체중",
+                  filled: true,
+                  fillColor: Colors.white,
+                  border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            const Text("kg"),
+          ],
+        ),
+
+        const SizedBox(height: 12),
+
+        // 감정 선택
+        Row(
+          children: List.generate(5, (i) {
+            return GestureDetector(
+              onTap: () => setState(() => editingMoodIndex = i),
+              child: Container(
+                margin: const EdgeInsets.only(right: 6),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: editingMoodIndex == i
+                      ? Colors.pink.shade100
+                      : Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  moodEmoji[i],
+                  style: TextStyle(
+                      fontSize: editingMoodIndex == i ? 28 : 22),
+                ),
+              ),
+            );
+          }),
+        ),
+
+        const SizedBox(height: 12),
+
+        // 메모 입력
+        TextField(
+          controller: noteCtrl,
+          maxLines: 3,
+          decoration: InputDecoration(
+            hintText: "기록을 입력하세요",
+            filled: true,
+            fillColor: Colors.white,
+            border:
+            OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        // 저장 버튼
+        ElevatedButton(
+          onPressed: () {
+            final key = _dateKey(selectedDiaryDate);   // ⭐ 오늘이 아니라 선택된 날짜 저장!
+
+            diaryBox.put(key, {
+              "weight": double.tryParse(weightCtrl.text) ?? 0,
+              "note": noteCtrl.text,
+              "mood": editingMoodIndex,
+            });
+
+            setState(() => isDiaryEditing = false);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.pink.shade300,
+            shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          child: const Text("저장하기"),
+        )
+      ],
+    );
+  }
+
+
   final List<String> _tipMessages = [
     // 축하 메시지 리스트 추가
     "이 시기엔 카페인 섭취를 조금 줄여보는 게 좋아요.",
@@ -1285,6 +1593,22 @@ class AddFavoriteCard extends StatelessWidget {
           child: Icon(Icons.add, size: 30, color: Colors.black87),
         ),
       ),
+    );
+  }
+}
+
+class _DiaryIcon extends StatelessWidget {
+  const _DiaryIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: Colors.pink.shade100,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Text("📖", style: TextStyle(fontSize: 18)),
     );
   }
 }

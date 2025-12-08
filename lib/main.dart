@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:pregnancy_mode_app/models/all_device.dart';
+import 'package:pregnancy_mode_app/models/energy_log.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/thinq_main.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/splash_screen.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/home_screen.dart';
@@ -24,6 +25,7 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(FavoriteDeviceAdapter());
   Hive.registerAdapter(AllDeviceAdapter());
+  Hive.registerAdapter(EnergyLogAdapter());
 
   await Hive.openBox<FavoriteDevice>('favorite_devices');
   await Hive.openBox('onboarding');
@@ -32,6 +34,7 @@ void main() async {
   await Hive.openBox("routine_settings");
   await Hive.openBox('pregnancyBox');
   await Hive.openBox('diary');
+  await Hive.openBox<EnergyLog>('energy_logs');
 
   final box = Hive.box('pregnancyBox');
   String? savedUniqueKey = box.get('unique_key');
