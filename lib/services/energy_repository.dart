@@ -5,15 +5,11 @@ import '../models/energy_log.dart';
 
 class EnergyRepository {
   Future<void> fetchAndSaveLogs() async {
-    print("=== fetchAndSaveLogs 시작 ===");
 
     try {
       final url = "http://192.168.219.97:8001/getLogs";
-      print("요청 URL: $url");
 
       final res = await http.get(Uri.parse(url));
-      print("서버 응답 코드: ${res.statusCode}");
-      print("서버 응답 바디: ${res.body}");
 
       final List data = jsonDecode(res.body);
 

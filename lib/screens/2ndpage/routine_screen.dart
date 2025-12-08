@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
 import 'package:pregnancy_mode_app/screens/2ndpage/air_cleaner_control_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/aircon_control_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/chart_screen.dart';
@@ -9,6 +11,23 @@ import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/smart_routine_detail_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/edit_screen.dart';
+
+import 'package:pregnancy_mode_app/models/energy_log.dart';
+
+double getDeviceWatt(int id) {
+  switch (id) {
+    case 1:
+      return 1200;
+    case 2:
+      return 120;
+    case 3:
+      return 100;
+    case 4:
+      return 80;
+    default:
+      return 0;
+  }
+}
 
 class RoutineScreen extends StatefulWidget {
   final PregnancyController controller;
@@ -23,25 +42,25 @@ class RoutineScreen extends StatefulWidget {
 }
 
 class _RoutineScreenState extends State<RoutineScreen> {
-
-  /// 🔥 공통 상태 문자열 생성 — HomeScreen FavoriteCard와 동일 구조(+커스텀 적용)
   String _getDeviceStatus(String type, PregnancyController c) {
     switch (type) {
       case "aircon":
         final temp = c.airconTargetTemp.toStringAsFixed(0);
         final strength = c.airconWindStrength;
         final direction = c.airconWindDirection;
-
         return "$temp°C · $strength ·\n$direction";
 
       case "aircleaner":
-      // 단계 → 텍스트 변환
         String levelText(int lv) {
           switch (lv) {
-            case 0: return "약";
-            case 1: return "보통";
-            case 2: return "강";
-            default: return "-";
+            case 0:
+              return "약";
+            case 1:
+              return "보통";
+            case 2:
+              return "강";
+            default:
+              return "-";
           }
         }
 
@@ -52,18 +71,20 @@ class _RoutineScreenState extends State<RoutineScreen> {
       case "humidifier":
         final hum = c.humidifierTargetHumidity.toStringAsFixed(0);
 
-        // 🔥 분무량 1/2/3 → 퍼센트로 변환
-        String mistPercent(int level) {
-          switch (level) {
-            case 1: return "50%";  // 약
-            case 2: return "75%";  // 보통
-            case 3: return "100%"; // 강
-            default: return "-";
+        String mistPercent(int lv) {
+          switch (lv) {
+            case 1:
+              return "50%";
+            case 2:
+              return "75%";
+            case 3:
+              return "100%";
+            default:
+              return "-";
           }
         }
 
         final mist = mistPercent(c.humidifierMistLevel);
-
         return "희망습도: $hum% · 분무량: $mist";
 
       case "robot":
@@ -71,7 +92,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
         return "모드: $turbo";
 
       default:
-        return "";
+        return "-";
     }
   }
 
@@ -79,17 +100,14 @@ class _RoutineScreenState extends State<RoutineScreen> {
   Widget build(BuildContext context) {
     final controller = widget.controller;
 
-    final double screenWidth = MediaQuery.of(context).size.width;
-    const double horizontalPadding = 16;
-    const double betweenCard = 12;
-    final double cardWidth =
-        (screenWidth - horizontalPadding * 2 - betweenCard) / 2;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final double cardWidth = (screenWidth - 16 * 2 - 12) / 2;
 
     return Scaffold(
-      backgroundColor: Color(0xffFAF0F0),
+      backgroundColor: const Color(0xffFAF0F0),
       body: Column(
         children: [
-          /// ---------------------- 상단바 ----------------------
+          // ---------------------- 상단바 ----------------------
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
             child: Row(
@@ -97,29 +115,26 @@ class _RoutineScreenState extends State<RoutineScreen> {
                 Flexible(
                   child: Row(
                     children: [
-                      Text(
+                      const Text(
                         "홈",
                         style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            fontSize: 25, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       GestureDetector(
-                        onTap: () {},
                         child: Image.asset(
                           "assets/images/keyboard_arrow_down.png",
                           width: 10,
                           height: 10,
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),
 
                 Row(
                   children: [
-                    /// 제품 추가 패널
+                    // 추가 패널
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
@@ -130,81 +145,45 @@ class _RoutineScreenState extends State<RoutineScreen> {
                             backgroundColor: Colors.transparent,
                             builder: (context) {
                               return Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
+                                padding: const EdgeInsets.only(top: 16),
+                                decoration: const BoxDecoration(
                                   color: Color(0xffEFF1F4),
                                   borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(24),
-                                  ),
+                                      top: Radius.circular(24)),
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    SizedBox(height: 12),
-                                    Container(
-                                      width: 40,
-                                      height: 5,
-                                      decoration: BoxDecoration(
-                                        color: Colors.black26,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ),
-                                    SizedBox(height: 16),
-                                    Padding(
-                                      padding: EdgeInsets.all(20),
-                                      child: Column(
-                                        children: [
-                                          Material(
-                                            color: Colors.transparent,
-                                            child: InkWell(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (_) => EditScreen(),
-                                                  ),
-                                                );
-                                              },
-                                              child: Ink(
-                                                width: MediaQuery.of(context).size.width,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius: BorderRadius.circular(20),
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsets.all(20),
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(Icons.add_circle,
-                                                          color: Color(0xff43BA84)),
-                                                      SizedBox(width: 10),
-                                                      Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Text(
-                                                            "제품 추가",
-                                                            style: TextStyle(
-                                                              fontSize: 20,
-                                                              fontWeight:
-                                                              FontWeight.bold,
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            "LG와 다양한 브랜드의 제품",
-                                                            style: TextStyle(
-                                                              fontSize: 15,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => EditScreen(),
                                           ),
-                                          SizedBox(height: 12),
-                                        ],
+                                        );
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(20),
+                                        margin: const EdgeInsets.all(20),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                          BorderRadius.circular(20),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.add_circle,
+                                                color: Color(0xff43BA84)),
+                                            const SizedBox(width: 10),
+                                            const Text(
+                                              "제품 추가",
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -221,7 +200,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                       ),
                     ),
 
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
 
                     GestureDetector(
                       onTap: () {
@@ -237,31 +216,29 @@ class _RoutineScreenState extends State<RoutineScreen> {
                       ),
                     ),
 
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                   ],
-                ),
+                )
               ],
             ),
           ),
 
-          /// ---------------------- 본문 ----------------------
+          // ---------------------- 본문 ----------------------
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                // 자동 계산되는 리포트 카드
                 const _EnergyReportCard(),
+
                 const SizedBox(height: 24),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
-                    Text(
-                      '스마트 루틴',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text('스마트 루틴',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
                     Icon(Icons.chevron_right, color: Colors.grey),
                   ],
                 ),
@@ -272,95 +249,94 @@ class _RoutineScreenState extends State<RoutineScreen> {
 
                 Row(
                   children: [
-                    const Text(
-                      '내 가전',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(width: 5),
+                    const Text('내 가전',
+                        style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 5),
                     GestureDetector(
-                      child: Icon(Icons.arrow_forward_ios,
-                          size: 18, color: Color(0xff8F8E8E)),
                       onTap: () {
                         Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => EditScreen()),
-                        );
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => EditScreen()));
                       },
+                      child: const Icon(Icons.arrow_forward_ios,
+                          size: 18, color: Color(0xff8F8E8E)),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 12),
 
                 Wrap(
-                  spacing: betweenCard,
-                  runSpacing: betweenCard,
+                  spacing: 12,
+                  runSpacing: 12,
                   children: [
-                    /// ---------------- 에어컨 ----------------
+                    // 에어컨
                     _DeviceTile(
                       width: cardWidth,
-                      name: '에어컨',
+                      name: "에어컨",
                       status: _getDeviceStatus("aircon", controller),
                       icon: Image.asset("assets/images/aircon.png"),
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                AirconControlScreen(controller: controller),
-                          ),
-                        ).then((_) => setState(() {}));
+                              builder: (_) =>
+                                  AirconControlScreen(controller: controller)),
+                        );
+                        setState(() {});
                       },
                     ),
 
-                    /// ---------------- 공기청정기 ----------------
+                    // 공기청정기
                     _DeviceTile(
                       width: cardWidth,
-                      name: '공기청정기',
+                      name: "공기청정기",
                       status: _getDeviceStatus("aircleaner", controller),
                       icon: Image.asset("assets/images/air_cleaner.png"),
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                AirCleanerControlScreen(controller: controller),
-                          ),
-                        ).then((_) => setState(() {}));
+                              builder: (_) =>
+                                  AirCleanerControlScreen(controller: controller)),
+                        );
+                        setState(() {});
                       },
                     ),
 
-                    /// ---------------- 가습기 ----------------
+                    // 가습기
                     _DeviceTile(
                       width: cardWidth,
-                      name: '가습기',
+                      name: "가습기",
                       status: _getDeviceStatus("humidifier", controller),
                       icon: Image.asset("assets/images/humidifier.png"),
                       onTap: () async {
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                HumidifierControlScreen(controller: controller),
-                          ),
+                              builder: (_) =>
+                                  HumidifierControlScreen(controller: controller)),
                         );
                         setState(() {});
                       },
                     ),
 
-                    /// ---------------- 로봇청소기 ----------------
+                    // 로봇청소기
                     _DeviceTile(
                       width: cardWidth,
-                      name: '로봇청소기',
+                      name: "로봇청소기",
                       status: _getDeviceStatus("robot", controller),
                       icon: Image.asset("assets/images/robot_cleaner.png"),
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                RobotCleanerControlScreen(controller: controller),
-                          ),
-                        ).then((_) => setState(() {}));
+                              builder: (_) =>
+                                  RobotCleanerControlScreen(controller: controller)),
+                        );
+                        setState(() {});
                       },
                     ),
                   ],
@@ -374,80 +350,149 @@ class _RoutineScreenState extends State<RoutineScreen> {
   }
 }
 
+//
+// ───────────────────────────────────────────────────────────
+//   █  에너지 리포트 카드 (자동 계산됨)
+// ───────────────────────────────────────────────────────────
+//
 class _EnergyReportCard extends StatelessWidget {
   const _EnergyReportCard();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '12월 리포트',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    return ValueListenableBuilder(
+      valueListenable: Hive.box<EnergyLog>('energy_logs').listenable(),
+      builder: (context, Box<EnergyLog> box, _) {
+        double totalKwh = 0;
+
+        for (final log in box.values) {
+          final hours = _getUsageHours(log.extraInfo);
+          final watt = getDeviceWatt(log.deviceId);
+          totalKwh += (watt * hours) / 1000.0;
+        }
+
+        final cost = totalKwh * 88.3;
+
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-              InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ChartScreen(), // ← 이동할 화면
-                    ),
-                  );
-                },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 4, horizontal: 6),
-                  child: Text(
-                    '자세히 보기',
-                    style: TextStyle(
-                      color: Color(0xff7b5cff),
-                      fontWeight: FontWeight.bold,
-                    ),
+            ],
+          ),
+
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // -------------------- 🔵 아이콘 위치 수정 --------------------
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Image.asset(
+                    "assets/images/energy_report_icon.png",
+                    fit: BoxFit.contain,
                   ),
+                ),
+              ),
+
+              const SizedBox(width: 12),
+
+              // -------------------- 🔵 텍스트 묶음 --------------------
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // '자세히 보기'
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => ChartScreen()),
+                          );
+                        },
+                        child: const Text(
+                          "자세히 보기 >",
+                          style: TextStyle(
+                            color: Color(0xff7b5cff),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    // 금액
+                    Text(
+                      '${cost.toStringAsFixed(0)} 원',
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    // kWh
+                    Text(
+                      '${totalKwh.toStringAsFixed(2)} kWh',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    // 지난달 데이터
+                    const Text(
+                      '지난달 같은 기간 87.61 kWh',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          SizedBox(height: 4),
-          Text(
-            '제품 에너지 사용량',
-            style: TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-          SizedBox(height: 12),
-          Text(
-            '16,240원',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 4),
-          Text('75.69 kWh', style: TextStyle(fontSize: 12)),
-          SizedBox(height: 4),
-          Text(
-            '지난달 같은 기간 대비 8% 사용량 증가',
-            style: TextStyle(fontSize: 11, color: Colors.grey),
-          ),
-        ],
-      ),
+        );
+      },
     );
+  }
+
+  static double _getUsageHours(String extraInfo) {
+    final regex = RegExp(r'\((\d{2})~(\d{2})시\)');
+    final match = regex.firstMatch(extraInfo);
+    if (match == null) return 0.0;
+
+    int start = int.parse(match.group(1)!);
+    int end = int.parse(match.group(2)!);
+
+    if (end < start) end += 24;
+    return (end - start).toDouble();
   }
 }
 
+
+
+//
+// ───────────────────────────────────────────────────────────
+//   ░  디바이스 타일
+// ───────────────────────────────────────────────────────────
+//
 class _DeviceTile extends StatelessWidget {
   final String name;
   final double width;
@@ -479,7 +524,7 @@ class _DeviceTile extends StatelessWidget {
               BoxShadow(
                 color: Colors.black.withOpacity(0.03),
                 blurRadius: 8,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -491,17 +536,12 @@ class _DeviceTile extends StatelessWidget {
               Text(
                 name,
                 style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
+                    fontWeight: FontWeight.bold, fontSize: 14),
               ),
               const SizedBox(height: 4),
               Text(
                 status,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey,
-                ),
+                style: const TextStyle(fontSize: 11, color: Colors.grey),
               ),
             ],
           ),
@@ -511,6 +551,11 @@ class _DeviceTile extends StatelessWidget {
   }
 }
 
+//
+// ───────────────────────────────────────────────────────────
+//   ░  스마트 루틴 헤더
+// ───────────────────────────────────────────────────────────
+//
 class _SmartRoutineHeaderCard extends StatelessWidget {
   final PregnancyController controller;
 
@@ -523,20 +568,21 @@ class _SmartRoutineHeaderCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => SmartRoutineDetailScreen(controller: controller),
+            builder: (_) =>
+                SmartRoutineDetailScreen(controller: controller),
           ),
         );
       },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Color(0xfff5efff),
+          color: const Color(0xfff5efff),
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.03),
               blurRadius: 8,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -546,25 +592,22 @@ class _SmartRoutineHeaderCard extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.auto_awesome, color: Color(0xff7b5cff)),
+                  color: Colors.white, shape: BoxShape.circle),
+              child:
+              const Icon(Icons.auto_awesome, color: Color(0xff7b5cff)),
             ),
             const SizedBox(width: 12),
             const Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '나를 위한 가전별 맞춤 루틴',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  Text('나를 위한 가전별 맞춤 루틴',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
                   SizedBox(height: 4),
-                  Text(
-                    '임산부 기본 코스로 가전을 자동 제어합니다.',
-                    style: TextStyle(fontSize: 13, color: Colors.black54),
-                  ),
+                  Text('임산부 기본 코스로 가전을 자동 제어합니다.',
+                      style:
+                      TextStyle(fontSize: 13, color: Colors.black54)),
                 ],
               ),
             ),

@@ -39,6 +39,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   fl_chart: ^1.1.1
+  flutter_native_splash: ^2.4.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -94,3 +95,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_native_splash:
+  color: "#DFE6BD"   # 네가 사용하는 스플래시 화면 배경색
+  image: assets/images/lg_thinq_splash.png   # 너의 스플래시 이미지
+  android_12:
+    color: "#DFE6BD"
+    image: assets/images/lg_thinq_splash.png
