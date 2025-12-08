@@ -28,17 +28,11 @@ class _RoutineScreenState extends State<RoutineScreen> {
   String _getDeviceStatus(String type, PregnancyController c) {
     switch (type) {
       case "aircon":
-        final routine = Hive.box("routine_settings");
+        final temp = c.airconTargetTemp.toStringAsFixed(0);
+        final strength = c.airconWindStrength;
+        final direction = c.airconWindDirection;
 
-        int? temp = routine.get("aircon_target_temp");
-        String? strength = routine.get("aircon_wind_strength");
-        String? direction = routine.get("aircon_wind_direction");
-
-        if (temp != null && strength != null && direction != null) {
-          return "$temp°C · $strength · $direction";
-        } else {
-          return "설정 없음";
-        }
+        return "$temp°C · $strength ·\n$direction";
 
       case "aircleaner":
       // 단계 → 텍스트 변환
