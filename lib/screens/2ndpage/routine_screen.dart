@@ -48,7 +48,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
         final temp = c.airconTargetTemp.toStringAsFixed(0);
         final strength = c.airconWindStrength;
         final direction = c.airconWindDirection;
-        return "$temp°C · $strength ·\n$direction";
+        return "$temp°C · $strength ·$direction";
 
       case "aircleaner":
         String levelText(int lv) {
@@ -254,12 +254,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(width: 5),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => EditScreen()));
-                      },
+                      onTap: () {},
                       child: const Icon(Icons.arrow_forward_ios,
                           size: 18, color: Color(0xff8F8E8E)),
                     ),

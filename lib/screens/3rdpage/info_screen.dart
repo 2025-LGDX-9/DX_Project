@@ -74,11 +74,14 @@ class InfoScreen extends StatelessWidget {
                 },
               ),
               CategoryButton(
-                icon: Image.asset("assets/images/hospital.png"),
-                label: '건강·의료',
+                icon: Image.asset("assets/images/goverment_info.png"),
+                label: '정부지원/\n복지 정보',
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('건강·의료 정보는 준비 중입니다.')),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const GovernmentSupportScreen(),
+                    ),
                   );
                 },
               ),
@@ -119,14 +122,11 @@ class InfoScreen extends StatelessWidget {
                 },
               ),
               CategoryButton(
-                icon: Image.asset("assets/images/goverment_info.png"),
-                label: '정부지원/\n복지 정보',
+                icon: Image.asset("assets/images/hospital.png"),
+                label: '건강·의료',
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const GovernmentSupportScreen(),
-                    ),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('건강·의료 정보는 준비 중입니다.')),
                   );
                 },
               ),
