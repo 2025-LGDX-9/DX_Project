@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pregnancy_mode_app/Test/WeatherDetailScreen.dart';
 import 'package:pregnancy_mode_app/Test/WeatherTestScreen.dart';
-import 'package:pregnancy_mode_app/screens/1stpage/invite_member.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/enter_group.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/tutorial_screen.dart';
 import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/home_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
+import 'check_group.dart';
+import 'join_group_screen.dart';
 import 'onboarding_screen.dart';
 
 Widget _buildTopBackground() {
@@ -540,100 +542,89 @@ class ThinqHomeScreen extends StatelessWidget {
                                                 Material(
                                                   color: Colors.transparent,
                                                   child: Ink(
-                                                    width: MediaQuery.of(
-                                                      context,
-                                                    ).size.width,
+                                                    width: MediaQuery.of(context).size.width,
                                                     decoration: BoxDecoration(
                                                       color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            20,
-                                                          ),
+                                                      borderRadius: BorderRadius.circular(20),
                                                     ),
                                                     child: Padding(
-                                                      padding: EdgeInsets.all(
-                                                        20,
-                                                      ),
+                                                      padding: EdgeInsets.all(20),
                                                       child: Column(
                                                         children: [
+                                                          // 🔵 멤버 가입 버튼
                                                           InkWell(
-                                                            onTap: () {
-                                                              Navigator.push(
+                                                            onTap: () async {
+                                                              final result = await Navigator.push(
                                                                 context,
                                                                 MaterialPageRoute(
-                                                                  builder: (_) =>
-                                                                      InviteMember(),
+                                                                  builder: (_) => JoinGroupScreen(controller: controller),
+
                                                                 ),
                                                               );
+
+                                                              if (result == true) {
+                                                                // join_group_screen.dart에서 pop(true) 되었다는 뜻
+                                                                if (onPregnancyModeChanged != null) {
+                                                                  onPregnancyModeChanged!(true);
+                                                                }
+                                                              }
                                                             },
-                                                            child: Ink(
-                                                              child: Row(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  Icon(
-                                                                    Icons
-                                                                        .person_add,
-                                                                    color: Color(
-                                                                      0xff909090,
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 10,
-                                                                  ),
-                                                                  Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: [
-                                                                      Text(
-                                                                        "멤버 초대",
-                                                                        style: TextStyle(
-                                                                          fontSize:
-                                                                              20,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                        ),
+                                                            child: Row(
+                                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                                              children: [
+                                                                Icon(
+                                                                  Icons.login,
+                                                                  color: Color(0xff4A90E2),
+                                                                ),
+                                                                SizedBox(width: 10),
+                                                                Column(
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  children: [
+                                                                    Text(
+                                                                      "멤버 가입",
+                                                                      style: TextStyle(
+                                                                        fontSize: 20,
+                                                                        fontWeight: FontWeight.bold,
                                                                       ),
-                                                                    ],
-                                                                  ),
-                                                                ],
-                                                              ),
+                                                                    ),
+                                                                    Text(
+                                                                      "초대코드를 입력해 그룹에 참여하세요",
+                                                                      style: TextStyle(
+                                                                        fontSize: 14,
+                                                                        color: Colors.black54,
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
                                                             ),
                                                           ),
+
                                                           SizedBox(height: 12),
                                                           Divider(height: 1),
                                                           SizedBox(height: 12),
+
+                                                          // 🔵 새로운 홈 만들기 버튼 (기존 기능 유지)
                                                           InkWell(
-                                                            onTap: () {},
+                                                            onTap: () {
+                                                              // TODO: 새로운 홈 만들기 기능 나중에 연결
+                                                            },
                                                             child: Row(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .center,
+                                                              crossAxisAlignment: CrossAxisAlignment.center,
                                                               children: [
                                                                 Icon(
-                                                                  Icons
-                                                                      .add_home,
-                                                                  color: Color(
-                                                                    0xff0298EB,
-                                                                  ),
+                                                                  Icons.add_home,
+                                                                  color: Color(0xff0298EB),
                                                                 ),
-                                                                SizedBox(
-                                                                  width: 10,
-                                                                ),
+                                                                SizedBox(width: 10),
                                                                 Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                                   children: [
                                                                     Text(
                                                                       "새로운 홈 만들기",
                                                                       style: TextStyle(
-                                                                        fontSize:
-                                                                            20,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
+                                                                        fontSize: 20,
+                                                                        fontWeight: FontWeight.bold,
                                                                       ),
                                                                     ),
                                                                   ],
@@ -646,6 +637,9 @@ class ThinqHomeScreen extends StatelessWidget {
                                                     ),
                                                   ),
                                                 ),
+
+
+
                                               ],
                                             ),
                                           ),

@@ -6,12 +6,35 @@ class PregnancyController extends ChangeNotifier{
   DateTime? startDate;  // 임신 시작일
   String? uniqueKey;
 
+  String? relation;
+  int? memberId;
+  int? memberIndex;
+
   bool get isInitialized => babyNickname != null && startDate != null;
 
-  void saveInfo({required String nickname, required DateTime start, required String uniqueKey}) {
+  bool get isGroupMember =>
+      relation != null && memberId != null && uniqueKey != null;
+
+  void saveInfo({
+    required String nickname,
+    required DateTime start,
+    required String uniqueKey
+  }) {
     babyNickname = nickname;
     startDate = start;
     this.uniqueKey = uniqueKey;
+
+    notifyListeners();
+  }
+
+  void saveMemberInfo({
+    required String relation,
+    required int memberId,
+    required int memberIndex,
+  }) {
+    this.relation = relation;
+    this.memberId = memberId;
+    this.memberIndex = memberIndex;
 
     notifyListeners();
   }

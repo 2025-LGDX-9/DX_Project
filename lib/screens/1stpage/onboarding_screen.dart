@@ -135,6 +135,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         box.put("unique_key", result.uniqueKey);
                         pregBox.put("unique_key", result.uniqueKey);
 
+                        pregBox.put("groupCode", result.uniqueKey);
+
                         widget.controller.saveInfo(
                           nickname: _nicknameCtrl.text.trim(),
                           start: _startDate!,
@@ -152,6 +154,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         box.put('startDate', _startDate!.toIso8601String());
                         box.put('completed', true);
                         box.put('pregnancyMode', true);
+                        pregBox.put('nickname', _nicknameCtrl.text.trim());
+                        pregBox.put('startDate', _startDate!.toIso8601String());
+
 
                         if (isFirstTime) {
                           box.put('tutorialShown', false);

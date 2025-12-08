@@ -5,13 +5,16 @@ import 'package:hive/hive.dart';
 import 'package:pregnancy_mode_app/models/all_device.dart';
 import 'package:pregnancy_mode_app/models/favorite_device.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/calendar_screen.dart';
-import 'package:pregnancy_mode_app/screens/1stpage/invite_member.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/enter_group.dart';
+// import 'package:pregnancy_mode_app/screens/1stpage/enter_group.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/onboarding_screen.dart';
 import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/tutorial_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/edit_screen.dart';
 import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
 import 'package:pregnancy_mode_app/services/favorite_service.dart';
+
+import 'check_group.dart';
 
 class HomeScreen extends StatefulWidget {
   final PregnancyController controller;
@@ -636,11 +639,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     children: [
                                                       InkWell(
                                                         onTap: () {
+                                                          final box = Hive.box('pregnancyBox');
+                                                          final groupCode = box.get('unique_key', defaultValue: "TEST123");
+
+                                                          print("🔥 Loaded groupCode = $groupCode");
+
                                                           Navigator.push(
                                                             context,
                                                             MaterialPageRoute(
                                                               builder: (_) =>
-                                                                  InviteMember(),
+                                                               CheckGroup(groupCode: groupCode),
                                                             ),
                                                           );
                                                         },

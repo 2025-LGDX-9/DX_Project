@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/register_phone.dart';
 
-class InviteMember extends StatelessWidget {
-  const InviteMember({super.key});
+class enter_group extends StatelessWidget {
+  const enter_group({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -35,6 +35,9 @@ void main() async {
 
   final box = Hive.box('pregnancyBox');
   String? savedUniqueKey = box.get('unique_key');
+  String? savedRelation = box.get('relation');
+  int? savedMemberId = box.get('memberId');
+  int? savedMemberIndex = box.get('memberIndex');
 
   PregnancyController controller = PregnancyController();
 
@@ -51,6 +54,13 @@ void main() async {
     }
   }
 
+  if (savedRelation != null && savedMemberId != null && savedMemberIndex != null) {
+    controller.saveMemberInfo(
+      relation: savedRelation,
+      memberId: savedMemberId,
+      memberIndex: savedMemberIndex,
+    );
+  }
   runApp(PregnancyModeApp(controller: controller,));
 }
 
