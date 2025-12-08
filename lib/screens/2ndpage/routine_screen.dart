@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/air_cleaner_control_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/aircon_control_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/humidifier_control_screen.dart';
@@ -26,9 +27,17 @@ class _RoutineScreenState extends State<RoutineScreen> {
   String _getDeviceStatus(String type, PregnancyController c) {
     switch (type) {
       case "aircon":
-        final t = c.airconTargetTemp.toStringAsFixed(0);
-        final mode = c.airconSleepMode ? "취침" : "기본";
-        return "$t°C · $mode";
+        final routine = Hive.box("routine_settings");
+
+        int? temp = routine.get("aircon_target_temp");
+        String? strength = routine.get("aircon_wind_strength");
+        String? direction = routine.get("aircon_wind_direction");
+
+        if (temp != null && strength != null && direction != null) {
+          return "$temp°C · $strength · $direction";
+        } else {
+          return "설정 없음";
+        }
 
       case "aircleaner":
       // 단계 → 텍스트 변환

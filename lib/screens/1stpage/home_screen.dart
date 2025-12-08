@@ -1131,9 +1131,17 @@ class FavoriteDeviceCard extends StatelessWidget {
   String getStatus() {
     switch (type) {
       case "aircon":
-        final t = controller.airconTargetTemp.toStringAsFixed(0);
-        final mode = controller.airconSleepMode ? "취침" : "기본";
-        return "$t°C · $mode";
+        final routine = Hive.box("routine_settings");
+
+        int? temp = routine.get("aircon_target_temp");
+        String? strength = routine.get("aircon_wind_strength");
+        String? direction = routine.get("aircon_wind_direction");
+
+        if (temp != null && strength != null && direction != null) {
+          return "$temp°C · $strength ·\n$direction";
+        } else {
+          return "설정 없음";
+        }
 
       case "aircleaner":
         String levelText(int lv) {
@@ -1191,6 +1199,7 @@ class FavoriteDeviceCard extends StatelessWidget {
       children: [
         Container(
           width: 110,
+          height: 130,
           // +카드와 동일한 크기
           margin: const EdgeInsets.only(right: 12),
           padding: const EdgeInsets.all(12),
@@ -1223,13 +1232,11 @@ class FavoriteDeviceCard extends StatelessWidget {
 
               const SizedBox(height: 2),
 
-              Flexible(
-                child: Text(
-                  status,
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
+              Text(
+                status,
+                style: const TextStyle(fontSize: 11, color: Colors.grey),
+                maxLines: null,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
