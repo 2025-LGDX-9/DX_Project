@@ -1,7 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/register_phone.dart';
 import 'package:pregnancy_mode_app/services/api_service.dart';
 import 'package:pregnancy_mode_app/models/member_model.dart';
+
+final List<Color> memberColors = [
+  Color(0xffFFB6C8), // 1번: 임산부
+  Color(0xffA7C7FF), // 2번: 남편
+  Color(0xffBDE7F6), // 3번
+  Color(0xffA9F6E3), // 4번
+  Color(0xffF5B1FF), // 5번
+  Color(0xffFFB4B4), // 6번
+];
+
+Color getColorByIndex(int index) {
+  if (index - 1 < memberColors.length) {
+    return memberColors[index - 1];
+  }
+  return memberColors.last;
+}
+
 
 class CheckGroup extends StatefulWidget {
   final String groupCode; // 현재 아내의 초대코드 (그룹 기준)
@@ -51,7 +69,7 @@ class _InviteMemberState extends State<CheckGroup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfff5f6f7),
+      backgroundColor: const Color(0xffFAF0F0),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -89,31 +107,17 @@ class _InviteMemberState extends State<CheckGroup> {
   List<Widget> _buildMemberCards(BuildContext context) {
     List<Widget> cardList = [];
 
-    // 1) 기본 사용자(새싹이맘)
-    cardList.add(
-      _buildMemberCard(
-        MemberModel(
-          memberId: 0,
-          uniqueKey: widget.groupCode,
-          memberIndex: 1,
-          relation: "임산부",
-        ),
-        index: 1,
-      ),
-    );
+    final box = Hive.box('pregnancyBox');
 
-    // 2) FastAPI로 조회된 게스트들
-    for (var i = 0; i < members.length && i < 5; i++) {
-      cardList.add(_buildMemberCard(members[i], index: i + 1));
+    for (var m in members) {
+      cardList.add(_buildMemberCard(m, index: m.memberIndex));
     }
 
-    // 3) 마지막에 +추가 버튼은 항상 가장 뒤로
-    if (cardList.length < 6) {
-      cardList.add(_buildAddButton(context));
-    }
+    cardList.add(_buildAddButton(context));
 
     return cardList;
   }
+
 
   // --------------------------------------------------
   // 본인 카드 (새싹이맘)
@@ -147,6 +151,20 @@ class _InviteMemberState extends State<CheckGroup> {
   // 게스트 카드 UI
   // --------------------------------------------------
   Widget _buildMemberCard(MemberModel m, {required int index}) {
+    final box = Hive.box('pregnancyBox');
+    final babyName = box.get('nickname', defaultValue: "아기");
+
+    // 1) 기본 표시 텍스트는 relation
+    String displayRelation = m.relation;
+
+    // 2) memberIndex == 1 인 경우 → 태명맘
+    if (m.memberIndex == 1) {
+      displayRelation = "${babyName}맘";
+    }
+
+    // 3) 색상은 memberIndex 기반
+    Color bgColor = getColorByIndex(m.memberIndex);
+
     return Column(
       children: [
         Container(
@@ -154,7 +172,7 @@ class _InviteMemberState extends State<CheckGroup> {
           height: 120,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.blue.shade100,
+            color: bgColor,
           ),
           child: const Center(
             child: Image(
@@ -162,18 +180,17 @@ class _InviteMemberState extends State<CheckGroup> {
             ),
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
+
+        /// ★★★ 여기! displayRelation 로 바꿔줘야 태명맘이 표시됨
         Text(
-          m.relation == "임산부"
-              ? "임산부 (본인)"
-              : m.relation,
+          displayRelation,
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
 
-        // 인덱스 표시 (옵션)
         Text(
           "멤버 ${m.memberIndex}",
           style: const TextStyle(fontSize: 14, color: Colors.grey),
@@ -181,6 +198,8 @@ class _InviteMemberState extends State<CheckGroup> {
       ],
     );
   }
+
+
 
   // --------------------------------------------------
   // +추가 버튼

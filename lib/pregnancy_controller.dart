@@ -24,6 +24,11 @@ class PregnancyController extends ChangeNotifier{
     startDate = start;
     this.uniqueKey = uniqueKey;
 
+    final box = Hive.box('pregnancyBox');
+    box.put('nickname', nickname);
+    box.put('startDate', start.toIso8601String());
+    box.put('unique_key', uniqueKey);
+
     notifyListeners();
   }
 
@@ -36,6 +41,11 @@ class PregnancyController extends ChangeNotifier{
     this.memberId = memberId;
     this.memberIndex = memberIndex;
 
+    notifyListeners();
+  }
+
+  void setBabyNickname(String nickname) {
+    babyNickname = nickname;
     notifyListeners();
   }
 
