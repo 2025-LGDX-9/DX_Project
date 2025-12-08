@@ -6,7 +6,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:pregnancy_mode_app/services/energy_repository.dart';
 
 // =====================================================
-// 🔵 EXTRA_INFO 파싱: "(07~08시)" → 1시간
+// 🔵 EXTRA_INFO 파싱: "(07~08시)" → 사용시간 계산
 // =====================================================
 class EnergyParser {
   static double getUsageHours(String extraInfo) {
@@ -18,35 +18,30 @@ class EnergyParser {
     int start = int.parse(match.group(1)!);
     int end = int.parse(match.group(2)!);
 
-    // 날짜 넘어가는 경우 (예: 22~02시)
-    if (end < start) end += 24;
+    if (end < start) end += 24; // 22~02시 처리
 
     return (end - start).toDouble();
   }
 }
 
 // =====================================================
-// 🔵 기기별 사용량 계산 클래스
+// 🔵 기기별 계산
 // =====================================================
 class EnergyCalculator {
   final Box<EnergyLog> box;
   EnergyCalculator(this.box);
 
-  /// 기기별 총 사용시간(kWh)
   double totalUsageForDevice(int deviceId) {
-    final List<EnergyLog> logs =
-    box.values.where((e) => e.deviceId == deviceId).toList();
-
+    final logs = box.values.where((e) => e.deviceId == deviceId).toList();
     logs.sort((a, b) => a.eventTime.compareTo(b.eventTime));
 
-    double total = 0.0;
+    double total = 0;
     for (final log in logs) {
       total += EnergyParser.getUsageHours(log.extraInfo);
     }
     return total;
   }
 
-  /// 모든 기기의 사용량 맵으로 리턴
   Map<int, double> getAllEnergy() {
     return {
       1: totalUsageForDevice(1),
@@ -56,34 +51,79 @@ class EnergyCalculator {
     };
   }
 
-  /// 기기별 로그 리스트
   List<EnergyLog> logsForDevice(int deviceId) {
-    final logs = box.values.where((e) => e.deviceId == deviceId).toList();
-    logs.sort((a, b) => a.eventTime.compareTo(b.eventTime));
-    return logs;
+    final result =
+    box.values.where((e) => e.deviceId == deviceId).toList();
+    result.sort((a, b) => a.eventTime.compareTo(b.eventTime));
+    return result;
   }
 }
 
 // =====================================================
-// 🔵 그래프 생성 함수
+// 🔵 최근 7일 요일별 사용시간 계산
 // =====================================================
-List<BarChartGroupData> generateGraph(List<EnergyLog> logs) {
-  return List.generate(
-    logs.length,
-        (i) => BarChartGroupData(
-      x: i,
-      barRods: [
-        BarChartRodData(
-          toY: EnergyParser.getUsageHours(logs[i].extraInfo), // 실제 사용시간
-          width: 6,
-        )
-      ],
-    ),
-  );
+Map<String, double> getWeeklyUsage(List<EnergyLog> logs) {
+  Map<String, double> result = {
+    "월": 0, "화": 0, "수": 0, "목": 0, "금": 0, "토": 0, "일": 0,
+  };
+
+  DateTime now = DateTime.now();
+  DateTime sevenDaysAgo = now.subtract(const Duration(days: 6));
+
+  for (final log in logs) {
+    if (log.eventTime.isBefore(sevenDaysAgo)) continue;
+
+    final weekday = log.eventTime.weekday;
+    final hours = EnergyParser.getUsageHours(log.extraInfo);
+
+    switch (weekday) {
+      case 1: result["월"] = result["월"]! + hours; break;
+      case 2: result["화"] = result["화"]! + hours; break;
+      case 3: result["수"] = result["수"]! + hours; break;
+      case 4: result["목"] = result["목"]! + hours; break;
+      case 5: result["금"] = result["금"]! + hours; break;
+      case 6: result["토"] = result["토"]! + hours; break;
+      case 7: result["일"] = result["일"]! + hours; break;
+    }
+  }
+
+  return result;
 }
 
 // =====================================================
-// 🔵 UI 화면(스크린)
+// 🔵 막대그래프 데이터 생성
+// =====================================================
+List<BarChartGroupData> generateWeeklyGraph(Map<String, double> weekly) {
+  final keys = weekly.keys.toList();
+
+  return List.generate(keys.length, (i) {
+    return BarChartGroupData(
+      x: i,
+      barRods: [
+        BarChartRodData(
+          toY: weekly[keys[i]]!,
+          width: 14,
+        )
+      ],
+    );
+  });
+}
+
+// =====================================================
+// 🔵 소비전력(W)
+// =====================================================
+double getDeviceWatt(int id) {
+  switch (id) {
+    case 1: return 1200; // 에어컨
+    case 2: return 120;  // 가습기
+    case 3: return 100;  // 공기청정기
+    case 4: return 80;  // 로봇청소기
+    default: return 0;
+  }
+}
+
+// =====================================================
+// 🔵 UI 화면
 // =====================================================
 class ChartScreen extends StatefulWidget {
   const ChartScreen({super.key});
@@ -93,7 +133,6 @@ class ChartScreen extends StatefulWidget {
 }
 
 class _ChartScreenState extends State<ChartScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -103,19 +142,38 @@ class _ChartScreenState extends State<ChartScreen> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable:
-      Hive.box<EnergyLog>('energy_logs').listenable(), // 데이터 갱신 자동 반영
+      valueListenable: Hive.box<EnergyLog>('energy_logs').listenable(),
       builder: (context, box, _) {
-        print("현재 Hive 데이터: ${box.values.toList()}");
         final calculator = EnergyCalculator(box);
-
         final allEnergy = calculator.getAllEnergy();
-        final totalEnergy =
-        allEnergy.values.fold<double>(0, (a, b) => a + b); // 안전한 합산
+
+        // 🔵 총 kWh 계산
+        double totalKwh = 0;
+        allEnergy.forEach((deviceId, hours) {
+          totalKwh += (getDeviceWatt(deviceId) * hours) / 1000.0;
+        });
+
+        // 🔵 예상 요금
+        final expectedPrice = totalKwh * 88.3;
+
+        // 🔵 도넛 그래프용 색상
+        final deviceColors = {
+          1: Colors.teal,
+          2: Colors.lightBlue,
+          3: Colors.green,
+          4: Colors.grey,
+        };
+
+        // 🔵 기기별 kWh 변환
+        final deviceKwh = {
+          1: (getDeviceWatt(1) * allEnergy[1]!) / 1000.0,
+          2: (getDeviceWatt(2) * allEnergy[2]!) / 1000.0,
+          3: (getDeviceWatt(3) * allEnergy[3]!) / 1000.0,
+          4: (getDeviceWatt(4) * allEnergy[4]!) / 1000.0,
+        };
 
         return Scaffold(
           backgroundColor: const Color(0xffeef1f5),
-
           appBar: AppBar(
             backgroundColor: const Color(0xffeef1f5),
             elevation: 0,
@@ -131,60 +189,116 @@ class _ChartScreenState extends State<ChartScreen> {
 
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
+            child: Column(
+              children: [
 
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  buildItem(
-                    name: "에어컨",
-                    color: Colors.teal,
-                    energy: allEnergy[1]!,
-                    percent: totalEnergy == 0
-                        ? 0
-                        : allEnergy[1]! / totalEnergy * 100,
-                    logs: calculator.logsForDevice(1),
+                // =====================================================
+                // 🔵 도넛 그래프 (기기별 색 구분 + 라벨 제거)
+                // =====================================================
+                SizedBox(
+                  height: 240,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      PieChart(
+                        PieChartData(
+                          sectionsSpace: 0,
+                          centerSpaceRadius: 80,
+                          sections: [
+                            for (int id in deviceKwh.keys)
+                              PieChartSectionData(
+                                value: deviceKwh[id],
+                                color: deviceColors[id],
+                                radius: 22,
+                                showTitle: false,
+                              ),
+                          ],
+                        ),
+                      ),
+
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "총 사용량",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          Text(
+                            "${totalKwh.toStringAsFixed(1)} kWh",
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "${expectedPrice.toStringAsFixed(0)}원",
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // =====================================================
+                // 🔵 각 기기별 통계 카드
+                // =====================================================
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
                   ),
 
-                  const SizedBox(height: 16),
-                  buildItem(
-                    name: "가습기",
-                    color: Colors.lightBlue,
-                    energy: allEnergy[2]!,
-                    percent: totalEnergy == 0
-                        ? 0
-                        : allEnergy[2]! / totalEnergy * 100,
-                    logs: calculator.logsForDevice(2),
-                  ),
+                  child: Column(
+                    children: [
+                      buildItem(
+                        deviceId: 1,
+                        name: "에어컨",
+                        color: Colors.teal,
+                        energy: allEnergy[1]!,
+                        logs: calculator.logsForDevice(1),
+                      ),
+                      const SizedBox(height: 16),
 
-                  const SizedBox(height: 16),
-                  buildItem(
-                    name: "공기청정기",
-                    color: Colors.green,
-                    energy: allEnergy[3]!,
-                    percent: totalEnergy == 0
-                        ? 0
-                        : allEnergy[3]! / totalEnergy * 100,
-                    logs: calculator.logsForDevice(3),
-                  ),
+                      buildItem(
+                        deviceId: 2,
+                        name: "가습기",
+                        color: Colors.lightBlue,
+                        energy: allEnergy[2]!,
+                        logs: calculator.logsForDevice(2),
+                      ),
+                      const SizedBox(height: 16),
 
-                  const SizedBox(height: 16),
-                  buildItem(
-                    name: "로봇청소기",
-                    color: Colors.grey,
-                    energy: allEnergy[4]!,
-                    percent: totalEnergy == 0
-                        ? 0
-                        : allEnergy[4]! / totalEnergy * 100,
-                    logs: calculator.logsForDevice(4),
+                      buildItem(
+                        deviceId: 3,
+                        name: "공기청정기",
+                        color: Colors.green,
+                        energy: allEnergy[3]!,
+                        logs: calculator.logsForDevice(3),
+                      ),
+                      const SizedBox(height: 16),
+
+                      buildItem(
+                        deviceId: 4,
+                        name: "로봇청소기",
+                        color: Colors.grey,
+                        energy: allEnergy[4]!,
+                        logs: calculator.logsForDevice(4),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
@@ -193,13 +307,19 @@ class _ChartScreenState extends State<ChartScreen> {
   }
 
   // =========================================================
+  // 🔵 개별 카드 UI
+  // =========================================================
   Widget buildItem({
+    required int deviceId,
     required String name,
     required Color color,
     required double energy,
-    required double percent,
     required List<EnergyLog> logs,
   }) {
+    final weekly = getWeeklyUsage(logs);
+    final weekKeys = weekly.keys.toList();
+    final kwh = (getDeviceWatt(deviceId) * energy) / 1000.0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -207,26 +327,52 @@ class _ChartScreenState extends State<ChartScreen> {
           children: [
             Container(width: 14, height: 14, color: color),
             const SizedBox(width: 8),
-            Text(
-              name,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+            Text(name,
+                style: const TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.bold)),
             const Spacer(),
-            Text("${energy.toInt()}kWh"),
+            Text("${energy.toStringAsFixed(1)}h"),
             const SizedBox(width: 12),
-            Text("${percent.toStringAsFixed(0)}%"),
+            Text("${kwh.toStringAsFixed(2)}kWh"),
           ],
         ),
 
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
 
         SizedBox(
-          height: 120,
+          height: 150,
           child: BarChart(
             BarChartData(
-              barGroups: generateGraph(logs),
+              barGroups: generateWeeklyGraph(weekly),
               borderData: FlBorderData(show: false),
-              titlesData: FlTitlesData(show: false),
+
+              titlesData: FlTitlesData(
+                leftTitles:
+                AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles:
+                AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles:
+                AxisTitles(sideTitles: SideTitles(showTitles: false)),
+
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      final index = value.toInt();
+                      if (index < 0 || index >= weekKeys.length) {
+                        return const SizedBox.shrink();
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          weekKeys[index],
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
           ),
         ),

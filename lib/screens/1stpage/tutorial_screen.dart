@@ -5,6 +5,7 @@ import 'package:pregnancy_mode_app/screens/1stpage/tutorial_page_3.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/tutorial_page_4.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/tutorial_page_5.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/tutorial_page_6.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/tutorial_page_7.dart';
 
 class TutorialScreen extends StatefulWidget {
   const TutorialScreen({super.key});
@@ -39,7 +40,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
                 // Indicator
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(5, (index) {
+                  children: List.generate(7, (index) {
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -68,11 +69,12 @@ class _TutorialScreenState extends State<TutorialScreen> {
                       },
                       children: const [
                         TutorialPage1(),
+                        TutorialPage7(),
+                        TutorialPage6(),
                         TutorialPage2(),
                         TutorialPage3(),
                         TutorialPage4(),
                         TutorialPage5(),
-                        TutorialPage6(),
                       ],
                     ),
                   ),
