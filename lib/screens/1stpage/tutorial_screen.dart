@@ -4,6 +4,7 @@ import 'package:pregnancy_mode_app/screens/1stpage/tutorial_page_2.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/tutorial_page_3.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/tutorial_page_4.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/tutorial_page_5.dart';
+import 'package:pregnancy_mode_app/screens/1stpage/tutorial_page_6.dart';
 
 class TutorialScreen extends StatefulWidget {
   const TutorialScreen({super.key});
@@ -71,6 +72,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
                         TutorialPage3(),
                         TutorialPage4(),
                         TutorialPage5(),
+                        TutorialPage6(),
                       ],
                     ),
                   ),
