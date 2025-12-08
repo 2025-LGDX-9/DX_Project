@@ -12,8 +12,6 @@ class ApiService {
   Future<RegisterResponse> registerPregnancyUser(PregnancyUser user) async {
     final url = Uri.parse("$baseUrl/register_pregnancy");
 
-
-
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
@@ -53,9 +51,6 @@ class ApiService {
     }
   }
 
-  /// -----------------------------------------------------------------
-  /// 3) 임신 정보 업데이트
-  /// -----------------------------------------------------------------
   Future<bool> updatePregnancyInfo(String uniqueKey, String nickname, String startDate) async {
     final url = Uri.parse("$baseUrl/pregnancy/update");
 
