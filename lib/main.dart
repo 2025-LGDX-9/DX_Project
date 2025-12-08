@@ -19,6 +19,8 @@ import 'models/favorite_device.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 Future<void> safeOpenBox<T>(String name) async {
   if (!Hive.isBoxOpen(name)) {
     await Hive.openBox<T>(name);
@@ -30,6 +32,7 @@ void main() async {
   await initializeDateFormatting('ko_KR', null);
 
   await Hive.initFlutter();
+
   Hive.registerAdapter(FavoriteDeviceAdapter());
   Hive.registerAdapter(AllDeviceAdapter());
   Hive.registerAdapter(EnergyLogAdapter());
@@ -77,19 +80,18 @@ void main() async {
     await EnergyRepository().fetchAndSaveLogs();
   }
 
-  runApp(PregnancyModeApp(controller: controller,));
-
+  runApp(MyApp(controller: controller));
 }
 
-class PregnancyModeApp extends StatefulWidget {
+class MyApp extends StatefulWidget {
   final PregnancyController controller;
-  const PregnancyModeApp({super.key, required this.controller});
+  const MyApp({super.key, required this.controller});
 
   @override
-  State<PregnancyModeApp> createState() => _PregnancyModeAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
-class _PregnancyModeAppState extends State<PregnancyModeApp> {
+class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
   bool _pregnancyMode = false;
   bool _showSplash = true;
@@ -103,8 +105,7 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
 
     widget.controller.loadSavedData();
     widget.controller.loadAllDeviceSettings();
-
-    seedAllDevices();
+    _seedAllDevices();
 
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
@@ -112,31 +113,15 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
     });
   }
 
-  void seedAllDevices() {
+  void _seedAllDevices() {
     final box = Hive.box<AllDevice>('all_devices');
 
     if (box.isEmpty) {
       final devices = [
-        AllDevice(
-          name: "에어컨",
-          iconCode: Icons.ac_unit.codePoint,
-          type: "aircon",
-        ),
-        AllDevice(
-          name: "공기청정기",
-          iconCode: Icons.air.codePoint,
-          type: "aircleaner",
-        ),
-        AllDevice(
-          name: "가습기",
-          iconCode: Icons.water_drop.codePoint,
-          type: "humidifier",
-        ),
-        AllDevice(
-          name: "로봇청소기",
-          iconCode: Icons.cleaning_services.codePoint,
-          type: "robot",
-        ),
+        AllDevice(name: "에어컨", iconCode: Icons.ac_unit.codePoint, type: "aircon"),
+        AllDevice(name: "공기청정기", iconCode: Icons.air.codePoint, type: "aircleaner"),
+        AllDevice(name: "가습기", iconCode: Icons.water_drop.codePoint, type: "humidifier"),
+        AllDevice(name: "로봇청소기", iconCode: Icons.cleaning_services.codePoint, type: "robot"),
       ];
 
       for (var d in devices) {
@@ -145,7 +130,6 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
     }
   }
 
-  /// 🔥 HomeScreen에서 모드 변경 시 호출됨
   void _handlePregnancyModeChanged(bool isOn) {
     Hive.box('onboarding').put('pregnancyMode', isOn);
     setState(() => _pregnancyMode = isOn);
@@ -155,7 +139,7 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
     if (_pregnancyMode) {
       return HomeScreen(
         controller: widget.controller,
-        onPregnancyModeChanged: _handlePregnancyModeChanged, // ★ 추가됨
+        onPregnancyModeChanged: _handlePregnancyModeChanged,
       );
     } else {
       return ThinqHomeScreen(
@@ -168,25 +152,31 @@ class _PregnancyModeAppState extends State<PregnancyModeApp> {
 
   @override
   Widget build(BuildContext context) {
-    if (_showSplash) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: ThinQSplashScreen(),
-      );
-    }
-
-    final screens = [
-      _homeScreen,
-      RoutineScreen(controller: widget.controller),
-      InfoScreen(controller: widget.controller),
-      MenuScreen(controller: widget.controller),
-    ];
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      locale: const Locale('ko', 'KR'),  // ← ★ 한국어 Locale 적용
-      home: Scaffold(
-        body: SafeArea(child: screens[_selectedIndex]),
+      locale: const Locale('ko', 'KR'),
+
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('ko', 'KR'),
+        Locale('en', 'US'),
+      ],
+
+      home: _showSplash
+          ? ThinQSplashScreen()
+          : Scaffold(
+        body: SafeArea(
+          child: [
+            _homeScreen,
+            RoutineScreen(controller: widget.controller),
+            InfoScreen(controller: widget.controller),
+            MenuScreen(controller: widget.controller),
+          ][_selectedIndex],
+        ),
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           selectedItemColor: Colors.black,

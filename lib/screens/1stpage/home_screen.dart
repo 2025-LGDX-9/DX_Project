@@ -760,20 +760,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       SizedBox(width: 10),
-                      GestureDetector(
-                        onTap: () => {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => CalendarScreen()),
-                          ),
-                        },
-                        child: Image.asset(
-                          "assets/images/calendar.png",
-                          width: 25,
-                          height: 25,
-                        ),
-                      ),
-                      SizedBox(width: 10),
                       // 알림 버튼
                       GestureDetector(
                         onTap: () => {
@@ -1353,16 +1339,31 @@ class _TodayDiarySummaryCardState extends State<TodayDiarySummaryCard> {
     _loadDiary();
   }
 
+  Future<void> _pickDay() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDay,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      locale: const Locale("ko", "KR"),
+    );
+
+    if (picked != null) {
+      setState(() {
+        selectedDay = picked;
+      });
+      _loadDiary();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: diaryBox.listenable(),
       builder: (context, box, _) {
-        // Hive에서 최신 값 읽기
         String key = DateFormat("yyyy-MM-dd").format(selectedDay);
         final diary = diaryBox.get(key, defaultValue: {});
 
-        // 단, 편집 중일 때는 유저 입력을 덮어쓰지 않음
         if (!isEditing) {
           todoCtrl.text = diary["todo"] ?? "";
           stories = List<String>.from(diary["stories"] ?? []);
@@ -1403,10 +1404,21 @@ class _TodayDiarySummaryCardState extends State<TodayDiarySummaryCard> {
                 child: const Icon(Icons.chevron_left, size: 26),
               ),
 
-              Text(
-                formattedDate,
-                style:
-                const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              // 날짜 버튼
+              InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: (){Navigator.push(context, MaterialPageRoute(builder: (_)=>CalendarScreen()));},
+                child: Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: Text(
+                    formattedDate,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
 
               Row(
