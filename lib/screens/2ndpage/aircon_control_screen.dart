@@ -23,7 +23,7 @@ class _AirconControlScreenState extends State<AirconControlScreen> {
 
     // Controller → 화면 변수 로드
     airconOn = widget.controller.airconOn;
-    targetTemp = widget.controller.airconTargetTemp;
+    targetTemp = widget.controller.airconTargetTemp.clamp(16.0, 30.0);
     sleepMode = widget.controller.airconSleepMode;
     windStrength = widget.controller.airconWindStrength;
     windDirection = widget.controller.airconWindDirection;
@@ -261,7 +261,7 @@ class _TemperatureCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _tempButton("-", () => onChange(temp - 1)),
+              _tempButton("-", () => onChange((temp - 1).clamp(16.0, 30.0))),
               const SizedBox(width: 20),
 
               Text(
@@ -270,16 +270,16 @@ class _TemperatureCard extends StatelessWidget {
               ),
 
               const SizedBox(width: 20),
-              _tempButton("+", () => onChange(temp + 1)),
+              _tempButton("+", () => onChange((temp + 1).clamp(16.0, 30.0))),
             ],
           ),
 
           Slider(
             min: 16,
             max: 30,
-            value: temp,
+            value: temp.clamp(16.0, 30.0),
             activeColor: const Color(0xff19c3e6),
-            onChanged: onChange,
+            onChanged: (v) => onChange(v.clamp(16.0, 30.0)),
           ),
         ],
       ),

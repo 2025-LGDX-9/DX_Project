@@ -1138,11 +1138,11 @@ class FavoriteDeviceCard extends StatelessWidget {
       case "aircleaner":
         String levelText(int lv) {
           switch (lv) {
-            case 1:
+            case 0:
               return "약";
-            case 2:
+            case 1:
               return "보통";
-            case 3:
+            case 2:
               return "강";
             default:
               return "-";
@@ -1151,7 +1151,7 @@ class FavoriteDeviceCard extends StatelessWidget {
 
         final clean = levelText(controller.airCleanerCleanLevel);
         final booster = levelText(controller.airCleanerBoosterLevel);
-        return "청정: $clean · 부스터: $booster";
+        return "청정: $clean ·\n부스터: $booster";
 
       case "humidifier":
         final hum = controller.humidifierTargetHumidity.toStringAsFixed(0);
@@ -1171,7 +1171,7 @@ class FavoriteDeviceCard extends StatelessWidget {
 
         final mist = mistPercent(controller.humidifierMistLevel);
 
-        return "희망습도: $hum% · 분무량: $mist";
+        return "희망습도: $hum% ·\n분무량: $mist";
 
       case "robot":
         final turbo = controller.robotTurbo ? "터보" : "일반";

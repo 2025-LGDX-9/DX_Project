@@ -34,9 +34,9 @@ class _RoutineScreenState extends State<RoutineScreen> {
       // 단계 → 텍스트 변환
         String levelText(int lv) {
           switch (lv) {
-            case 1: return "약";
-            case 2: return "보통";
-            case 3: return "강";
+            case 0: return "약";
+            case 1: return "보통";
+            case 2: return "강";
             default: return "-";
           }
         }
