@@ -212,26 +212,47 @@ class _CalendarScreenState extends State<CalendarScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xfffaefef),
         elevation: 0,
-        leading: BackButton(color: Colors.black),
+        centerTitle: true,  // 🔥 중앙 정렬 활성화
+        automaticallyImplyLeading: false, // 기본 leading 처리하지 않게
+        leadingWidth: 56,  // 왼쪽 공간 확보
 
+        // 🔙 뒤로가기 버튼 직접 구성
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+
+        // 🔥 title: 중앙에 오도록 구성
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             GestureDetector(
-                onTap: () => setState(() =>
-                _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1)),
-                child: const Icon(Icons.chevron_left)),
+              onTap: () => setState(() {
+                _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1);
+              }),
+              child: const Icon(Icons.chevron_left),
+            ),
             const SizedBox(width: 8),
-            Text("${_focusedDay.year}년 ${_focusedDay.month}월",
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(
+              "${_focusedDay.year}년 ${_focusedDay.month}월",
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(width: 8),
             GestureDetector(
-                onTap: () => setState(() =>
-                _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1)),
-                child: const Icon(Icons.chevron_right)),
+              onTap: () => setState(() {
+                _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1);
+              }),
+              child: const Icon(Icons.chevron_right),
+            ),
           ],
         ),
+
+        // 🔥 오른쪽에도 동일한 폭 확보 (leadingWidth 만큼)
+        actions: const [
+          SizedBox(width: 56),
+        ],
       ),
+
 
       body: Column(
         children: [

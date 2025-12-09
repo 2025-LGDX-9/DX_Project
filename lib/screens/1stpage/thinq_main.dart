@@ -287,9 +287,12 @@ class ThinqHomeScreen extends StatelessWidget {
                                                       );
 
                                                       if (result == true) {
+                                                        Navigator.pop(context);
                                                         if (onPregnancyModeChanged != null) {
                                                           onPregnancyModeChanged!(true);
                                                         }
+                                                      } else {
+                                                        //
                                                       }
                                                     },
                                                     child: Ink(
