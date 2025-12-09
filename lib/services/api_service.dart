@@ -4,7 +4,7 @@ import '../models/member_model.dart';
 import '../models/pregnancy_user.dart';
 
 class ApiService {
-  final String baseUrl = "http://192.168.219.169:8001";  // FastAPI 서버 주소
+  final String baseUrl = "http://192.168.219.226:8001";  // FastAPI 서버 주소
 
   /// -----------------------------------------------------------------
   /// 1) 임신 정보 등록 API → 서버가 uniqueKey 생성하여 Flutter로 전달
@@ -143,7 +143,46 @@ class ApiService {
     }
   }
 
+  Future<bool> saveCalendarData({
+    required String writeDate,     // "yyyy-MM-dd"
+    required String todo,
+    required List<String> stories,
+  }) async {
+    final url = Uri.parse("$baseUrl/calendar_data");
 
+    // 여러 개의 이야기를 한 문자열로 합침 (줄바꿈 기준)
+    final diaryText = stories.join("\n");
+
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "writeDate": writeDate,
+        "todoList": todo,
+        "todayDiary": diaryText,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      print("❌ 캘린더 저장 실패: ${response.statusCode} / ${response.body}");
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>> loadCalendarData(String writeDate) async {
+    final url = Uri.parse("$baseUrl/calendar_data/$writeDate");
+
+    final res = await http.get(url);
+
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body);
+    } else {
+      print("❌ 서버 로드 실패: ${res.body}");
+      return {"todo": "", "stories": []};
+    }
+  }
 }
 
 /// FastAPI 응답을 담기 위한 모델

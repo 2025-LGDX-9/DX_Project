@@ -14,6 +14,7 @@ import 'package:pregnancy_mode_app/pregnancy_controller.dart';
 import 'package:pregnancy_mode_app/screens/1stpage/tutorial_screen.dart';
 import 'package:pregnancy_mode_app/screens/2ndpage/edit_screen.dart';
 import 'package:pregnancy_mode_app/screens/appbar/nofification_screen.dart';
+import 'package:pregnancy_mode_app/services/api_service.dart';
 import 'package:pregnancy_mode_app/services/favorite_service.dart';
 import 'package:intl/intl.dart';
 
@@ -1311,25 +1312,50 @@ class _TodayDiarySummaryCardState extends State<TodayDiarySummaryCard> {
     _loadDiary();
   }
 
-  void _loadDiary() {
+  void _loadDiary() async {
     String key = DateFormat("yyyy-MM-dd").format(selectedDay);
-    final diary = diaryBox.get(key, defaultValue: {});
 
+    // 1) 로컬 먼저 로딩 (빠른 표시)
+    final diary = diaryBox.get(key, defaultValue: {});
     todoCtrl.text = diary["todo"] ?? "";
-    stories = List<String>.from(diary["stories"] ?? []);
+
+    final diaryTextLocal = diary["stories"] ?? "";
+    stories = diaryTextLocal.toString().split("\n")
+        .where((e) => e.trim().isNotEmpty).toList();
+
+    setState(() {});
+
+    // 2) 서버에서 최신 데이터 가져오기
+    final serverData = await ApiService().loadCalendarData(key);
+
+    todoCtrl.text = serverData["todo"] ?? "";
+    stories = List<String>.from(serverData["stories"] ?? []);
+
+    // 3) 다시 로컬에 반영(자동 동기화)
+    diaryBox.put(key, {
+      "todo": todoCtrl.text,
+      "stories": stories.join("\n"),
+    });
 
     setState(() {});
   }
 
-  void _saveDiary() {
+  void _saveDiary() async {
     String key = DateFormat("yyyy-MM-dd").format(selectedDay);
 
+    // 1) 로컬(Hive) 저장
     stories.removeWhere((s) => s.trim().isEmpty);
-
     diaryBox.put(key, {
       "todo": todoCtrl.text,
-      "stories": stories,
+      "stories": stories.join("\n"),   // 리스트 → 문자열
     });
+
+    // 2) 서버 저장
+    await ApiService().saveCalendarData(
+      writeDate: key,
+      todo: todoCtrl.text,
+      stories: stories,
+    );
 
     setState(() => isEditing = false);
   }
@@ -1366,7 +1392,13 @@ class _TodayDiarySummaryCardState extends State<TodayDiarySummaryCard> {
 
         if (!isEditing) {
           todoCtrl.text = diary["todo"] ?? "";
-          stories = List<String>.from(diary["stories"] ?? []);
+
+          final diaryText = diary["stories"] ?? "";
+          stories = diaryText
+              .toString()
+              .split('\n')
+              .where((e) => e.trim().isNotEmpty)
+              .toList();
         }
 
         return _buildUI();

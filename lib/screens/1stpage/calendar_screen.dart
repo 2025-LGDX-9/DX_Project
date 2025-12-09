@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:pregnancy_mode_app/services/api_service.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -10,6 +11,8 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
+  final api = ApiService();
+
   bool isEditing = false;
 
   DateTime _focusedDay = DateTime.now();
@@ -34,13 +37,31 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // ---------------------------
   // LOAD
   // ---------------------------
-  void _loadDiary() {
-    final day = _selectedDay ?? DateTime.now();
+  void _loadDiary() async{
+    final day = _selectedDay!;   // ← null 아님 보증
     final key = DateFormat("yyyy-MM-dd").format(day);
-    final diary = diaryBox.get(key, defaultValue: {});
 
+    // 1) 로컬 먼저 로딩 (빠른 표시)
+    final diary = diaryBox.get(key, defaultValue: {});
     todoCtrl.text = diary["todo"] ?? "";
-    stories = List<String>.from(diary["stories"] ?? []);
+
+    final diaryTextLocal = diary["stories"] ?? "";
+    stories = diaryTextLocal.toString().split("\n")
+        .where((e) => e.trim().isNotEmpty).toList();
+
+    setState(() {});
+
+    // 2) 서버에서 최신 데이터 가져오기
+    final serverData = await ApiService().loadCalendarData(key);
+
+    todoCtrl.text = serverData["todo"] ?? "";
+    stories = List<String>.from(serverData["stories"] ?? []);
+
+    // 3) 다시 로컬에 반영(자동 동기화)
+    diaryBox.put(key, {
+      "todo": todoCtrl.text,
+      "stories": stories.join("\n"),
+    });
 
     setState(() {});
   }
@@ -48,14 +69,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // ---------------------------
   // SAVE
   // ---------------------------
-  void _saveDiary() {
+  void _saveDiary() async {
     final day = _selectedDay!;
     final key = DateFormat("yyyy-MM-dd").format(day);
 
     diaryBox.put(key, {
       "todo": todoCtrl.text,
-      "stories": stories,
+      "stories": stories.join("\n"),   // 리스트 → 문자열
     });
+
+    // 2) 서버 저장
+    await api.saveCalendarData(
+      writeDate: key,
+      todo: todoCtrl.text,
+      stories: stories,
+    );
 
     setState(() {
       isEditingTodo = false;
