@@ -117,7 +117,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
 
 
-
   // SAVE
   void _saveDiary() async {
     final day = _selectedDay!;
@@ -311,9 +310,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             GestureDetector(
-              onTap: () => setState(() {
-                _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1);
-              }),
+              onTap: () {
+                setState(() {
+                  _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1);
+                });
+                _loadMonthlyData();
+              },
               child: const Icon(Icons.chevron_left),
             ),
             const SizedBox(width: 8),
@@ -323,11 +325,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
             const SizedBox(width: 8),
             GestureDetector(
-              onTap: () => setState(() {
-                _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1);
-              }),
+              onTap: () {
+                setState(() {
+                  _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1);
+                });
+                _loadMonthlyData();  // ★ 추가
+              },
               child: const Icon(Icons.chevron_right),
             ),
+
           ],
         ),
 
