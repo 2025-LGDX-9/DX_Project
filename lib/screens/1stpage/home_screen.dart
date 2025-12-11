@@ -923,6 +923,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  IconData getMaterialIconByCode(int code) {
+    switch (code) {
+      case 0:
+        return Icons.ac_unit; // 에어컨
+      case 1:
+        return Icons.water_drop; // 가습기
+      case 2:
+        return Icons.air; // 공기청정기
+      case 3:
+        return Icons.smart_toy; // 로봇청소기
+      default:
+        return Icons.device_unknown;
+    }
+  }
+
   Widget _buildFavoriteDevicesSection() {
     final favorites = FavoriteService.getFavorites();
 
@@ -973,7 +988,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 for (var d in favorites)
                   FavoriteDeviceCard(
                     name: d.name,
-                    icon: IconData(d.iconCode, fontFamily: 'MaterialIcons'),
+                    icon: getMaterialIconByCode(d.iconCode),
                     type: d.type,
                     // ★ 추가됨
                     controller: widget.controller,
@@ -1024,7 +1039,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     final device = addableDevices[i];
                     return ListTile(
                       leading: Icon(
-                        IconData(device.iconCode, fontFamily: 'MaterialIcons'),
+                        getMaterialIconByCode(device.iconCode),
                       ),
                       title: Text(device.name),
                       onTap: () {

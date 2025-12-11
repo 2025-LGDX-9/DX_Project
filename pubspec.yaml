@@ -98,10 +98,3 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
-
-flutter_native_splash:
-  color: "#DFE6BD"   # 네가 사용하는 스플래시 화면 배경색
-  image: assets/images/lg_thinq_splash.png   # 너의 스플래시 이미지
-  android_12:
-    color: "#DFE6BD"
-    image: assets/images/lg_thinq_splash.png
