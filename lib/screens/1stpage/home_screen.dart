@@ -41,16 +41,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<String> _babyMessasges = [
     "엄마 오늘도 화이팅이에요!",
-    "엄마가 행복하면 제가 더 잘 자라요.",
-    "엄마는 생각보다 훨씬 강해요.",
-    "엄마, 가볍게 몸을 한번 쭉 늘려볼까요?",
-    "엄마, 잠깐 산책 어때요?",
-    "엄마, 햇빛 조금 쐬어도 좋아요. 따뜻한 기운이 느껴져요.",
-    "엄마, 오늘은 기분 좋은 향도 맡아봐요.",
-    "엄마, 오늘은 스스로에게 칭찬 한 마디 해줘요. 그 말이 제게도 와요.",
-    "엄마, 기분 좋은 공기를 들이켜봐요. 마음이 맑아져요.",
-    "엄마, 잠깐 스트레칭해서 어깨도 풀어봐요. 훨씬 좋아져요.",
-    "엄마, 조금만 쓰다듬어줘요.",
+    "엄마! 창문 열고 공기 한번 환기해보는 건 어때요?",
+    "1~2분만 천천히 걸어줘도 몸이 편안해진대요~!",
+    "엄마~ 가볍게 몸을 한번 쭉 늘려보는건 어때요??",
+    "엄마! 잠깐 산책 나갔다 오는건 어때요~?",
+    "엄마~ 물도 틈틈히 마셔주세요~!",
+    "좋아하는 음악을 틀어놓으면 기분이 좋아질 거예요!!",
+    "상쾌한 공기를 들이켜봐요!\n마음이 맑아질거예요~!",
+    "엄마~ 잠깐 스트레칭해서 어깨도 풀어봐요!",
+    "엄마! 잠깐 앉아서 다리 좀 편하게 올려두는 건 어때요?",
   ];
 
   final List<String> _tipMessages = [
@@ -155,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
             "오늘의 영양제 추천",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          content: Text(randomMessage, style: const TextStyle(fontSize: 14)),
+          content: Text(textAlign: TextAlign.center, randomMessage, style: const TextStyle(fontSize: 14)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -1070,6 +1069,7 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
+              textAlign: TextAlign.center,
               _randombabyMessage,
               style: TextStyle(color: Colors.red.shade400),
             ),
@@ -1129,7 +1129,7 @@ class _TipCard extends StatelessWidget {
         children: [
           Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text(description),
+          Text(textAlign: TextAlign.center, description),
           const SizedBox(height: 12),
           OutlinedButton.icon(
             onPressed: onPressed,
