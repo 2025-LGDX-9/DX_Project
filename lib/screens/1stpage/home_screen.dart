@@ -878,9 +878,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     ValueListenableBuilder(
                       valueListenable: Hive.box("diary").listenable(),
                       builder: (context, box, _) {
-                        return TodayDiarySummaryCard();
+                        return Container(
+                          width: double.infinity,   // ★ 가로 100% 강제 적용
+                          child: TodayDiarySummaryCard(),
+                        );
                       },
                     ),
+
                     SizedBox(height: 24),
                     const Text(
                       '임신 주차 꿀팁',
@@ -1461,94 +1465,160 @@ class _TodayDiarySummaryCardState extends State<TodayDiarySummaryCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ---------------- 날짜 + 수정버튼 ----------------
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              GestureDetector(
-                onTap: () => _changeDay(-1),
-                child: const Icon(Icons.chevron_left, size: 26),
-              ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const double sideWidth = 80; // 양쪽 고정 너비
 
-              // 날짜 버튼
-              InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => CalendarScreen()),
-                  ).then((_) {
-                    setState(() {});  // Home 화면도 갱신 필요하면 추가
-                  });
-
-                },
-                child: Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  child: Text(
-                    formattedDate,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+              return SizedBox(
+                height: 40,
+                child: Row(
+                  children: [
+                    // LEFT AREA (항상 고정 폭)
+                    SizedBox(
+                      width: sideWidth,
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => _changeDay(-1),
+                            child: const Icon(Icons.chevron_left, size: 24),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+
+                    // CENTER (항상 완전 중앙!)
+                    Expanded(
+                      child: Center(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => CalendarScreen()),
+                            );
+                          },
+                          child: Text(
+                            formattedDate,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // RIGHT AREA (항상 고정 폭)
+                    SizedBox(
+                      width: sideWidth,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (isEditing)
+                            GestureDetector(
+                              onTap: _saveDiary,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Color(0xffFFD7E8),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Text(
+                                  "저장",
+                                  style: TextStyle(
+                                    color: Color(0xffC8558A),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            )
+                          else
+                            GestureDetector(
+                              onTap: () => setState(() => isEditing = true),
+                              child: const Icon(Icons.edit, size: 20),
+                            ),
+
+                          const SizedBox(width: 8),
+
+                          GestureDetector(
+                            onTap: () => _changeDay(1),
+                            child: const Icon(Icons.chevron_right, size: 24),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-
-              Row(
-                children: [
-                  if (!isEditing)
-                    GestureDetector(
-                      onTap: () => setState(() => isEditing = true),
-                      child: const Icon(Icons.edit, size: 20),
-                    ),
-                  if (isEditing)
-                    GestureDetector(
-                      onTap: _saveDiary,
-                      child: const Icon(Icons.check,
-                          size: 22, color: Colors.green),
-                    ),
-
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () => _changeDay(1),
-                    child: const Icon(Icons.chevron_right, size: 26),
-                  ),
-                ],
-              )
-            ],
+              );
+            },
           ),
+
 
           const SizedBox(height: 16),
 
           // ---------------- 오늘 해야 할 일 ----------------
-          const Text("오늘 해야 할 일",
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text(
+            "오늘 해야 할 일",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 6),
 
-          isEditing
-              ? TextField(
-            controller: todoCtrl,
-            maxLines: 1,
-            decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12))),
-          )
-              : Text(todoCtrl.text.isEmpty ? "기록 없음" : todoCtrl.text,
-              style: TextStyle(color: Colors.grey.shade700)),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: isEditing
+                    ? TextField(
+                  controller: todoCtrl,
+                  minLines: 2,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.all(12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                )
+                    : Text(
+                  todoCtrl.text.isEmpty ? "기록 없음" : todoCtrl.text,
+                  style: TextStyle(
+                    color: Colors.grey.shade700,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 6),
+
+              // 휴지통 버튼 (편집모드에서만)
+              if (isEditing)
+                GestureDetector(
+                  onTap: () => setState(() => todoCtrl.clear()),
+                  child: const Icon(Icons.delete, color: Colors.red, size: 22),
+                ),
+            ],
+          ),
+
 
           const SizedBox(height: 18),
 
+
           // ---------------- 오늘 이야기 ----------------
-          const Text("오늘의 이야기",
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text(
+            "오늘의 이야기",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 6),
 
           isEditing ? _buildEditingStories() : _buildReadStories(),
         ],
       ),
+
     );
   }
 
@@ -1577,51 +1647,68 @@ class _TodayDiarySummaryCardState extends State<TodayDiarySummaryCard> {
   Widget _buildEditingStories() {
     return Column(
       children: [
-        for (int i = 0; i < stories.length; i++)
+        for (int i = 0; i < stories.length; i++) ...[
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // 텍스트 박스
               Expanded(
                 child: TextField(
                   controller: TextEditingController(text: stories[i])
                     ..selection = TextSelection.fromPosition(
                       TextPosition(offset: stories[i].length),
                     ),
-                  maxLines: 2,
+                  // 🔥 중앙 말고 왼쪽 위부터 입력되도록
+                  minLines: 3,   // 최소 3줄 높이
+                  maxLines: 5,   // 최대 5줄 (원하면 줄 수 조절 가능)
                   onChanged: (v) => stories[i] = v,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
+                    alignLabelWithHint: true,
+                    contentPadding: const EdgeInsets.all(12),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),
+
               const SizedBox(width: 6),
+
+              // 삭제 아이콘
               GestureDetector(
-                onTap: () => setState(() {
-                  stories.removeAt(i);
-                }),
-                child:
-                const Icon(Icons.remove_circle, color: Colors.red),
+                onTap: () => setState(() => stories.removeAt(i)),
+                child: const Icon(Icons.delete, color: Colors.red),
               ),
             ],
           ),
-        const SizedBox(height: 12),
 
-        GestureDetector(
-          onTap: () => setState(() => stories.add("")),
-          child: const Row(
-            children: [
-              Icon(Icons.add_circle, color: Colors.blue),
-              SizedBox(width: 4),
-              Text("이야기 추가"),
-            ],
+          // 🔥 이야기 박스들 사이 간격
+          const SizedBox(height: 8),
+        ],
+
+        const SizedBox(height: 4),
+
+        // "이야기 추가" 버튼
+        Center(
+          child: GestureDetector(
+            onTap: () => setState(() => stories.add("")),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.add_circle, color: Colors.blue),
+                SizedBox(width: 4),
+                Text("이야기 추가"),
+              ],
+            ),
           ),
-        )
+        ),
       ],
     );
   }
+
+
 }
 
 
