@@ -18,6 +18,7 @@ class JoinGroupScreen extends StatefulWidget {
 class _JoinGroupScreenState extends State<JoinGroupScreen> {
   final TextEditingController _codeController = TextEditingController();
   final TextEditingController _relationController = TextEditingController();
+  bool _isSubmitting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +112,7 @@ class _JoinGroupScreenState extends State<JoinGroupScreen> {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              onPressed: _onSubmit,
+              onPressed: _isSubmitting ? null : _onSubmit,
               child: const Text(
                 "그룹 참여하기",
                 style: TextStyle(
@@ -165,15 +166,22 @@ class _JoinGroupScreenState extends State<JoinGroupScreen> {
   // 🔥 제출/검증 로직
   // ================================
   Future<void> _onSubmit() async {
+    if (_isSubmitting) return; // 🔥 중복 방지
+
+    setState(() => _isSubmitting = true);
+
     final code = _codeController.text.trim();
     final relation = _relationController.text.trim();
 
     if (code.length != 6) {
       _showToast("초대 코드를 정확히 입력해주세요.");
+      setState(() => _isSubmitting = false);
       return;
     }
+
     if (relation.isEmpty) {
       _showToast("관계를 입력해주세요.");
+      setState(() => _isSubmitting = false);
       return;
     }
 
@@ -194,7 +202,6 @@ class _JoinGroupScreenState extends State<JoinGroupScreen> {
         box.put("nickname", info["babyNickname"]);
         box.put("startDate", info["startDate"]);
 
-        // controller에도 반영 → 주차 계산 가능
         widget.controller.saveInfo(
           nickname: info["babyNickname"],
           start: DateTime.parse(info["startDate"]),
@@ -202,9 +209,15 @@ class _JoinGroupScreenState extends State<JoinGroupScreen> {
         );
       }
 
+      final onboardBox = Hive.box("onboarding");
+      onboardBox.put("completed", true);
+      onboardBox.put("pregnancyMode", true);
+
+      setState(() => _isSubmitting = false);
       Navigator.pop(context, true);
     } else {
       _showToast(result["message"]);
+      setState(() => _isSubmitting = false);
     }
   }
 

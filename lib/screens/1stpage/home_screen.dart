@@ -388,11 +388,107 @@ class _HomeScreenState extends State<HomeScreen> {
                                               color: Colors.transparent,
                                               child: InkWell(
                                                 onTap: () {
+                                                  final box = Hive.box(
+                                                    'pregnancyBox',
+                                                  );
+                                                  final groupCode = box
+                                                      .get(
+                                                    'unique_key',
+                                                    defaultValue:
+                                                    "TEST123",
+                                                  );
+
+                                                  print(
+                                                    "🔥 Loaded groupCode = $groupCode",
+                                                  );
+
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
                                                       builder: (_) =>
-                                                          EditScreen(),
+                                                          CheckGroup(
+                                                            groupCode:
+                                                            groupCode,
+                                                          ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Ink(
+                                                  width: MediaQuery.of(
+                                                    context,
+                                                  ).size.width,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: EdgeInsets.all(20),
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons
+                                                              .person_add,
+                                                          color: Color(
+                                                            0xff909090,
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 10),
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              "멤버 초대",
+                                                              style: TextStyle(
+                                                                fontSize: 20,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 12),
+                                            //씽큐 플레이
+                                            Material(
+                                              color: Colors.transparent,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  final box = Hive.box(
+                                                    'pregnancyBox',
+                                                  );
+                                                  final groupCode = box
+                                                      .get(
+                                                    'unique_key',
+                                                    defaultValue:
+                                                    "TEST123",
+                                                  );
+
+                                                  print(
+                                                    "🔥 Loaded groupCode = $groupCode",
+                                                  );
+
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (_) =>
+                                                          CheckGroup(
+                                                            groupCode:
+                                                            groupCode,
+                                                          ),
                                                     ),
                                                   );
                                                 },
@@ -437,66 +533,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             ),
                                                             Text(
                                                               "LG와 다양한 브랜드의 제품",
-                                                              style: TextStyle(
-                                                                fontSize: 15,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(height: 12),
-                                            //씽큐 플레이
-                                            Material(
-                                              color: Colors.transparent,
-                                              child: InkWell(
-                                                onTap: () {},
-                                                child: Ink(
-                                                  width: MediaQuery.of(
-                                                    context,
-                                                  ).size.width,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
-                                                        ),
-                                                  ),
-                                                  child: Padding(
-                                                    padding: EdgeInsets.all(20),
-                                                    child: Row(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Icon(
-                                                          Icons
-                                                              .add_home_outlined,
-                                                          color: Color(
-                                                            0xffDB4F4F,
-                                                          ),
-                                                        ),
-                                                        SizedBox(width: 10),
-                                                        Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                              "ThinQ PLAY",
-                                                              style: TextStyle(
-                                                                fontSize: 20,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              "앱 다운로드와 제품 업그레이드",
                                                               style: TextStyle(
                                                                 fontSize: 15,
                                                               ),
@@ -661,32 +697,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   child: Column(
                                                     children: [
                                                       InkWell(
-                                                        onTap: () {
-                                                          final box = Hive.box(
-                                                            'pregnancyBox',
-                                                          );
-                                                          final groupCode = box
-                                                              .get(
-                                                                'unique_key',
-                                                                defaultValue:
-                                                                    "TEST123",
-                                                              );
-
-                                                          print(
-                                                            "🔥 Loaded groupCode = $groupCode",
-                                                          );
-
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                              builder: (_) =>
-                                                                  CheckGroup(
-                                                                    groupCode:
-                                                                        groupCode,
-                                                                  ),
-                                                            ),
-                                                          );
-                                                        },
+                                                        onTap: () {},
                                                         child: Ink(
                                                           child: Row(
                                                             crossAxisAlignment:
@@ -695,9 +706,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             children: [
                                                               Icon(
                                                                 Icons
-                                                                    .person_add,
+                                                                    .add_home_outlined,
                                                                 color: Color(
-                                                                  0xff909090,
+                                                                  0xffDB4F4F,
                                                                 ),
                                                               ),
                                                               SizedBox(
@@ -709,7 +720,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                         .start,
                                                                 children: [
                                                                   Text(
-                                                                    "멤버 초대",
+                                                                    "ThinQ PLAY",
                                                                     style: TextStyle(
                                                                       fontSize:
                                                                           20,

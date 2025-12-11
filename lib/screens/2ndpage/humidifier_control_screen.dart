@@ -136,12 +136,7 @@ class _HumidifierControlScreenState extends State<HumidifierControlScreen> {
                           title: isPowerOn ? '켜짐' : '꺼짐',
                           subtitle: '전원',
                           isActive: isPowerOn,
-                          onTap: () {
-                            setState(() {
-                              isPowerOn = !isPowerOn;
-                              _save();
-                            });
-                          },
+                          onTap: () {},
                         ),
 
                         SmallSettingTile(

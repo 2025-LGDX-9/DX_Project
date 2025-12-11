@@ -4,7 +4,7 @@ import '../models/member_model.dart';
 import '../models/pregnancy_user.dart';
 
 class ApiService {
-  final String baseUrl = "http://192.168.219.245:8001";  // FastAPI 서버 주소
+  final String baseUrl = "http://49.50.137.92:8001";  // FastAPI 서버 주소
 
   /// -----------------------------------------------------------------
   /// 1) 임신 정보 등록 API → 서버가 uniqueKey 생성하여 Flutter로 전달

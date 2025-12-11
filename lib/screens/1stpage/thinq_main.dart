@@ -274,59 +274,57 @@ class ThinqHomeScreen extends StatelessWidget {
                                                 // =============================
                                                 // 🔵 가족 계정 참여하기 버튼 (수정 버전) — bottom sheet 유지됨!
                                                 // =============================
-                                                Material(
-                                                  color: Colors.transparent,
-                                                  child: InkWell(
-                                                    onTap: () async {
-                                                      // ❗ bottom sheet 닫지 않음
-                                                      final result = await Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (_) => JoinGroupScreen(controller: controller),
-                                                        ),
-                                                      );
+                                                if (!hasPregnancyInfo)
+                                                  Material(
+                                                    color: Colors.transparent,
+                                                    child: InkWell(
+                                                      onTap: () async {
+                                                        final result = await Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (_) => JoinGroupScreen(controller: controller),
+                                                          ),
+                                                        );
 
-                                                      if (result == true) {
-                                                        Navigator.pop(context);
-                                                        if (onPregnancyModeChanged != null) {
-                                                          onPregnancyModeChanged!(true);
+                                                        if (result == true) {
+                                                          Navigator.pop(context);
+                                                          if (onPregnancyModeChanged != null) {
+                                                            onPregnancyModeChanged!(true);
+                                                          }
                                                         }
-                                                      } else {
-                                                        //
-                                                      }
-                                                    },
-                                                    child: Ink(
-                                                      width: MediaQuery.of(context).size.width,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius: BorderRadius.circular(20),
-                                                      ),
-                                                      child: Padding(
-                                                        padding: EdgeInsets.all(20),
-                                                        child: Row(
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            Icon(Icons.group_add, color: Color(0xff4A90E2)),
-                                                            SizedBox(width: 10),
-                                                            Column(
-                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                              children: [
-                                                                Text(
-                                                                  "가족 그룹 참여하기",
-                                                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                                                                ),
-                                                                Text(
-                                                                  "초대코드를 입력하여 그룹에 참여하세요.",
-                                                                  style: TextStyle(fontSize: 14, color: Colors.black54),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
+                                                      },
+                                                      child: Ink(
+                                                        width: MediaQuery.of(context).size.width,
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius: BorderRadius.circular(20),
+                                                        ),
+                                                        child: Padding(
+                                                          padding: EdgeInsets.all(20),
+                                                          child: Row(
+                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            children: [
+                                                              Icon(Icons.group_add, color: Color(0xff4A90E2)),
+                                                              SizedBox(width: 10),
+                                                              Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                children: [
+                                                                  Text(
+                                                                    "가족 그룹 참여하기",
+                                                                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                                  ),
+                                                                  Text(
+                                                                    "초대코드를 입력하여 그룹에 참여하세요.",
+                                                                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
                                                 SizedBox(height: 12),
 
 
