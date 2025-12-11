@@ -696,8 +696,6 @@ class ThinqHomeScreen extends StatelessWidget {
                                                   ),
                                                 ),
 
-
-
                                               ],
                                             ),
                                           ),
@@ -711,6 +709,7 @@ class ThinqHomeScreen extends StatelessWidget {
                                 "assets/images/pregnant_register.png",
                                 width: 30,
                                 height: 30,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -729,6 +728,7 @@ class ThinqHomeScreen extends StatelessWidget {
                               "assets/images/notification.png",
                               width: 25,
                               height: 25,
+                              color: Colors.white,
                             ),
                           ),
                           SizedBox(width: 10),
@@ -781,6 +781,7 @@ class ThinqHomeScreen extends StatelessWidget {
                               "assets/images/menu.png",
                               width: 30,
                               height: 30,
+                              color: Colors.white,
                             ),
                           ),
                         ],

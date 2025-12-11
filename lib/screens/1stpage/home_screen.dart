@@ -924,18 +924,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   IconData getMaterialIconByCode(int code) {
-    switch (code) {
-      case 0:
-        return Icons.ac_unit; // 에어컨
-      case 1:
-        return Icons.water_drop; // 가습기
-      case 2:
-        return Icons.air; // 공기청정기
-      case 3:
-        return Icons.smart_toy; // 로봇청소기
-      default:
-        return Icons.device_unknown;
-    }
+    // switch (code) {
+    //   case 0:
+    //     return Icons.ac_unit; // 에어컨
+    //   case 1:
+    //     return Icons.water_drop; // 가습기
+    //   case 2:
+    //     return Icons.air; // 공기청정기
+    //   case 3:
+    //     return Icons.smart_toy; // 로봇청소기
+    //   default:
+    //     return Icons.device_unknown;
+    // }
+    return IconData(code, fontFamily: 'MaterialIcons');
   }
 
   Widget _buildFavoriteDevicesSection() {

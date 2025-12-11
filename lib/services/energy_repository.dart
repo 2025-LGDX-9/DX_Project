@@ -7,7 +7,8 @@ class EnergyRepository {
   Future<void> fetchAndSaveLogs() async {
 
     try {
-      final url = "http://49.50.137.92:8001/getLogs";
+      // final url = "http://49.50.137.92:8001/getLogs";
+      final url = "http://192.168.0.104:8001/getLogs";
 
       final res = await http.get(Uri.parse(url));
 

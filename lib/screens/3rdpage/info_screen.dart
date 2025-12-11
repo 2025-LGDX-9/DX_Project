@@ -200,7 +200,7 @@ class _MeditationCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        '집에서 따라하는 10분 명상',
+                        '집에서 따라하는 10분 명상 영상',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(width: 5,),
@@ -236,18 +236,24 @@ class CategoryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    // 🔥 화면 크기에 따라 자동 조절되는 안전한 아이콘 크기
+    final double iconBoxSize = screenWidth * 0.16; // 폰: 60~65px / 태블릿: 80~100px
+    final double iconSize = iconBoxSize * 0.5;     // 아이콘 이미지 비율
+
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
       child: Column(
-        mainAxisSize: MainAxisSize.min, // 🔥 셀 안에서 필요 이상으로 안 늘어나게
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 56, // 🔥 조금 줄임 (64 → 56)
-            height: 56, // 🔥 조금 줄임
+            width: iconBoxSize,
+            height: iconBoxSize,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(iconBoxSize * 0.35),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.03),
@@ -258,17 +264,17 @@ class CategoryButton extends StatelessWidget {
             ),
             child: Center(
               child: SizedBox(
-                width: 28,
-                height: 28, // 살짝 줄임
+                width: iconSize,
+                height: iconSize,
                 child: icon,
               ),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 11),
+            style: const TextStyle(fontSize: 12),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -277,3 +283,4 @@ class CategoryButton extends StatelessWidget {
     );
   }
 }
+

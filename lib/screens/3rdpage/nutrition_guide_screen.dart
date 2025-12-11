@@ -236,10 +236,23 @@ class _NutritionGuideScreenState extends State<NutritionGuideScreen>
     required String image,
     required String title,
     required String buttonText,
-    required VoidCallback onPressed,   // ← 추가
+    required VoidCallback onPressed,
   }) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    // 👉 스마트폰 기준
+    const double phoneCardWidth = 150;
+
+    // 👉 태블릿 대응: 화면 너비 기반으로 자동 확대
+    //    (폰: 150px 고정, 태블릿: 화면 22~28% 차지)
+    final double cardWidth =
+    screenWidth < 600 ? phoneCardWidth : screenWidth * 0.25;
+
+    final double imageHeight =
+    screenWidth < 600 ? 120 : cardWidth * 0.7; // 태블릿에서 이미지도 비율 확대
+
     return Container(
-      width: 150,
+      width: cardWidth,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -254,24 +267,35 @@ class _NutritionGuideScreenState extends State<NutritionGuideScreen>
         children: [
           ClipRRect(
             borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16), topRight: Radius.circular(16)),
-            child: Image.asset(image, height: 120, width: 150, fit: BoxFit.cover),
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+            ),
+            child: Image.asset(
+              image,
+              height: imageHeight,
+              width: cardWidth,
+              fit: BoxFit.cover,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
               title,
               style: const TextStyle(
-                  fontWeight: FontWeight.bold, fontSize: 14),
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
           TextButton(
-            onPressed: onPressed,    // ← 여기 적용
+            onPressed: onPressed,
             child: Text(buttonText),
-          )
+          ),
         ],
       ),
     );
   }
+
 }
 

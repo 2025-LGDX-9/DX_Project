@@ -46,6 +46,8 @@ void main() async {
   await Hive.openBox('diary');
   await Hive.openBox<EnergyLog>('energy_logs');
 
+  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+
   final box = Hive.box('pregnancyBox');
   String? savedUniqueKey = box.get('unique_key');
   String? savedRelation = box.get('relation');
