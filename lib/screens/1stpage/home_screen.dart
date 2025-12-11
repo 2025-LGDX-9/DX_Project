@@ -37,6 +37,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late String uniqueKey;
+
+  final List<String> _babyMessasges = [
+    "엄마 오늘도 화이팅이에요!",
+    "엄마가 행복하면 제가 더 잘 자라요.",
+    "엄마는 생각보다 훨씬 강해요.",
+    "엄마, 가볍게 몸을 한번 쭉 늘려볼까요?",
+    "엄마, 잠깐 산책 어때요?",
+    "엄마, 햇빛 조금 쐬어도 좋아요. 따뜻한 기운이 느껴져요.",
+    "엄마, 오늘은 기분 좋은 향도 맡아봐요.",
+    "엄마, 오늘은 스스로에게 칭찬 한 마디 해줘요. 그 말이 제게도 와요.",
+    "엄마, 기분 좋은 공기를 들이켜봐요. 마음이 맑아져요.",
+    "엄마, 잠깐 스트레칭해서 어깨도 풀어봐요. 훨씬 좋아져요.",
+    "엄마, 조금만 쓰다듬어줘요.",
+  ];
+
   final List<String> _tipMessages = [
     // 축하 메시지 리스트 추가
     "이 시기엔 카페인 섭취를 조금 줄여보는 게 좋아요.",
@@ -74,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String _randomTip = "";
   String _randomDeviceTip = "";
+  String _randombabyMessage = "";
 
   bool _editMode = false;
   String _babyName = "우리 아기";
@@ -94,9 +111,14 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
 
+    final box = Hive.box('pregnancyBox');
+    uniqueKey = box.get('unique_key', defaultValue: "");
+
     _randomTip = _tipMessages[Random().nextInt(_tipMessages.length)];
     _randomDeviceTip =
         _deviceTipMessages[Random().nextInt(_deviceTipMessages.length)];
+    _randombabyMessage =
+    _babyMessasges[Random().nextInt(_babyMessasges.length)];
     _babyName = widget.controller.babyNickname ?? "우리 아기";
   }
 
@@ -1037,7 +1059,7 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
-              '저는 지금 헤엄치는 중이에요',
+              _randombabyMessage,
               style: TextStyle(color: Colors.red.shade400),
             ),
           ),
@@ -1299,6 +1321,7 @@ class TodayDiarySummaryCard extends StatefulWidget {
 class _TodayDiarySummaryCardState extends State<TodayDiarySummaryCard> {
   final diaryBox = Hive.box("diary");
 
+
   DateTime selectedDay = DateTime.now();
 
   bool isEditing = false;
@@ -1325,8 +1348,14 @@ class _TodayDiarySummaryCardState extends State<TodayDiarySummaryCard> {
 
     setState(() {});
 
+    final box = Hive.box('pregnancyBox');
+    final uniqueKey = box.get('unique_key', defaultValue: "");
+
     // 2) 서버에서 최신 데이터 가져오기
-    final serverData = await ApiService().loadCalendarData(key);
+    final serverData = await ApiService().loadCalendarData(
+      uniqueKey: uniqueKey,
+      writeDate: key,
+    );
 
     todoCtrl.text = serverData["todo"] ?? "";
     stories = List<String>.from(serverData["stories"] ?? []);
@@ -1343,15 +1372,19 @@ class _TodayDiarySummaryCardState extends State<TodayDiarySummaryCard> {
   void _saveDiary() async {
     String key = DateFormat("yyyy-MM-dd").format(selectedDay);
 
-    // 1) 로컬(Hive) 저장
+    final box = Hive.box('pregnancyBox');
+    final uniqueKey = box.get('unique_key', defaultValue: "");
+
+    // 로컬 저장
     stories.removeWhere((s) => s.trim().isEmpty);
     diaryBox.put(key, {
       "todo": todoCtrl.text,
-      "stories": stories.join("\n"),   // 리스트 → 문자열
+      "stories": stories.join("\n"),
     });
 
-    // 2) 서버 저장
+    // 서버 저장
     await ApiService().saveCalendarData(
+      uniqueKey: uniqueKey,
       writeDate: key,
       todo: todoCtrl.text,
       stories: stories,
@@ -1359,6 +1392,7 @@ class _TodayDiarySummaryCardState extends State<TodayDiarySummaryCard> {
 
     setState(() => isEditing = false);
   }
+
 
   void _changeDay(int offset) {
     selectedDay = selectedDay.add(Duration(days: offset));
@@ -1439,7 +1473,15 @@ class _TodayDiarySummaryCardState extends State<TodayDiarySummaryCard> {
               // 날짜 버튼
               InkWell(
                 borderRadius: BorderRadius.circular(8),
-                onTap: (){Navigator.push(context, MaterialPageRoute(builder: (_)=>CalendarScreen()));},
+                onTap: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => CalendarScreen()),
+                  ).then((_) {
+                    setState(() {});  // Home 화면도 갱신 필요하면 추가
+                  });
+
+                },
                 child: Padding(
                   padding:
                   const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

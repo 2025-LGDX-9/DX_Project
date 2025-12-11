@@ -32,13 +32,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
     super.initState();
     _selectedDay = DateTime.now();
     _loadDiary();
+    _loadMonthlyData();
   }
 
   // ---------------------------
   // LOAD
   // ---------------------------
-  void _loadDiary() async{
-    final day = _selectedDay!;   // ← null 아님 보증
+  void _loadDiary() async {
+    final day = _selectedDay!;   // null 아님 보증
     final key = DateFormat("yyyy-MM-dd").format(day);
 
     // 1) 로컬 먼저 로딩 (빠른 표시)
@@ -46,40 +47,95 @@ class _CalendarScreenState extends State<CalendarScreen> {
     todoCtrl.text = diary["todo"] ?? "";
 
     final diaryTextLocal = diary["stories"] ?? "";
-    stories = diaryTextLocal.toString().split("\n")
-        .where((e) => e.trim().isNotEmpty).toList();
+    stories = diaryTextLocal
+        .toString()
+        .split("\n")
+        .where((e) => e.trim().isNotEmpty)
+        .toList();
 
-    setState(() {});
+    setState(() {});   // 로컬 내용 먼저 보여주기
 
     // 2) 서버에서 최신 데이터 가져오기
-    final serverData = await ApiService().loadCalendarData(key);
+    final uniqueKey = Hive.box('pregnancyBox').get('uniqueKey')
+        ?? Hive.box('pregnancyBox').get('unique_key');
 
-    todoCtrl.text = serverData["todo"] ?? "";
-    stories = List<String>.from(serverData["stories"] ?? []);
+    final serverData = await api.loadCalendarData(
+      uniqueKey: uniqueKey,
+      writeDate: key,
+    );
 
-    // 3) 다시 로컬에 반영(자동 동기화)
-    diaryBox.put(key, {
-      "todo": todoCtrl.text,
-      "stories": stories.join("\n"),
-    });
+    // 서버에서 넘어온 값 정리
+    final serverTodo = (serverData["todo"] as String?) ?? "";
+    final serverStories =
+        (serverData["stories"] as List?)?.cast<String>() ?? [];
 
-    setState(() {});
+    // ❗ 서버에 실제 데이터가 있을 때만 로컬을 덮어쓴다
+    if (serverTodo.isNotEmpty || serverStories.isNotEmpty) {
+      todoCtrl.text = serverTodo;
+      stories = serverStories;
+
+      diaryBox.put(key, {
+        "todo": todoCtrl.text,
+        "stories": stories.join("\n"),
+      });
+
+      setState(() {});
+    }
   }
 
-  // ---------------------------
+  void _loadMonthlyData() async {
+    final now = DateTime.now();
+    final year = now.year;
+    final month = now.month;
+
+    final uniqueKey = Hive.box('pregnancyBox').get('uniqueKey')
+        ?? Hive.box('pregnancyBox').get('unique_key');
+
+    final monthly = await api.loadMonthlyCalendar(
+      uniqueKey: uniqueKey,
+      year: year,
+      month: month,
+    );
+
+    Map todoMap = monthly["todo"] ?? {};
+    Map storyMap = monthly["stories"] ?? {};
+
+    // Hive에 저장
+    todoMap.forEach((date, todo) {
+      diaryBox.put(date, {
+        "todo": todo,
+        "stories": (storyMap[date] ?? []).join("\n"),
+      });
+    });
+
+    // 🚀 이 부분이 **초 핵심**
+    setState(() {
+      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month, 1);
+    });
+  }
+
+
+
+
+
   // SAVE
-  // ---------------------------
   void _saveDiary() async {
     final day = _selectedDay!;
     final key = DateFormat("yyyy-MM-dd").format(day);
 
     diaryBox.put(key, {
       "todo": todoCtrl.text,
-      "stories": stories.join("\n"),   // 리스트 → 문자열
+      "stories": stories.join("\n"),
     });
+
+
+    final uniqueKey = Hive.box('pregnancyBox').get('uniqueKey')
+        ?? Hive.box('pregnancyBox').get('unique_key');
 
     // 2) 서버 저장
     await api.saveCalendarData(
+
+      uniqueKey: uniqueKey,
       writeDate: key,
       todo: todoCtrl.text,
       stories: stories,
@@ -370,6 +426,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   setState(() {
                                     stories.add(storyInputCtrl.text.trim());
                                   });
+
                                   _saveDiary();
                                   Navigator.pop(context);
                                 },
