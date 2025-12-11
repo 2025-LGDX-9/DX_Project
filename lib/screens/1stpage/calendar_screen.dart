@@ -152,10 +152,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
     String key = DateFormat("yyyy-MM-dd").format(day);
     final diary = diaryBox.get(key);
     String todo = diary?["todo"] ?? "";
+    String firstLine = todo.split("\n").first.trim();
 
     if (todo.isEmpty) return "";
-    if (todo.length <= 4) return todo;
-    return todo.substring(0, 4);
+    if (firstLine.length <= 4) return firstLine;
+    return firstLine.substring(0, 4);
   }
 
   // ---------------------------
